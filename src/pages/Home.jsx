@@ -108,7 +108,7 @@ export default function Home() {
       {/* --- CABEÇALHO --- */}
       <div style={{ textAlign: 'center', marginBottom: '30px' }}>
         <h1 style={{ fontSize: '3rem', fontWeight: '900', color: '#fff', letterSpacing: '1px', marginBottom: '5px' }}>
-          <span style={{ color: '#00d68f' }}>LGI</span>
+          <span style={{ color: '#00d68f' }}>Manager.Frotas</span>
         </h1>
         <p style={{ color: '#a0aec0', fontSize: '1rem' }}>Painel de Controle e Monitoramento</p>
       </div>

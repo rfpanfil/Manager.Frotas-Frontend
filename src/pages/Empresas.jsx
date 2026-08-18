@@ -3,8 +3,10 @@ import React, { useState, useEffect } from 'react';
 import { Building, Plus, X, Edit, Trash2 } from 'lucide-react';
 import api from '../services/api';
 import { SAAS_CONFIG, TODOS_MODULOS } from '../config/saas';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function Empresas() {
+    const { user, carregarPermissoesDoBackend } = useAuth();
     const [empresas, setEmpresas] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
@@ -66,6 +68,8 @@ export default function Empresas() {
             }
             setShowModal(false);
             carregarEmpresas();
+            // Atualiza o sidebar do usuário se ele estiver editando a própria empresa (ou para garantir, atualiza sempre)
+            await carregarPermissoesDoBackend();
         } catch (error) {
             console.error("Erro ao salvar empresa:", error);
             alert(error.response?.data?.detail || "Erro ao salvar empresa.");

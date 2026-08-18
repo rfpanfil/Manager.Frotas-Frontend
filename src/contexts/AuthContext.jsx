@@ -115,7 +115,8 @@ export function AuthProvider({ children }) {
       logout,
       signOut: logout,
       can,
-      trocarEmpresa // <--- Exporta a nova função
+      trocarEmpresa,
+      carregarPermissoesDoBackend
     }}>
       {children}
     </AuthContext.Provider>
