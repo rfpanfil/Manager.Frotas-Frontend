@@ -13,7 +13,7 @@
 
 Para facilitar a avaliação, o sistema conta com dados fictícios (empresa, veículos, ordem de compra) e um banco de dados de demonstração.
 
-Acesse o frontend hospedado na Vercel: **[Link será inserido aqui após o deploy]**
+Acesse o frontend hospedado na Vercel: **[https://manager-frotas-frontend.vercel.app](https://manager-frotas-frontend.vercel.app)**
 
 🔐 **Credenciais de Acesso (Mock):**
 - **Administrador:** `admin@demo.com` / `Demo@2026`
