@@ -1,0 +1,95 @@
+# ========================
+# GERAL
+# ========================
+*.log
+.DS_Store
+Thumbs.db
+
+# ========================
+# PYTHON (backend)
+# ========================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Ambientes virtuais
+venv/
+.env/
+.venv/
+ENV/
+env/
+
+# Ferramentas Python
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Streamlit / FastAPI
+.streamlit/
+*.sqlite3
+
+# ========================
+# NODE / REACT (frontend)
+# ========================
+node_modules/
+dist/
+build/
+.cache/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ========================
+# IDEs / EDITORES
+# ========================
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ========================
+# NEXTCLOUD / SISTEMA
+# ========================
+*.sync-conflict*
+
+
+*.db
+
+
+
+# ========================
+# DADOS SENSÍVEIS E BACKUPS
+# ========================
+backend/data/senha usuario postgrees.txt
+backend/data/*.txt
+backend/data/*.sql
+backend/data/log_backups.txt
+backend/*.env
+# Ignorar scripts de automação que contêm senhas
+*.bat
+backend/data/*.bat
+backend/app/routers/*.txt
+backend/data
+docker-compose.override.yml
+postgres-data/
+postgres-data
+backend/data/
+backend/alembic/versions/
+# Ignorar uploads e dados gerados (Checklists, Fotos, PDFs)
+backend_data/
+
+# ========================
+# ARQUIVOS DE AMBIENTE
+# ========================
+.env
+.env.*
+!.env.example
+
+# ========================
+# BACKUPS SQL
+# ========================
+*.sql
