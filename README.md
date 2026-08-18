@@ -5,7 +5,7 @@
 ![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=black)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-336791?logo=postgresql&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker&logoColor=white)
-![License](https://img.shields.io/badge/License-MIT-green.svg)
+![License](https://img.shields.io/badge/License-Proprietary-red.svg)
 
 **Manager.Frotas** é um sistema completo para gestão de frotas, compras e manutenção, desenvolvido sob uma arquitetura limpa (Domain-Driven Design), projetado para escalar.
 
@@ -36,28 +36,26 @@ O projeto adota uma arquitetura rigorosa:
 - **Hardening:** Senhas hasheadas via `bcrypt`, Rate Limiting (`slowapi`) para mitigar força bruta e Security Headers contra XSS.
 - **Isolamento de Dados (IDOR Protection):** As consultas backend injetam validações em nível de banco baseadas na propriedade dos dados pelo `current_user`.
 
-## 🚀 Como Rodar Localmente
-
-Certifique-se de ter o **Docker** e o **Docker Compose** instalados.
+## 🚀 Como Rodar Localmente (Frontend)
 
 1. **Clone o repositório:**
-   ```bash
-   git clone https://github.com/seu-usuario/Manager.Frotas.git
-   cd Manager.Frotas
-   ```
+   `ash
+   git clone https://github.com/rfpanfil/Manager.Frotas-Frontend.git
+   cd Manager.Frotas-Frontend
+   `
 
-2. **Configure o `.env`:**
-   Copie o arquivo de exemplo e ajuste se necessário:
-   ```bash
-   cp .env.example .env
-   ```
+2. **Instale as dependências:**
+   `ash
+   npm install
+   `
 
-3. **Suba os containers:**
-   ```bash
-   docker-compose up --build
-   ```
-   
-   O backend estará disponível em `http://localhost:8001` e o frontend em `http://localhost:3000`.
+3. **Inicie o servidor de desenvolvimento:**
+   `ash
+   npm run dev
+   `
+   O frontend estará disponível em http://localhost:3000.
+
+*(Nota: O backend de produção deste projeto possui código privado para proteger a lógica de negócios. O frontend consome a API de demonstração na nuvem).*
 
 ## 📄 Licença
 
