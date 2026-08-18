@@ -62,14 +62,23 @@ export default function Empresas() {
             if (editandoId) {
                 await api.put(`/empresas/${editandoId}`, formData);
                 alert("Empresa atualizada com sucesso!");
+                // Se o superadmin editou a empresa que ele está acessando no momento, atualizamos o storage e damos reload!
+                if (user?.empresa_atual?.id === editandoId) {
+                    const updatedUser = { ...user };
+                    updatedUser.modulos_ativos = formData.modulos_ativos;
+                    updatedUser.empresa_atual = { ...updatedUser.empresa_atual, modulos_ativos: formData.modulos_ativos };
+                    localStorage.setItem('loop_user', JSON.stringify(updatedUser));
+                }
             } else {
                 await api.post('/empresas/', formData);
                 alert("Empresa cadastrada com sucesso!");
             }
             setShowModal(false);
             carregarEmpresas();
-            // Atualiza o sidebar do usuário se ele estiver editando a própria empresa (ou para garantir, atualiza sempre)
-            await carregarPermissoesDoBackend();
+            // Atualiza o sidebar forçando o reload se o usuário atualizou a própria empresa (ou atualizar a sessão no futuro)
+            if (user?.empresa_atual?.id === editandoId) {
+                window.location.reload();
+            }
         } catch (error) {
             console.error("Erro ao salvar empresa:", error);
             alert(error.response?.data?.detail || "Erro ao salvar empresa.");
