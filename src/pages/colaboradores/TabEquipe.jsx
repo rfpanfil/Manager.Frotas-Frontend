@@ -91,6 +91,8 @@ export default function TabEquipe() {
 
             // --- LÓGICA DE ORDENAÇÃO ADICIONADA ---
             const listaOrdenada = response.data.sort((a, b) => {
+                // Se nenhum tiver data, consideramos iguais na ordem
+                if (!a.vencimento_cnh && !b.vencimento_cnh) return 0;
                 // Se não tiver data, joga para o final da lista
                 if (!a.vencimento_cnh) return 1;
                 if (!b.vencimento_cnh) return -1;
