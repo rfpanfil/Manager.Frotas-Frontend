@@ -63,7 +63,7 @@ export default function Empresas() {
                 await api.put(`/empresas/${editandoId}`, formData);
                 alert("Empresa atualizada com sucesso!");
                 // Se o superadmin editou a empresa que ele está acessando no momento, atualizamos o storage e damos reload!
-                if (user?.empresa_atual_id === editandoId || user?.empresa_id === editandoId) {
+                if (user?.empresa_atual_id == editandoId || user?.empresa_id == editandoId) {
                     const updatedUser = { ...user };
                     updatedUser.modulos_ativos = formData.modulos_ativos;
                     localStorage.setItem('loop_user', JSON.stringify(updatedUser));
@@ -75,7 +75,7 @@ export default function Empresas() {
             setShowModal(false);
             carregarEmpresas();
             // Atualiza o sidebar forçando o reload se o usuário atualizou a própria empresa (ou atualizar a sessão no futuro)
-            if (user?.empresa_atual_id === editandoId || user?.empresa_id === editandoId) {
+            if (user?.empresa_atual_id == editandoId || user?.empresa_id == editandoId) {
                 window.location.reload();
             }
         } catch (error) {
