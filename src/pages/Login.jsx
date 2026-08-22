@@ -46,8 +46,8 @@ export default function Login() {
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '10px' }}>
             <Truck size={48} color="#8B5CF6" />
           </div>
-          <h2 style={{ fontSize: '1.8rem', fontWeight: 'bold', margin: 0 }}>LGI</h2>
-          <p style={{ color: '#a0aec0', fontSize: '0.9rem' }}>Gestão Inteligente</p>
+          <h2 style={{ fontSize: '1.8rem', fontWeight: 'bold', margin: 0 }}>Manager.Frotas</h2>
+          <p style={{ color: '#a0aec0', fontSize: '0.9rem' }}>Plataforma SaaS de Gestão</p>
         </div>
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
@@ -93,7 +93,21 @@ export default function Login() {
           <p>E-mail: cog@loopservices.com.br</p>
           <p>Whatsapp: <a href="https://wa.me/5541998330048" style={{ color: '#8B5CF6' }}>+55 (41) 99833-0048</a></p>
         </div>
-      </div>
+                  <div style={{ marginTop: '20px', textAlign: 'center', borderTop: '1px solid #2d3748', paddingTop: '20px' }}>
+            <p style={{ color: '#a0aec0', fontSize: '0.9rem', marginBottom: '10px' }}>Ambiente de Demonstração (Portfólio)</p>
+            <button
+                onClick={() => { setIdentifier('admin@demo.com'); setPassword('Demo@2026'); }}
+                type="button"
+                style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+                width: '100%', padding: '10px', backgroundColor: '#2d3748', color: 'white',
+                border: '1px solid #4a5568', borderRadius: '8px', cursor: 'pointer', fontSize: '0.9rem'
+                }}
+            >
+                Preencher Credenciais de Teste
+            </button>
+            </div>
+        </div>
     </div>
   );
 }
