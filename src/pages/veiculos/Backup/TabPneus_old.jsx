@@ -7,6 +7,7 @@ import {
     ArrowDownCircle, X, Save, FileText, Calendar, User, Plus, Package, ArrowUpCircle, Edit, Trash2
 } from 'lucide-react';
 import Select from 'react-select';
+import toast from 'react-hot-toast';
 
 // Estilos padronizados para o React-Select
 const customSelectStyles = {
@@ -157,11 +158,11 @@ export default function TabPneus() {
                 data_evento: new Date().toISOString()
             });
 
-            alert("Pneu montado com sucesso!");
+            toast.success("Pneu montado com sucesso!");
             setModalSelecaoPneu(false);
             carregarDados();
         } catch (error) {
-            alert("Erro ao montar pneu: " + (error.response?.data?.detail || error.message));
+            toast.error("Erro ao montar pneu: " + (error.response?.data?.detail || error.message));
         }
     }
 
@@ -188,11 +189,11 @@ export default function TabPneus() {
                 status: pneuEditando.status
             };
             await api.put(`/pneus/${pneuEditando.id}/dados`, payload);
-            alert("Pneu atualizado com sucesso!");
+            toast.success("Pneu atualizado com sucesso!");
             setModalEdicao(false);
             carregarDados();
         } catch (error) {
-            alert("Erro ao salvar: " + (error.response?.data?.detail || error.message));
+            toast.error("Erro ao salvar: " + (error.response?.data?.detail || error.message));
         }
     }
 
@@ -205,7 +206,7 @@ export default function TabPneus() {
             const res = await api.get(`/pneus/${pneu.id}/historico`);
             setHistoricoData(res.data);
         } catch (error) {
-            alert("Erro ao carregar histórico.");
+            toast.error("Erro ao carregar histórico.");
         }
     }
 
@@ -219,7 +220,7 @@ export default function TabPneus() {
         return (
             <div
                 onClick={() => { // <--- CORRETO (um 'o')
-                    if (pneuAqui) alert(`Pneu ${pneuAqui.fogo || pneuAqui.dot} já está nesta posição.`);
+                    if (pneuAqui) toast(`Pneu ${pneuAqui.fogo || pneuAqui.dot} já está nesta posição.`);
                     else {
                         setPosicaoAlvo(posicao);
                         setBuscaModal(''); // <--- Limpa a busca ao abrir
@@ -307,12 +308,12 @@ export default function TabPneus() {
             // Força categoria PNEUS e controle SERIALIZADO
             const payload = { ...formModelo, categoria: 'PNEUS', tipo_controle: 'SERIALIZADO', unidade_medida: 'UN' };
             await api.post('/estoque/itens', payload);
-            alert("Modelo de pneu cadastrado com sucesso!");
+            toast.success("Modelo de pneu cadastrado com sucesso!");
             setModalNovoModelo(false);
             setModalTipoInclusao(false);
             carregarDados(); // Recarrega a lista de modelos
         } catch (error) {
-            alert("Erro ao criar modelo: " + (error.response?.data?.detail || error.message));
+            toast.error("Erro ao criar modelo: " + (error.response?.data?.detail || error.message));
         }
     }
 
@@ -328,12 +329,12 @@ export default function TabPneus() {
             };
 
             await api.post('/estoque/movimentar', payload);
-            alert("Entrada realizada com sucesso! Os pneus estão no estoque.");
+            toast.success("Entrada realizada com sucesso! Os pneus estão no estoque.");
             setModalEntrada(false);
             setModalTipoInclusao(false);
             carregarDados(); // Recarrega o dashboard e lista de pneus
         } catch (error) {
-            alert("Erro na entrada: " + (error.response?.data?.detail || error.message));
+            toast.error("Erro na entrada: " + (error.response?.data?.detail || error.message));
         }
     }
 

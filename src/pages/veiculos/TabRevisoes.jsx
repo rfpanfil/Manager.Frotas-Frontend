@@ -6,6 +6,7 @@ import { Wrench, PlusCircle, Trash2, AlertTriangle, CheckCircle, Clock, X, Searc
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import Select from 'react-select';
+import toast from 'react-hot-toast';
 
 const customSelectStyles = {
     container: (base) => ({ ...base, width: '100%' }),
@@ -61,7 +62,7 @@ export default function Revisoes() {
 
     async function carregarDados() {
         try {
-            const [resRev, resVei] = await Promise.all([api.get('/revisoes/'), api.get('/veiculos/')]);
+            const [resRev, resVei] = await Promise.all([api.get('/revisoes/'), api.get('/veiculos/resumo')]);
             setRevisoes(resRev.data);
             setVeiculos(resVei.data);
         } catch (error) { console.error("Erro ao carregar:", error); }
@@ -96,7 +97,7 @@ export default function Revisoes() {
     // --- FUNÇÕES DE API ---
     async function criarPlano(e) {
         e.preventDefault();
-        if (!formPlano.veiculo_id) return alert("Por favor, selecione um veículo.");
+        if (!formPlano.veiculo_id) return toast.error("Por favor, selecione um veículo.");
         try {
             // Ocultamos a data e o KM inicial no momento da criação para satisfazer o banco de dados
             const payload = {
@@ -108,10 +109,10 @@ export default function Revisoes() {
             };
 
             await api.post('/revisoes/', payload);
-            alert("Plano configurado com sucesso! Agora você já pode registrar a primeira execução na lista.");
+            toast.success("Plano configurado com sucesso! Agora você já pode registrar a primeira execução na lista.");
             setModalNovoPlanoAberto(false);
             carregarDados();
-        } catch (error) { alert("Erro ao salvar: " + (error.response?.data?.detail || error.message)); }
+        } catch (error) { toast.error("Erro ao salvar: " + (error.response?.data?.detail || error.message)); }
     }
 
     async function registrarExecucao(e) {
@@ -122,10 +123,10 @@ export default function Revisoes() {
                 km_revisao: parseFloat(formRegistro.km_revisao),
                 observacao: formRegistro.observacao
             });
-            alert("Revisão registrada com sucesso!");
+            toast.success("Revisão registrada com sucesso!");
             setModalRegistroAberto(false);
             carregarDados();
-        } catch (error) { alert("Erro ao registrar: " + (error.response?.data?.detail || error.message)); }
+        } catch (error) { toast.error("Erro ao registrar: " + (error.response?.data?.detail || error.message)); }
     }
 
     async function abrirHistorico(r) {
@@ -134,13 +135,13 @@ export default function Revisoes() {
             const res = await api.get(`/revisoes/${r.id}/historico`);
             setHistoricoLogs(res.data);
             setModalHistoricoAberto(true);
-        } catch (error) { alert("Erro ao carregar histórico."); }
+        } catch (error) { toast.error("Erro ao carregar histórico."); }
     }
 
     async function handleDelete(id) {
         if (confirm("Excluir este plano de revisão completamente? (O histórico também será apagado)")) {
             try { await api.delete(`/revisoes/${id}`); carregarDados(); }
-            catch (error) { alert("Erro ao excluir."); }
+            catch (error) { toast.error("Erro ao excluir."); }
         }
     }
 

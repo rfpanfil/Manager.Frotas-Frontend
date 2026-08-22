@@ -1,6 +1,8 @@
 // Arquivo: frontend/src/contexts/AuthContext.jsx
 import { createContext, useState, useEffect, useContext } from 'react';
+import * as Sentry from '@sentry/react';
 import api from '../services/api';
+import toast from 'react-hot-toast';
 
 const AuthContext = createContext({});
 
@@ -25,6 +27,7 @@ export function AuthProvider({ children }) {
         const parsedUser = JSON.parse(userStorage);
         api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
         setUser(parsedUser);
+        Sentry.setUser({ id: parsedUser.id, empresa_id: parsedUser.empresa_id, cargo: parsedUser.cargo });
 
         if (permStorage) {
           setPermissoes(JSON.parse(permStorage));
@@ -68,6 +71,7 @@ export function AuthProvider({ children }) {
     api.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
 
     setUser(usuarioLogado);
+    Sentry.setUser({ id: usuarioLogado.id, empresa_id: usuarioLogado.empresa_id, cargo: usuarioLogado.cargo });
     await carregarPermissoesDoBackend();
   }
 
@@ -86,13 +90,14 @@ export function AuthProvider({ children }) {
       api.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
 
       setUser(usuarioLogado);
+      Sentry.setUser({ id: usuarioLogado.id, empresa_id: usuarioLogado.empresa_id, cargo: usuarioLogado.cargo });
       await carregarPermissoesDoBackend();
 
       // Dá um refresh na página para limpar os estados velhos da memória do React
       window.location.href = '/';
     } catch (error) {
       console.error("Erro ao trocar de empresa:", error);
-      alert("Erro ao tentar trocar de empresa.");
+      toast.error("Erro ao tentar trocar de empresa.");
     }
   }
 
@@ -103,6 +108,7 @@ export function AuthProvider({ children }) {
     api.defaults.headers.common['Authorization'] = undefined;
     setUser(null);
     setPermissoes([]);
+    Sentry.setUser(null);
   }
 
   return (
@@ -115,8 +121,7 @@ export function AuthProvider({ children }) {
       logout,
       signOut: logout,
       can,
-      trocarEmpresa,
-      carregarPermissoesDoBackend
+      trocarEmpresa // <--- Exporta a nova função
     }}>
       {children}
     </AuthContext.Provider>

@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import api from '../services/api';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import MarkerClusterGroup from 'react-leaflet-cluster';
 import 'leaflet/dist/leaflet.css';
 import { Truck, RefreshCcw, User, Wifi, WifiOff, MapPin } from 'lucide-react';
 import L from 'leaflet';
@@ -149,53 +150,55 @@ export default function MapaFrota() {
 
                     <ControladorMapa foco={focoMapa} />
 
-                    {listaExibicao.map((item) => (
-                        (item.latitude && item.longitude) && (
-                            <Marker
-                                key={item.id}
-                                position={[item.latitude, item.longitude]}
-                                icon={customIcon}
-                                eventHandlers={{
-                                    click: () => setFocoMapa({ lat: item.latitude, lon: item.longitude }),
-                                }}
-                            >
-                                <Popup minWidth={250}>
-                                    <div style={{ textAlign: 'center' }}>
-                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px', marginBottom: '5px', color: '#2d3748' }}>
-                                            <User size={16} />
-                                            <strong style={{ fontSize: '1.1rem' }}>{item.colaborador}</strong>
-                                        </div>
-
-                                        <div style={{ background: '#f7fafc', padding: '5px', borderRadius: '5px', fontSize: '0.9rem', marginBottom: '10px' }}>
-                                            🚗 {item.veiculo}
-                                        </div>
-
-                                        <div style={{ textAlign: 'left', fontSize: '0.85rem', color: '#4a5568', marginBottom: '10px', paddingLeft: '5px', borderLeft: '3px solid #3182ce' }}>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                                                <MapPin size={12} /> <strong>Destino:</strong>
+                    <MarkerClusterGroup chunkedLoading>
+                        {listaExibicao.map((item) => (
+                            (item.latitude && item.longitude) && (
+                                <Marker
+                                    key={item.id}
+                                    position={[item.latitude, item.longitude]}
+                                    icon={customIcon}
+                                    eventHandlers={{
+                                        click: () => setFocoMapa({ lat: item.latitude, lon: item.longitude }),
+                                    }}
+                                >
+                                    <Popup minWidth={250}>
+                                        <div style={{ textAlign: 'center' }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px', marginBottom: '5px', color: '#2d3748' }}>
+                                                <User size={16} />
+                                                <strong style={{ fontSize: '1.1rem' }}>{item.colaborador}</strong>
                                             </div>
-                                            {item.destino.split('|')[0]}
-                                        </div>
 
-                                        <hr style={{ margin: '5px 0', border: '0', borderTop: '1px solid #eee' }} />
-
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.8rem' }}>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
-                                                {item.status_conexao === 'Online' ? <Wifi size={14} color="#00d68f" /> : <WifiOff size={14} color="#e53e3e" />}
-                                                <span style={{ color: item.status_conexao === 'Online' ? '#00d68f' : '#e53e3e', fontWeight: 'bold' }}>
-                                                    {item.status_conexao}
-                                                </span>
+                                            <div style={{ background: '#f7fafc', padding: '5px', borderRadius: '5px', fontSize: '0.9rem', marginBottom: '10px' }}>
+                                                🚗 {item.veiculo}
                                             </div>
-                                            <div><strong>{item.velocidade} km/h</strong></div>
+
+                                            <div style={{ textAlign: 'left', fontSize: '0.85rem', color: '#4a5568', marginBottom: '10px', paddingLeft: '5px', borderLeft: '3px solid #3182ce' }}>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                                                    <MapPin size={12} /> <strong>Destino:</strong>
+                                                </div>
+                                                {item.destino.split('|')[0]}
+                                            </div>
+
+                                            <hr style={{ margin: '5px 0', border: '0', borderTop: '1px solid #eee' }} />
+
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.8rem' }}>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
+                                                    {item.status_conexao === 'Online' ? <Wifi size={14} color="#00d68f" /> : <WifiOff size={14} color="#e53e3e" />}
+                                                    <span style={{ color: item.status_conexao === 'Online' ? '#00d68f' : '#e53e3e', fontWeight: 'bold' }}>
+                                                        {item.status_conexao}
+                                                    </span>
+                                                </div>
+                                                <div><strong>{item.velocidade} km/h</strong></div>
+                                            </div>
+                                            <div style={{ fontSize: '0.7rem', color: '#a0aec0', marginTop: '3px', textAlign: 'right' }}>
+                                                {new Date(item.ultima_atualizacao).toLocaleTimeString()}
+                                            </div>
                                         </div>
-                                        <div style={{ fontSize: '0.7rem', color: '#a0aec0', marginTop: '3px', textAlign: 'right' }}>
-                                            {new Date(item.ultima_atualizacao).toLocaleTimeString()}
-                                        </div>
-                                    </div>
-                                </Popup>
-                            </Marker>
-                        )
-                    ))}
+                                    </Popup>
+                                </Marker>
+                            )
+                        ))}
+                    </MarkerClusterGroup>
                 </MapContainer>
 
                 <div style={{

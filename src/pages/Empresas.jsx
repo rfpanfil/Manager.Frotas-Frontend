@@ -3,10 +3,9 @@ import React, { useState, useEffect } from 'react';
 import { Building, Plus, X, Edit, Trash2 } from 'lucide-react';
 import api from '../services/api';
 import { SAAS_CONFIG, TODOS_MODULOS } from '../config/saas';
-import { useAuth } from '../contexts/AuthContext';
+import toast from 'react-hot-toast';
 
 export default function Empresas() {
-    const { user, carregarPermissoesDoBackend } = useAuth();
     const [empresas, setEmpresas] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
@@ -32,7 +31,7 @@ export default function Empresas() {
             setEmpresas(res.data);
         } catch (error) {
             console.error("Erro ao buscar empresas:", error);
-            alert("Erro ao carregar as empresas. Verifique se você é um Super Admin.");
+            toast.error("Erro ao carregar as empresas. Verifique se você é um Super Admin.");
         } finally {
             setLoading(false);
         }
@@ -56,31 +55,21 @@ export default function Empresas() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!formData.nome_fantasia) return alert("O Nome Fantasia é obrigatório.");
+        if (!formData.nome_fantasia) return toast.error("O Nome Fantasia é obrigatório.");
 
         try {
             if (editandoId) {
                 await api.put(`/empresas/${editandoId}`, formData);
-                alert("Empresa atualizada com sucesso!");
-                // Se o superadmin editou a empresa que ele está acessando no momento, atualizamos o storage e damos reload!
-                if (user?.empresa_atual_id == editandoId || user?.empresa_id == editandoId) {
-                    const updatedUser = { ...user };
-                    updatedUser.modulos_ativos = formData.modulos_ativos;
-                    localStorage.setItem('loop_user', JSON.stringify(updatedUser));
-                }
+                toast.success("Empresa atualizada com sucesso!");
             } else {
                 await api.post('/empresas/', formData);
-                alert("Empresa cadastrada com sucesso!");
+                toast.success("Empresa cadastrada com sucesso!");
             }
             setShowModal(false);
             carregarEmpresas();
-            // Atualiza o sidebar forçando o reload se o usuário atualizou a própria empresa (ou atualizar a sessão no futuro)
-            if (user?.empresa_atual_id == editandoId || user?.empresa_id == editandoId) {
-                window.location.reload();
-            }
         } catch (error) {
             console.error("Erro ao salvar empresa:", error);
-            alert(error.response?.data?.detail || "Erro ao salvar empresa.");
+            toast.error(error.response?.data?.detail || "Erro ao salvar empresa.");
         }
     };
 
@@ -89,10 +78,10 @@ export default function Empresas() {
 
         try {
             await api.delete(`/empresas/${id}`);
-            alert("Empresa excluída com sucesso.");
+            toast.success("Empresa excluída com sucesso.");
             carregarEmpresas();
         } catch (error) {
-            alert(error.response?.data?.detail || "Erro ao excluir empresa.");
+            toast.error(error.response?.data?.detail || "Erro ao excluir empresa.");
         }
     };
 

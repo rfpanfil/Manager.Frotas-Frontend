@@ -32,4 +32,23 @@ api.interceptors.request.use(async (config) => {
   return config;
 });
 
-export default api;
+api.interceptors.response.use(
+  // Respostas bem-sucedidas passam direto
+  (response) => response,
+
+  // Tratamento centralizado de erros HTTP
+  (error) => {
+    if (error.response?.status === 401) {
+      // Token expirado ou inválido — força logout imediato
+      localStorage.removeItem('loop_token');
+      localStorage.removeItem('loop_user');
+      localStorage.removeItem('loop_perms');
+      window.location.href = '/login';
+    }
+    // Para todos os outros erros (403, 404, 500, rede...), repassa para
+    // o .catch() do componente que fez a chamada tratar individualmente.
+    return Promise.reject(error);
+  }
+);
+
+export default api;

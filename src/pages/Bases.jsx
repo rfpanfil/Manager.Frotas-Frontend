@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
 import { Building, Plus, Trash2, Search } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 export default function Bases() {
     const { can } = useAuth();
@@ -28,14 +29,14 @@ export default function Bases() {
         try {
             await api.post('/bases/', { nome: novaBase });
             setNovaBase('');
-            alert("Base criada com sucesso!"); // <--- ALERTA ADICIONADO AQUI
+            toast.success("Base criada com sucesso!"); // <--- ALERTA ADICIONADO AQUI
             carregarBases();
-        } catch (e) { alert("Erro ao criar base. Verifique se já existe."); }
+        } catch (e) { toast.error("Erro ao criar base. Verifique se já existe."); }
     }
 
     async function handleDelete(id) {
         if(!confirm("Excluir esta base?")) return;
-        try { await api.delete(`/bases/${id}`); carregarBases(); } catch(e) { alert("Erro ao excluir."); }
+        try { await api.delete(`/bases/${id}`); carregarBases(); } catch(e) { toast.error("Erro ao excluir."); }
     }
 
     return (

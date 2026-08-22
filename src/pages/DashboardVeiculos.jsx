@@ -5,6 +5,7 @@ import { Truck, FileText, Filter, ChevronDown, ChevronRight } from 'lucide-react
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import Select from 'react-select';
+import toast from 'react-hot-toast';
 
 const customSelectStyles = {
     control: (base, state) => ({
@@ -69,7 +70,7 @@ export default function DashboardVeiculos() {
     async function carregarAuxiliares() {
         try {
             const [resVeiculos, resAnos, resTipos] = await Promise.all([
-                api.get('/veiculos/'),
+                api.get('/veiculos/resumo'), // endpoint leve — sem renavam, apólice, chassi
                 api.get('/dashboard/anos'),
                 api.get('/opcoes/tipos-gasto')
             ]);
@@ -130,7 +131,7 @@ export default function DashboardVeiculos() {
     // ===== EXPORTAR PDF CORRIGIDO (COM COMBUSTÍVEL) =====
     function exportarPDF() {
         if (!dados || dados.length === 0) {
-            alert("Não há dados para exportar.");
+            toast.error("Não há dados para exportar.");
             return;
         }
         setGerandoPDF(true);
@@ -208,7 +209,7 @@ export default function DashboardVeiculos() {
             doc.save(`Performance_Frota_${new Date().getTime()}.pdf`);
         } catch (error) {
             console.error("Erro PDF:", error);
-            alert("Erro ao gerar PDF: " + error.message);
+            toast.error("Erro ao gerar PDF: " + error.message);
         } finally {
             setGerandoPDF(false);
         }
@@ -297,7 +298,7 @@ export default function DashboardVeiculos() {
                                             setUsarFiltroPeriodo(true);
                                             setMenuPeriodoAberto(false);
                                         } else {
-                                            alert("Selecione data inicial e final");
+                                            toast.error("Selecione data inicial e final");
                                         }
                                     }}
                                     style={{

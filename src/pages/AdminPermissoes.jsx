@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 import { Shield, Check, X, Save, PlusCircle } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 export default function AdminPermissoes() {
     const [cargos, setCargos] = useState([]);
@@ -18,7 +19,7 @@ export default function AdminPermissoes() {
             setModulos(res.data.estrutura.modulos);
             setMatriz(res.data.matriz);
         } catch (error) {
-            alert("Erro ao carregar matriz. Verifique se é admin.");
+            toast.error("Erro ao carregar matriz. Verifique se é admin.");
         } finally { setLoading(false); }
     }
 
@@ -38,7 +39,7 @@ export default function AdminPermissoes() {
                 ativo: !temPermissao
             });
         } catch (error) {
-            alert("Erro ao salvar permissão.");
+            toast.error("Erro ao salvar permissão.");
             carregarMatriz(); // Reverte em caso de erro
         }
     }
@@ -50,10 +51,10 @@ export default function AdminPermissoes() {
         try {
             // Usa a rota existente no backend
             await api.post('/usuarios/cargos/', { nome });
-            alert(`Cargo '${nome}' criado! Configure as permissões na nova coluna à direita.`);
+            toast.success(`Cargo '${nome}' criado! Configure as permissões na nova coluna à direita.`);
             carregarMatriz(); // Recarrega a tabela para mostrar a nova coluna
         } catch (error) {
-            alert("Erro ao criar cargo: " + (error.response?.data?.detail || error.message));
+            toast.error("Erro ao criar cargo: " + (error.response?.data?.detail || error.message));
         }
     }
 

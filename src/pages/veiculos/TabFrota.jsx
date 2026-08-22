@@ -7,6 +7,7 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import Select from 'react-select';
 import CreatableSelect from 'react-select/creatable';
+import toast from 'react-hot-toast';
 
 // Estilos padronizados
 const customSelectStyles = {
@@ -131,7 +132,7 @@ export default function Veiculos() {
                     stateUpdater(prev => [...prev, res.data].sort((a, b) => a.nome.localeCompare(b.nome)));
                     setForm(prev => ({ ...prev, [fieldName]: novoNome }));
                 } catch (error) {
-                    alert("Erro ao cadastrar: " + (error.response?.data?.detail || error.message));
+                    toast.error("Erro ao cadastrar: " + (error.response?.data?.detail || error.message));
                 }
             }
         } else {
@@ -177,24 +178,37 @@ export default function Veiculos() {
             if (!payload.ano) delete payload.ano;
             if (!payload.vencimento_seguro) delete payload.vencimento_seguro;
 
-            if (editandoId) { await api.put(`/veiculos/${editandoId}`, payload); alert("Atualizado!"); }
-            else { await api.post('/veiculos/', payload); alert("Cadastrado!"); }
+            if (editandoId) { await api.put(`/veiculos/${editandoId}`, payload); toast.success("Atualizado!"); }
+            else { await api.post('/veiculos/', payload); toast("Cadastrado!"); }
 
             setModalAberto(false);
             setEditandoId(null);
             setForm(initialForm);
             const res = await api.get('/veiculos/');
             setVeiculos(res.data);
-        } catch (error) { alert("Erro ao salvar."); }
+        } catch (error) { toast.error("Erro ao salvar."); }
     }
 
     async function handleDelete(id) {
         if (!confirm("Excluir?")) return;
-        try { await api.delete(`/veiculos/${id}`); carregarDados(); } catch (error) { alert("Erro."); }
+        try { await api.delete(`/veiculos/${id}`); carregarDados(); } catch (error) { toast.error("Erro."); }
     }
 
-    function abrirModal(v = null) {
-        if (v) { setEditandoId(v.id); setForm(v); }
+    async function abrirModal(v = null) {
+        if (v) { 
+            const tid = toast.loading("Carregando dados completos...");
+            try {
+                const res = await api.get(`/veiculos/${v.id}`);
+                setEditandoId(v.id); 
+                setForm(res.data);
+                toast.dismiss(tid);
+            } catch (error) {
+                console.error("Erro no abrirModal:", error);
+                toast.dismiss(tid);
+                toast.error("Erro ao carregar dados do veículo.");
+                return;
+            }
+        }
         else { setEditandoId(null); setForm(initialForm); }
         setModalAberto(true);
     }

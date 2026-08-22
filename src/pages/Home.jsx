@@ -46,60 +46,35 @@ export default function Home() {
 
   async function carregarDados() {
     try {
-      const response = await api.get('/gastos/?limit=1000');
-      const gastos = response.data;
-      processarDados(gastos);
+      // Usa o endpoint dedicado de dashboard — retorna apenas os KPIs prontos.
+      // Elimina o over-fetching antérior que baixava GET /gastos/?limit=1000 inteiro
+      // só para fazer aritmética no frontend.
+      const hoje = new Date();
+      const mes = hoje.getMonth() + 1;
+      const ano = hoje.getFullYear();
+
+      const response = await api.get('/dashboard/gastos', { params: { ano, mes } });
+      const { cards, grafico_semanal } = response.data;
+
+      const nomesMeses = ["JANEIRO", "FEVEREIRO", "MARÇO", "ABRIL", "MAIO", "JUNHO",
+        "JULHO", "AGOSTO", "SETEMBRO", "OUTUBRO", "NOVEMBRO", "DEZEMBRO"];
+      setMesNome(nomesMeses[hoje.getMonth()]);
+
+      setKpis({
+        hoje: cards.hoje || 0,
+        ontem: 0, // o endpoint não calcula "ontem" — fica zerado até criarmos um card específico
+        mesAtual: cards.mes || 0
+      });
+
+      // Usa o gráfico semanal como evolução rápida na home
+      setChartData(
+        (grafico_semanal || []).map((d, i) => ({ dia: d.dia, valor: d.valor }))
+      );
     } catch (error) {
       console.error("Erro ao carregar dados da home:", error);
     } finally {
       setLoading(false);
     }
-  }
-
-  function processarDados(gastos) {
-    const agora = new Date();
-    const hojeStr = agora.toISOString().split('T')[0];
-
-    const ontemData = new Date(agora);
-    ontemData.setDate(ontemData.getDate() - 1);
-    const ontemStr = ontemData.toISOString().split('T')[0];
-
-    const mesAtual = agora.getMonth();
-    const anoAtual = agora.getFullYear();
-
-    const nomesMeses = ["JANEIRO", "FEVEREIRO", "MARÇO", "ABRIL", "MAIO", "JUNHO", "JULHO", "AGOSTO", "SETEMBRO", "OUTUBRO", "NOVEMBRO", "DEZEMBRO"];
-    setMesNome(nomesMeses[mesAtual]);
-
-    let totalHoje = 0;
-    let totalOntem = 0;
-    let totalMes = 0;
-
-    const diasNoMes = new Date(anoAtual, mesAtual + 1, 0).getDate();
-    const dadosGrafico = Array.from({ length: diasNoMes }, (_, i) => ({
-      dia: i + 1,
-      valor: 0
-    }));
-
-    gastos.forEach(g => {
-      const dataGasto = new Date(g.data);
-      const dataGastoStr = g.data.split('T')[0];
-      const valor = parseFloat(g.valor);
-
-      if (dataGasto.getMonth() === mesAtual && dataGasto.getFullYear() === anoAtual) {
-        totalMes += valor;
-        // Pega o dia da string 'YYYY-MM-DD' para evitar fuso horário
-        const diaReal = parseInt(g.data.split('-')[2]);
-        if (dadosGrafico[diaReal - 1]) {
-          dadosGrafico[diaReal - 1].valor += valor;
-        }
-      }
-
-      if (dataGastoStr === hojeStr) totalHoje += valor;
-      if (dataGastoStr === ontemStr) totalOntem += valor;
-    });
-
-    setKpis({ hoje: totalHoje, ontem: totalOntem, mesAtual: totalMes });
-    setChartData(dadosGrafico);
   }
 
   return (
@@ -108,7 +83,7 @@ export default function Home() {
       {/* --- CABEÇALHO --- */}
       <div style={{ textAlign: 'center', marginBottom: '30px' }}>
         <h1 style={{ fontSize: '3rem', fontWeight: '900', color: '#fff', letterSpacing: '1px', marginBottom: '5px' }}>
-          <span style={{ color: '#00d68f' }}>Manager.Frotas</span>
+          <span style={{ color: '#00d68f' }}>LGI</span>
         </h1>
         <p style={{ color: '#a0aec0', fontSize: '1rem' }}>Painel de Controle e Monitoramento</p>
       </div>

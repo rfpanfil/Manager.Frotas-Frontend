@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import api from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 import { Users, PlusCircle, Trash2, Edit, Shield, ShieldAlert, User, ChevronDown, ChevronRight, Briefcase, Truck } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 export default function Usuarios() {
   const { user: currentUser, can } = useAuth();
@@ -61,24 +62,34 @@ export default function Usuarios() {
   }
 
 
-  function handleEdit(usuario) {
-    const dadosColaborador = usuario.colaborador || {};
+  async function handleEdit(usuario) {
+    const tid = toast.loading("Carregando dados completos...");
+    try {
+      const res = await api.get(`/usuarios/${usuario.id}`);
+      const userCompleto = res.data;
+      const dadosColaborador = userCompleto.colaborador || {};
 
-    setFormData({
-      id: usuario.id,
-      nome: usuario.nome,
-      celular: usuario.celular,
-      email: usuario.email || '',
-      login: usuario.login,
-      senha: '',
-      cargo: usuario.cargo,
+      setFormData({
+        id: userCompleto.id,
+        nome: userCompleto.nome,
+        celular: userCompleto.celular,
+        email: userCompleto.email || '',
+        login: userCompleto.login,
+        senha: '',
+        cargo: userCompleto.cargo,
 
-      cpf: dadosColaborador.cpf || '',
-      tipo_cnh: dadosColaborador.tipo_cnh || '',
-      vencimento_cnh: dadosColaborador.vencimento_cnh || '',
-      base: dadosColaborador.base || ''
-    });
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+        cpf: dadosColaborador.cpf || '',
+        tipo_cnh: dadosColaborador.tipo_cnh || '',
+        vencimento_cnh: dadosColaborador.vencimento_cnh || '',
+        base: dadosColaborador.base || ''
+      });
+      toast.dismiss(tid);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (error) {
+      console.error("Erro no handleEdit:", error);
+      toast.dismiss(tid);
+      toast.error("Erro ao carregar dados do usu�rio.");
+    }
   }
 
   function handleCancel() {
@@ -109,21 +120,21 @@ export default function Usuarios() {
 
       // Validação Específica para Colaboradores Operacionais
       if (!formData.id && isOperacional) {
-        if (!payload.cpf) return alert("CPF é obrigatório para perfis operacionais.");
+        if (!payload.cpf) return toast.error("CPF é obrigatório para perfis operacionais.");
         // CNH não é mais obrigatória para todos!
       }
 
       if (formData.id) {
         await api.put(`/usuarios/${formData.id}`, payload);
-        alert("Usuário atualizado!");
+        toast.success("Usuário atualizado!");
       } else {
-        if (!formData.senha) return alert("Senha obrigatória.");
+        if (!formData.senha) return toast("Senha obrigatória.");
         await api.post('/usuarios/', payload);
 
         if (isOperacional) {
-          alert("Usuário e Ficha Operacional criados com sucesso!");
+          toast.success("Usuário e Ficha Operacional criados com sucesso!");
         } else {
-          alert("Usuário criado com sucesso!");
+          toast.success("Usuário criado com sucesso!");
         }
       }
       handleCancel();
@@ -131,14 +142,14 @@ export default function Usuarios() {
     } catch (error) {
       let msg = error.response?.data?.detail || error.message;
       if (Array.isArray(msg)) msg = msg.map(d => d.msg).join('\n');
-      alert("Erro: " + msg);
+      toast.error("Erro: " + msg);
     }
   }
 
   async function handleDelete(id) {
     if (!window.confirm("Excluir usuário?")) return;
     try { await api.delete(`/usuarios/${id}`); carregarDados(); }
-    catch (error) { alert("Erro ao excluir."); }
+    catch (error) { toast.error("Erro ao excluir."); }
   }
 
   function getCargoIcon(cargo) {

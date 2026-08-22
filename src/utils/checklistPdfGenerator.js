@@ -439,7 +439,7 @@ export const gerarRelatorioDetalhado = async (veiculosFiltrados) => {
   }
 
   const totalVeiculos = veiculosComChecklist.length;
-  console.log(`Iniciando geração de relatório para ${totalVeiculos} veículo(s)...`);
+  
 
   for (let i = 0; i < veiculosComChecklist.length; i++) {
     const veiculo = veiculosComChecklist[i];
@@ -485,7 +485,7 @@ export const gerarRelatorioDetalhado = async (veiculosFiltrados) => {
         y += 5;
       }
 
-      console.log(`Veículo ${i + 1}/${totalVeiculos} processado: ${veiculo.placa}`);
+      
     } catch (error) {
       console.error(`Erro ao processar veículo ${veiculo.placa}:`, error);
 
@@ -521,5 +521,5 @@ export const gerarRelatorioDetalhado = async (veiculosFiltrados) => {
 
   doc.save(nomeArquivo);
 
-  console.log(`Relatório gerado com sucesso: ${nomeArquivo}`);
+  
 };

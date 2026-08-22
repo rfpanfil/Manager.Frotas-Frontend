@@ -45,8 +45,8 @@ export default function Login() {
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '10px' }}>
             <Truck size={48} color="#00d68f" />
           </div>
-          <h2 style={{ fontSize: '1.8rem', fontWeight: 'bold', margin: 0 }}>Manager.Frotas</h2>
-          <p style={{ color: '#a0aec0', fontSize: '0.9rem' }}>Acesso ao Sistema</p>
+          <h2 style={{ fontSize: '1.8rem', fontWeight: 'bold', margin: 0 }}>LGI</h2>
+          <p style={{ color: '#a0aec0', fontSize: '0.9rem' }}>Gestão Inteligente</p>
         </div>
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
@@ -87,11 +87,10 @@ export default function Login() {
           </button>
         </form>
 
-        <div style={{ marginTop: '30px', textAlign: 'center', fontSize: '0.85rem', color: '#718096', borderTop: '1px solid #333', paddingTop: '20px' }}>
-          <p style={{ marginBottom: '8px', fontWeight: 'bold', color: '#a0aec0' }}>Acesso de Demonstração:</p>
-          <p style={{ margin: '4px 0' }}>Admin: <span style={{ color: '#00d68f' }}>admin@demo.com</span></p>
-          <p style={{ margin: '4px 0' }}>Operador: <span style={{ color: '#00d68f' }}>operador@demo.com</span></p>
-          <p style={{ margin: '4px 0', marginTop: '10px' }}>Senha universal: <span style={{ color: '#00d68f' }}>Demo@2026</span></p>
+        <div style={{ marginTop: '30px', textAlign: 'center', fontSize: '0.8rem', color: '#718096', borderTop: '1px solid #333', paddingTop: '20px' }}>
+          <p>Para acessar o sistema, entre em contato com o COG:</p>
+          <p>E-mail: cog@loopservices.com.br</p>
+          <p>Whatsapp: <a href="https://wa.me/5541998330048" style={{ color: '#00d68f' }}>+55 (41) 99833-0048</a></p>
         </div>
       </div>
     </div>

@@ -11,6 +11,8 @@ import { format } from "date-fns";
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { gerarRelatorioDetalhadoColab } from '../../utils/checklistColabPdfGenerator';
+import toast from 'react-hot-toast';
+import imageCompression from 'browser-image-compression';
 
 registerLocale('pt-BR', ptBR);
 
@@ -110,15 +112,20 @@ export default function TabChecklistColab() {
             const dados = res.data;
             const resps = {};
             checklistItensDef.forEach(def => { resps[`${def.nome_item}_1`] = { status: '', observacao: '', categoria: def.categoria, foto: null, foto_path: null }; });
-            if (dados.itens) {
+            if (dados.itens && Array.isArray(dados.itens)) {
                 dados.itens.forEach(item => {
-                    if (item.indice === 1 && resps[`${item.nome_item}_1`]) {
-                        resps[`${item.nome_item}_1`] = { status: item.status || '', observacao: item.observacao || '', foto_path: item.foto_path, categoria: item.categoria };
+                    if (item.indice === 1) {
+                        resps[`${item.nome_item}_1`] = { 
+                            status: item.status || '', 
+                            observacao: item.observacao || '', 
+                            foto_path: item.foto_path, 
+                            categoria: item.categoria 
+                        };
                     }
                 });
             }
             setFormData({ data_verificacao: dados.data_verificacao.slice(0, 10), usuario_id: dados.usuario_id, status: dados.status || 'FINALIZADO', respostas: resps });
-        } catch (e) { alert("Erro ao carregar"); }
+        } catch (e) { toast.error("Erro ao carregar"); }
     }
 
     function handleRespostaChange(chave, campo, valor) {
@@ -126,9 +133,23 @@ export default function TabChecklistColab() {
         setFormData(p => ({ ...p, respostas: { ...p.respostas, [chave]: { ...p.respostas[chave], [campo]: valor } } }));
     }
 
-    function handleFileChange(chave, e) {
+    async function handleFileChange(chave, e) {
         if (isReadOnly) return;
-        setFormData(p => ({ ...p, respostas: { ...p.respostas, [chave]: { ...p.respostas[chave], foto: e.target.files[0] } } }));
+        const file = e.target.files[0];
+        if (!file) return;
+
+        try {
+            const options = {
+                maxSizeMB: 0.8,
+                maxWidthOrHeight: 1920,
+                useWebWorker: true
+            };
+            const compressedFile = await imageCompression(file, options);
+            setFormData(p => ({ ...p, respostas: { ...p.respostas, [chave]: { ...p.respostas[chave], foto: compressedFile } } }));
+        } catch (error) {
+            console.error("Erro ao comprimir imagem:", error);
+            toast.error("Erro ao processar a imagem.");
+        }
     }
 
     async function handleSubmitChecklist(e, statusFinal) {
@@ -147,7 +168,7 @@ export default function TabChecklistColab() {
                     faltantes.push(`- Foto: ${k.replace('_1', '')}`);
                 }
             });
-            if (faltantes.length > 0) return alert(`⚠️ Pendências:\n${faltantes.slice(0, 10).join('\n')}`);
+            if (faltantes.length > 0) return toast(`⚠️ Pendências:\n${faltantes.slice(0, 10).join('\n')}`);
         }
 
         const itensSalvar = []; const files = [];
@@ -175,15 +196,15 @@ export default function TabChecklistColab() {
 
         try {
             await api.post('/checklists-colab/', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
-            alert('Checklist salvo!'); setShowModalChecklist(false); setFabOpen(false); carregarTudo();
-        } catch (e) { alert("Erro ao salvar"); }
+            toast('Checklist salvo!'); setShowModalChecklist(false); setFabOpen(false); carregarTudo();
+        } catch (e) { toast.error("Erro ao salvar"); }
     }
 
     async function handleStatusChange(st) {
         try {
             await api.patch(`/checklists-colab/${colabSelecionado.checklist_id}/status`, { status: st });
-            alert("Status atualizado!"); setShowModalChecklist(false); setFabOpen(false); carregarTudo();
-        } catch (e) { alert("Erro"); }
+            toast.success("Status atualizado!"); setShowModalChecklist(false); setFabOpen(false); carregarTudo();
+        } catch (e) { toast.error("Erro"); }
     }
 
     // --- FUNÇÕES DE GERENCIAMENTO (MODAL) ---
@@ -194,7 +215,7 @@ export default function TabChecklistColab() {
             else await api.post('/checklists-colab/definicoes', formItem);
             setEditingItem(null); setFormItem({ nome_item: '', categoria: 'EPI', quantidade_padrao: 1, ativo: true });
             const res = await api.get('/checklists-colab/definicoes'); setChecklistItensDef(res.data);
-        } catch (e) { alert("Erro"); }
+        } catch (e) { toast.error("Erro"); }
     }
     async function handleDeleteItem(id) {
         if (confirm("Excluir item?")) { await api.delete(`/checklists-colab/definicoes/${id}`); const res = await api.get('/checklists-colab/definicoes'); setChecklistItensDef(res.data); }
@@ -206,12 +227,36 @@ export default function TabChecklistColab() {
             await api.post('/checklists-colab/config', formCargo);
             setFormCargo({ cargo_alvo: '', exige_foto: true });
             carregarTudo(); // Recarrega os configs e a dashboard
-        } catch (e) { alert("Erro"); }
+        } catch (e) { toast.error("Erro"); }
     }
     async function handleDeleteCargo(id) {
         if (confirm("Parar de exigir checklist para este cargo?")) {
             await api.delete(`/checklists-colab/config/${id}`);
             carregarTudo();
+        }
+    }
+
+    async function handleVerFoto(fotoSource) {
+        if (!fotoSource) return;
+
+        if (fotoSource instanceof File || fotoSource instanceof Blob) {
+            const url = window.URL.createObjectURL(fotoSource);
+            window.open(url, '_blank');
+            return;
+        }
+
+        if (typeof fotoSource === 'string' && (fotoSource.startsWith('http://') || fotoSource.startsWith('https://'))) {
+            window.open(fotoSource, '_blank');
+            return;
+        }
+
+        try {
+            const filename = fotoSource.split(/[/\\\\]/).pop();
+            const res = await api.get(`/checklists-colab/foto/${filename}`, { responseType: 'blob' });
+            const url = window.URL.createObjectURL(new Blob([res.data]));
+            window.open(url, '_blank');
+        } catch (e) {
+            toast.error("Erro ao carregar a foto.");
         }
     }
 
@@ -266,14 +311,14 @@ export default function TabChecklistColab() {
 
             {/* MODAL CHECKLIST */}
             {showModalChecklist && (
-                <div className="modal-overlay" style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', zIndex: 1000, display: 'flex', justifyContent: 'center' }}>
-                    <div className="modal-content-responsivo" style={{ background: '#1a202c', width: '100%', maxWidth: '900px', borderRadius: 8, padding: 20, height: 'fit-content', margin: 'auto' }}>
+                <div className="modal-overlay" style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', zIndex: 1000, overflowY: 'auto', display: 'flex', justifyContent: 'center', alignItems: 'flex-start', padding: '20px' }}>
+                    <div className="modal-content-responsivo px-2 py-4 md:px-10 md:py-6" style={{ background: '#1a202c', width: '100%', maxWidth: '900px', borderRadius: 8, height: 'fit-content', margin: 'auto' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 15, background: '#2d3748', padding: 15, borderRadius: 5 }}>
                             <h3 style={{ margin: 0, color: '#ecc94b' }}>{isReadOnly ? 'Inspeção:' : 'Avaliar:'} {colabSelecionado?.nome}</h3>
                             <button onClick={() => setShowModalChecklist(false)} style={{ background: 'none', border: 'none', color: '#e53e3e', cursor: 'pointer' }}><X size={24} /></button>
                         </div>
 
-                        <div className="checklist-scroll-area" style={{ maxHeight: '65vh', overflowY: 'auto', paddingBottom: 80 }}>
+                        <div className="checklist-scroll-area" style={{ maxHeight: '65vh', overflowY: 'auto', overflowX: 'hidden', boxSizing: 'border-box', paddingBottom: '15px' }}>
                             {Object.keys(itensPorCategoria).map(cat => (
                                 <div key={cat} style={{ marginBottom: 20 }}>
                                     <h3 style={{ borderBottom: '1px solid #444', color: '#00d68f', paddingBottom: 5 }}>{cat}</h3>
@@ -281,27 +326,41 @@ export default function TabChecklistColab() {
                                         const chave = `${def.nome_item}_1`;
                                         const dados = formData.respostas[chave] || { status: '', observacao: '', foto: null };
                                         return (
-                                            <div key={chave} className="checklist-item-grid" style={{ marginBottom: 10, background: '#2d3748', padding: 10, borderRadius: 5 }}>
-                                                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                                                    <span style={{ width: 25, height: 25, borderRadius: '50%', background: 'black', color: 'white', display: 'flex', justifyContent: 'center', alignItems: 'center', border: '1px solid #00d68f', fontSize: '0.8rem' }}>{def.quantidade_padrao}x</span>
-                                                    <strong>{def.nome_item}</strong>
+                                            <div key={chave} className="checklist-item-grid" style={{ border: '1px solid #4a5568', borderRadius: '8px', padding: '12px', marginBottom: '15px', boxSizing: 'border-box', width: '100%' }}>
+                                                {/* ÁREA NOME */}
+                                                <div className="chk-area-name" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                                    <span style={{ flexShrink: 0, width: 32, height: 32, borderRadius: '50%', background: 'black', color: 'white', display: 'flex', justifyContent: 'center', alignItems: 'center', border: '2px solid #047857', fontSize: '1rem', fontWeight: 'bold' }}>{def.quantidade_padrao}x</span>
+                                                    <span style={{ fontSize: '0.9rem', fontWeight: '500', lineHeight: '1.2' }}>{def.nome_item}</span>
                                                 </div>
-                                                <select disabled={isReadOnly} value={dados.status} onChange={e => handleRespostaChange(chave, 'status', e.target.value)} style={{ width: '100%', padding: 8, borderRadius: 4, background: dados.status === 'OK' ? '#00d68f' : dados.status === 'RUIM' ? '#e53e3e' : dados.status === 'FALTANTE' ? '#ecc94b' : '#1a202c', color: 'white', marginTop: 10 }}>
+
+                                                {/* ÁREA STATUS */}
+                                                <select className="chk-area-status" disabled={isReadOnly} value={dados.status} onChange={e => handleRespostaChange(chave, 'status', e.target.value)} style={{ width: '100%', padding: 8, borderRadius: 4, background: dados.status === 'OK' ? '#047857' : dados.status === 'RUIM' ? '#b91c1c' : dados.status === 'FALTANTE' ? '#b45309' : '#1a202c', color: 'white', fontWeight: 'bold', border: '1px solid #555' }}>
                                                     <option value="" disabled>Status...</option><option value="OK">OK</option><option value="RUIM">RUIM</option><option value="FALTANTE">FALTANTE</option><option value="N/A">N/A</option>
                                                 </select>
-                                                <input disabled={isReadOnly} type="text" placeholder="Observações" value={dados.observacao} onChange={e => handleRespostaChange(chave, 'observacao', e.target.value)} style={{ width: '100%', padding: 8, borderRadius: 4, background: '#1a202c', border: '1px solid #444', color: 'white', marginTop: 10 }} />
 
-                                                {/* CONDICIONAL DA FOTO BASEADO NA CONFIGURAÇÃO DO CARGO */}
-                                                {colabSelecionado?.exige_foto && (
-                                                    <div style={{ marginTop: 10 }}>
-                                                        {isReadOnly ? (dados.foto_path ? <span style={{ color: '#00d68f' }}><Camera size={16} /> Tem Foto</span> : <span style={{ color: '#a0aec0' }}>Sem Foto</span>) : (
-                                                            <label style={{ cursor: 'pointer', background: dados.foto || dados.foto_path ? '#00d68f' : '#4a5568', padding: 8, borderRadius: 4, display: 'flex', justifyContent: 'center', color: 'white' }}>
-                                                                <Camera size={16} /> <span style={{ marginLeft: 5 }}>{dados.foto || dados.foto_path ? 'Alterar' : 'Anexar Foto (Obrigatório)'}</span>
-                                                                <input type="file" accept="image/*" onChange={e => handleFileChange(chave, e)} style={{ display: 'none' }} />
-                                                            </label>
-                                                        )}
-                                                    </div>
-                                                )}
+                                                {/* ÁREA OBSERVAÇÃO */}
+                                                <input className="chk-area-obs" disabled={isReadOnly} type="text" placeholder="Observações" value={dados.observacao} onChange={e => handleRespostaChange(chave, 'observacao', e.target.value)} style={{ width: '100%', padding: 8, borderRadius: 4, background: '#1a202c', border: '1px solid #444', color: 'white', boxSizing: 'border-box' }} />
+
+                                                {/* ÁREA FOTO */}
+                                                <div className="chk-area-foto" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                                                    {colabSelecionado?.exige_foto && (
+                                                        <>
+                                                            {isReadOnly ? (
+                                                                dados.foto_path ? <span style={{ color: '#047857', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: 5 }}><Camera size={16} /> Tem Foto</span> : <span style={{ color: '#a0aec0', fontSize: '0.8rem' }}>Sem Foto</span>
+                                                            ) : (
+                                                                <label style={{ cursor: 'pointer', background: dados.foto || dados.foto_path ? '#047857' : '#4a5568', padding: '8px', borderRadius: 4, display: 'flex', justifyContent: 'center', alignItems: 'center', color: 'white', width: '100%', transition: 'background 0.2s' }}>
+                                                                    <Camera size={16} /> <span className="hidden xl:inline" style={{ marginLeft: 5, whiteSpace: 'nowrap', fontSize: '0.8rem', fontWeight: 'bold' }}>{dados.foto || dados.foto_path ? 'Alterar' : 'Foto'}</span>
+                                                                    <input type="file" accept="image/*" onChange={e => handleFileChange(chave, e)} style={{ display: 'none' }} />
+                                                                </label>
+                                                            )}
+                                                            {(dados.foto_path || dados.foto) && (
+                                                                <button type="button" onClick={() => handleVerFoto(dados.foto || dados.foto_path)} style={{ background: '#2c5282', color: 'white', padding: '8px', borderRadius: 4, border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, width: '100%', transition: 'background 0.2s' }}>
+                                                                    <Eye size={16} /> <span className="hidden xl:inline" style={{ whiteSpace: 'nowrap', fontSize: '0.8rem' }}>Ver</span>
+                                                                </button>
+                                                            )}
+                                                        </>
+                                                    )}
+                                                </div>
                                             </div>
                                         )
                                     })}
@@ -309,27 +368,20 @@ export default function TabChecklistColab() {
                             ))}
                         </div>
 
-                        {/* FAB BOTÕES */}
-                        <div style={{ position: 'absolute', bottom: 20, right: 20, display: 'flex', flexDirection: 'column-reverse', alignItems: 'flex-end', gap: 10 }}>
-                            <button onClick={() => setFabOpen(!fabOpen)} style={{ width: 60, height: 60, borderRadius: '50%', background: '#3182ce', color: 'white', border: 'none', cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                                {fabOpen ? <X size={30} /> : <Settings size={26} />}
-                            </button>
-                            {fabOpen && (
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                                    {!isReadOnly ? (
-                                        <>
-                                            <button onClick={e => handleSubmitChecklist(e, 'FINALIZADO')} style={{ background: '#00d68f', padding: '10px 20px', borderRadius: 20, border: 'none', fontWeight: 'bold', cursor: 'pointer' }}><CheckCircle size={16} /> Finalizar</button>
-                                            <button onClick={e => handleSubmitChecklist(e, 'PENDENTE')} style={{ background: '#ecc94b', padding: '10px 20px', borderRadius: 20, border: 'none', fontWeight: 'bold', cursor: 'pointer' }}><Save size={16} /> Rascunho</button>
-                                        </>
-                                    ) : (
-                                        podeAprovar && formData.status !== 'PENDENTE' && (
-                                            <>
-                                                <button onClick={() => handleStatusChange('APROVADO')} style={{ background: '#00d68f', padding: '10px 20px', borderRadius: 20, border: 'none', fontWeight: 'bold', cursor: 'pointer' }}><CheckCircle size={16} /> Aprovar</button>
-                                                <button onClick={() => handleStatusChange('REPROVADO')} style={{ background: '#e53e3e', padding: '10px 20px', borderRadius: 20, border: 'none', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}><X size={16} /> Reprovar</button>
-                                            </>
-                                        )
-                                    )}
-                                </div>
+                        {/* BOTÕES DESKTOP FIXOS NO RODAPÉ */}
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '15px', justifyContent: 'flex-end', marginTop: 20, paddingTop: 15, borderTop: '1px solid #444', width: '100%', boxSizing: 'border-box' }}>
+                            {!isReadOnly ? (
+                                <>
+                                    <button onClick={e => handleSubmitChecklist(e, 'PENDENTE')} style={{ background: '#b45309', padding: '10px 20px', borderRadius: 4, border: 'none', color: 'white', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}><Save size={18} /> Rascunho</button>
+                                    <button onClick={e => handleSubmitChecklist(e, 'FINALIZADO')} style={{ background: '#3182ce', padding: '10px 20px', borderRadius: 4, border: 'none', color: 'white', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}><CheckCircle size={18} /> Finalizar</button>
+                                </>
+                            ) : (
+                                podeAprovar && formData.status !== 'PENDENTE' && (
+                                    <>
+                                        <button onClick={() => handleStatusChange('REPROVADO')} style={{ background: '#b91c1c', padding: '10px 20px', borderRadius: 4, border: 'none', color: 'white', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}><X size={18} /> Reprovar</button>
+                                        <button onClick={() => handleStatusChange('APROVADO')} style={{ background: '#047857', padding: '10px 20px', borderRadius: 4, border: 'none', color: 'white', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}><CheckCircle size={18} /> Aprovar</button>
+                                    </>
+                                )
                             )}
                         </div>
                     </div>

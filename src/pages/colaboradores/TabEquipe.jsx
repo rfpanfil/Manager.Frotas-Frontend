@@ -6,6 +6,7 @@ import { PlusCircle, Users, Edit, Trash2, XCircle, FileText, X, Search, Filter, 
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import Select from 'react-select'; // Importando o Select para os novos filtros
+import toast from 'react-hot-toast';
 
 // Estilos para o React Select (Modo Escuro)
 const customSelectStyles = {
@@ -91,8 +92,6 @@ export default function TabEquipe() {
 
             // --- LÓGICA DE ORDENAÇÃO ADICIONADA ---
             const listaOrdenada = response.data.sort((a, b) => {
-                // Se nenhum tiver data, consideramos iguais na ordem
-                if (!a.vencimento_cnh && !b.vencimento_cnh) return 0;
                 // Se não tiver data, joga para o final da lista
                 if (!a.vencimento_cnh) return 1;
                 if (!b.vencimento_cnh) return -1;
@@ -137,9 +136,9 @@ export default function TabEquipe() {
                 await api.post(`/colaboradores/${editandoId}/cnh`, formData, {
                     headers: { 'Content-Type': 'multipart/form-data' }
                 });
-                alert("Documento anexado com sucesso!");
+                toast.success("Documento anexado com sucesso!");
                 carregarColaboradores();
-            } catch (error) { alert("Erro ao enviar documento."); }
+            } catch (error) { toast.error("Erro ao enviar documento."); }
         } else if (e.target.files && e.target.files[0]) {
             // Apenas guarda o arquivo se for cadastro novo
             setArquivoCNH(e.target.files[0]);
@@ -221,10 +220,10 @@ export default function TabEquipe() {
 
             if (editandoId) {
                 res = await api.put(`/colaboradores/${editandoId}`, payload);
-                alert("Colaborador atualizado!");
+                toast.success("Colaborador atualizado!");
             } else {
                 res = await api.post('/colaboradores/', payload);
-                alert("Colaborador cadastrado!");
+                toast("Colaborador cadastrado!");
             }
 
             // Upload do arquivo pendente (se for cadastro novo)
@@ -239,31 +238,42 @@ export default function TabEquipe() {
             fecharModal();
             carregarColaboradores();
         } catch (error) {
-            alert("Erro ao salvar: " + (error.response?.data?.detail || error.message));
+            toast.error("Erro ao salvar: " + (error.response?.data?.detail || error.message));
         }
     }
 
     async function handleDelete(id) {
         if (confirm("Tem certeza que deseja excluir este colaborador?")) {
             try { await api.delete(`/colaboradores/${id}`); carregarColaboradores(); }
-            catch (error) { alert("Erro ao excluir."); }
+            catch (error) { toast.error("Erro ao excluir."); }
         }
     }
 
-    function abrirModal(colaborador = null) {
+    async function abrirModal(colaborador = null) {
         setArquivoCNH(null);
         if (colaborador) {
-            setEditandoId(colaborador.id);
-            setForm({
-                nome: colaborador.nome,
-                tipo_colaborador: colaborador.tipo_colaborador || 'Técnico', // Adicionado Cargo
-                cpf: colaborador.cpf,
-                tipo_cnh: colaborador.tipo_cnh || '',
-                vencimento_cnh: colaborador.vencimento_cnh,
-                base: colaborador.base || '',
-                status: colaborador.status || 'Ativo', // Status carregado
-                cnh_path: colaborador.cnh_path
-            });
+            const tid = toast.loading("Carregando dados completos...");
+            try {
+                const res = await api.get(`/colaboradores/${colaborador.id}`);
+                const c = res.data;
+                setEditandoId(c.id);
+                setForm({
+                    nome: c.nome,
+                    tipo_colaborador: c.tipo_colaborador || 'Técnico',
+                    cpf: c.cpf,
+                    tipo_cnh: c.tipo_cnh || '',
+                    vencimento_cnh: c.vencimento_cnh,
+                    base: c.base || '',
+                    status: c.status || 'Ativo',
+                    cnh_path: c.cnh_path
+                });
+                toast.dismiss(tid);
+            } catch (error) {
+                console.error("Erro no abrirModal:", error);
+                toast.dismiss(tid);
+                toast.error("Erro ao carregar dados do colaborador.");
+                return;
+            }
         } else {
             setEditandoId(null);
             setForm(initialForm);
@@ -304,7 +314,7 @@ export default function TabEquipe() {
     }
 
     function abrirCNH(path) {
-        if (!path) return alert("Nenhum arquivo anexado.");
+        if (!path) return toast.error("Nenhum arquivo anexado.");
         const url = `http://localhost:8000/files/${path}`;
         window.open(url, '_blank');
     }

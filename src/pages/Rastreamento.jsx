@@ -11,6 +11,7 @@ import { useAuth } from '../contexts/AuthContext'; // <--- IMPORTADO
 // Configuração de ícones
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+import toast from 'react-hot-toast';
 let DefaultIcon = L.icon({ iconUrl: icon, shadowUrl: iconShadow, iconAnchor: [12, 41] });
 L.Marker.prototype.options.icon = DefaultIcon;
 
@@ -77,7 +78,7 @@ export default function Rastreamento() {
     }));
 
     async function buscarHistorico() {
-        if (!selectedColaborador) return alert("Selecione um colaborador");
+        if (!selectedColaborador) return toast.error("Selecione um colaborador");
 
         setLoading(true);
         setResultado(null);
@@ -92,13 +93,13 @@ export default function Rastreamento() {
             });
 
             if (res.data.pontos.length === 0) {
-                alert("Nenhum dado encontrado para este colaborador nesta data."); // Texto ajustado
+                toast.error("Nenhum dado encontrado para este colaborador nesta data."); // Texto ajustado
             } else {
                 setResultado(res.data);
             }
         } catch (error) {
             console.error(error);
-            alert("Erro ao buscar histórico.");
+            toast.error("Erro ao buscar histórico.");
         } finally {
             setLoading(false);
         }

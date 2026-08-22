@@ -6,6 +6,7 @@ import { PlusCircle, Users, Edit, Trash2, XCircle, FileText, X, Search, Filter, 
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import Select from 'react-select'; // Importando o Select para os novos filtros
+import toast from 'react-hot-toast';
 
 // Estilos para o React Select (Modo Escuro)
 const customSelectStyles = {
@@ -122,9 +123,9 @@ export default function Motoristas() {
               await api.post(`/motoristas/${editandoId}/cnh`, formData, {
                   headers: { 'Content-Type': 'multipart/form-data' }
               });
-              alert("CNH anexada com sucesso!");
+              toast.success("CNH anexada com sucesso!");
               carregarMotoristas();
-          } catch (error) { alert("Erro ao enviar CNH."); }
+          } catch (error) { toast.error("Erro ao enviar CNH."); }
       } else if (e.target.files && e.target.files[0]) {
           // Apenas guarda o arquivo se for cadastro novo
           setArquivoCNH(e.target.files[0]);
@@ -198,10 +199,10 @@ export default function Motoristas() {
 
       if (editandoId) {
         res = await api.put(`/motoristas/${editandoId}`, payload);
-        alert("Motorista atualizado!");
+        toast.success("Motorista atualizado!");
       } else {
         res = await api.post('/motoristas/', payload);
-        alert("Motorista cadastrado!");
+        toast("Motorista cadastrado!");
       }
 
       // Upload do arquivo pendente (se for cadastro novo)
@@ -216,30 +217,41 @@ export default function Motoristas() {
       fecharModal();
       carregarMotoristas();
     } catch (error) {
-      alert("Erro ao salvar: " + (error.response?.data?.detail || error.message));
+      toast.error("Erro ao salvar: " + (error.response?.data?.detail || error.message));
     }
   }
 
   async function handleDelete(id) {
     if (confirm("Tem certeza que deseja excluir este motorista?")) {
       try { await api.delete(`/motoristas/${id}`); carregarMotoristas(); } 
-      catch (error) { alert("Erro ao excluir."); }
+      catch (error) { toast.error("Erro ao excluir."); }
     }
   }
 
-  function abrirModal(motorista = null) {
+  async function abrirModal(motorista = null) {
     setArquivoCNH(null);
     if (motorista) {
-      setEditandoId(motorista.id);
-      setForm({
-          nome: motorista.nome,
-          cpf: motorista.cpf,
-          tipo_cnh: motorista.tipo_cnh,
-          vencimento_cnh: motorista.vencimento_cnh,
-          base: motorista.base || '',
-          status: motorista.status || 'Ativo', // Status carregado
-          cnh_path: motorista.cnh_path
-      });
+      const tid = toast.loading("Carregando dados completos...");
+      try {
+          const res = await api.get(`/motoristas/${motorista.id}`);
+          const m = res.data;
+          setEditandoId(m.id);
+          setForm({
+              nome: m.nome,
+              cpf: m.cpf,
+              tipo_cnh: m.tipo_cnh,
+              vencimento_cnh: m.vencimento_cnh,
+              base: m.base || '',
+              status: m.status || 'Ativo',
+              cnh_path: m.cnh_path
+          });
+          toast.dismiss(tid);
+      } catch (error) {
+          console.error("Erro no abrirModal:", error);
+          toast.dismiss(tid);
+          toast.error("Erro ao carregar dados do motorista.");
+          return;
+      }
     } else {
       setEditandoId(null);
       setForm(initialForm);
@@ -279,7 +291,7 @@ export default function Motoristas() {
   }
 
   function abrirCNH(path) {
-      if (!path) return alert("Nenhum arquivo anexado.");
+      if (!path) return toast.error("Nenhum arquivo anexado.");
       const url = `http://localhost:8000/files/${path}`; 
       window.open(url, '_blank');
   }

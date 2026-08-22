@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { useAuth } from '../contexts/AuthContext';
+import toast from 'react-hot-toast';
 
 export default function Otimizador() {
     const { user, can } = useAuth();
@@ -226,9 +227,9 @@ export default function Otimizador() {
     }
 
     async function handleOtimizar() {
-        if (!origem) return alert("Digite o endereço de partida.");
+        if (!origem) return toast("Digite o endereço de partida.");
         const validos = servicos.filter(s => s.endereco && s.valor);
-        if (validos.length === 0) return alert("Adicione serviços.");
+        if (validos.length === 0) return toast("Adicione serviços.");
 
         setLoading(true);
         try {
@@ -239,12 +240,12 @@ export default function Otimizador() {
             });
             setResultado(response.data);
         } catch (error) {
-            alert("Erro: " + (error.response?.data?.detail || error.message));
+            toast.error("Erro: " + (error.response?.data?.detail || error.message));
         } finally { setLoading(false); }
     }
 
     async function handleIniciarRotaOficial() {
-        if (!selecaoFinal.veiculo_id || !selecaoFinal.colaborador_id || !selecaoFinal.km_saida) return alert("Preencha os dados de saída.");
+        if (!selecaoFinal.veiculo_id || !selecaoFinal.colaborador_id || !selecaoFinal.km_saida) return toast.error("Preencha os dados de saída.");
 
         const agora = new Date();
         const minEst = resultado.resumo.tempo_total_min * 1.2;
@@ -265,7 +266,7 @@ export default function Otimizador() {
             await api.post('/rotas/', payload);
             navigate('/rotas');
         } catch (error) {
-            alert("Erro ao salvar. Verifique a conexão.");
+            toast.error("Erro ao salvar. Verifique a conexão.");
         }
     }
 

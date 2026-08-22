@@ -37,8 +37,9 @@ export default function Auditoria() {
     });
 
     // Paginação
-    const [limite, setLimite] = useState(100);
-    const [temMais, setTemMais] = useState(false);
+    const [limite, setLimite] = useState(50);
+    const [page, setPage] = useState(1);
+    const [total, setTotal] = useState(0);
     const [carregando, setCarregando] = useState(false);
 
     useEffect(() => {
@@ -46,8 +47,8 @@ export default function Auditoria() {
     }, []);
 
     useEffect(() => {
-        carregarLogs(0, limite);
-    }, [filtros.usuario, filtros.tabela, filtros.acao, filtros.data_inicio, filtros.data_fim, limite]);
+        carregarLogs();
+    }, [filtros.usuario, filtros.tabela, filtros.acao, filtros.data_inicio, filtros.data_fim, limite, page]);
 
     async function carregarOpcoes() {
         try {
@@ -56,13 +57,11 @@ export default function Auditoria() {
         } catch (e) { console.error("Erro filtros auditoria", e); }
     }
 
-    async function carregarLogs(overrideSkip = 0, overrideLimite = null) {
-        const limiteReal = overrideLimite !== null ? overrideLimite : limite;
-
+    async function carregarLogs() {
         setCarregando(true);
         try {
             const params = {
-                skip: overrideSkip, limit: limiteReal,
+                page, limit: limite,
                 busca: filtros.busca || undefined,
                 usuario_nome: filtros.usuario || undefined,
                 tabela: filtros.tabela || undefined,
@@ -72,12 +71,8 @@ export default function Auditoria() {
             };
 
             const res = await api.get('/auditoria/', { params });
-            if (overrideSkip === 0) {
-                setLogs(res.data);
-            } else {
-                setLogs(prev => [...prev, ...res.data]);
-            }
-            setTemMais(res.data.length === limiteReal);
+            setLogs(res.data.items || []);
+            setTotal(res.data.total || 0);
         } catch (e) {
             console.error("Erro ao carregar auditoria", e);
         } finally {
@@ -87,11 +82,8 @@ export default function Auditoria() {
 
     function handleBuscaTextual(e) {
         e.preventDefault();
-        carregarLogs(0, limite);
-    }
-
-    function carregarMais() {
-        carregarLogs(logs.length, 500);
+        if (page !== 1) setPage(1);
+        else carregarLogs();
     }
 
     // --- EXPORTAÇÕES ---
@@ -250,17 +242,40 @@ export default function Auditoria() {
                 )}
             </div>
 
-            {/* BOTÃO CARREGAR MAIS RESULTADOS */}
-            {temMais && !carregando && (
-                <div style={{ textAlign: 'center', marginTop: '20px', marginBottom: '20px' }}>
-                    <button
-                        onClick={carregarMais}
-                        style={{ background: '#2d3748', border: '1px solid #00d68f', color: '#00d68f', padding: '10px 30px', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold', fontSize: '1rem', transition: '0.2s' }}
-                    >
-                        Mostrar mais registros
-                    </button>
+            {/* CONTROLES DE PAGINAÇÃO SERVER-SIDE */}
+            {!carregando && total > 0 && (
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '20px', marginBottom: '20px', background: '#1a202c', padding: '15px', borderRadius: '8px', border: '1px solid #2d3748' }}>
+                    <div style={{ color: '#a0aec0', fontSize: '0.9rem' }}>
+                        Mostrando {(page - 1) * limite + 1} a {Math.min(page * limite, total)} de <strong style={{color: 'white'}}>{total}</strong> registros
+                    </div>
+                    
+                    <div style={{ display: 'flex', gap: '10px' }}>
+                        <button
+                            onClick={() => setPage(p => Math.max(1, p - 1))}
+                            disabled={page === 1}
+                            style={{ background: page === 1 ? '#2d3748' : '#3182ce', color: page === 1 ? '#718096' : 'white', border: 'none', padding: '8px 15px', borderRadius: '5px', cursor: page === 1 ? 'not-allowed' : 'pointer', fontWeight: 'bold' }}
+                        >
+                            Anterior
+                        </button>
+                        
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#2d3748', color: 'white', padding: '0 15px', borderRadius: '5px', fontWeight: 'bold' }}>
+                            Página {page}
+                        </div>
+                        
+                        <button
+                            onClick={() => setPage(p => p + 1)}
+                            disabled={page * limite >= total}
+                            style={{ background: page * limite >= total ? '#2d3748' : '#3182ce', color: page * limite >= total ? '#718096' : 'white', border: 'none', padding: '8px 15px', borderRadius: '5px', cursor: page * limite >= total ? 'not-allowed' : 'pointer', fontWeight: 'bold' }}
+                        >
+                            Próxima
+                        </button>
+                    </div>
                 </div>
             )}
         </div>
     );
 }
+
+
+
+

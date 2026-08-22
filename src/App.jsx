@@ -101,7 +101,11 @@ function Sidebar({ isOpen, closeMenu }) {
         {/* CABEÇALHO DO SIDEBAR */}
         <div style={{ padding: '20px', marginBottom: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
-            <h2 style={{ fontSize: '1.6rem', fontWeight: 'bold', margin: 0, color: 'white', letterSpacing: '1px' }}>Manager.Frotas</h2>
+            <img
+              src="/looplogo.png"
+              alt="Loop.Frotas"
+              style={{ height: '40px', maxWidth: '180px', objectFit: 'contain', display: 'block', marginBottom: '5px' }}
+            />
             <p style={{ color: '#aaa', fontSize: '0.8rem', margin: 0 }}>Gestão Inteligente</p>
           </div>
 
@@ -264,7 +268,7 @@ function AppContent() {
             <Menu size={28} />
           </button>
           {/* MUDANÇA AQUI TAMBÉM: LOGO NO TOPO MOBILE */}
-          <h2 style={{ fontSize: '1.2rem', fontWeight: 'bold', margin: 0, color: 'white' }}>Manager.Frotas</h2>
+          <img src="/looplogo.png" alt="Loop.Frotas" style={{ height: '35px', objectFit: 'contain' }} />
         </div>
       </div>
 
@@ -308,9 +312,17 @@ function AppContent() {
   )
 }
 
+import { Toaster } from 'react-hot-toast';
+
 function App() {
   return (
     <AuthProvider>
+      <Toaster position="top-right" toastOptions={{
+          style: {
+            background: '#333',
+            color: '#fff',
+          },
+      }} />
       <Router>
         <Routes>
           <Route path="/login" element={<Login />} />
