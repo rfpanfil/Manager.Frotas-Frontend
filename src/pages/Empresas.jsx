@@ -1,15 +1,13 @@
-import usePersistedTab from '../hooks/usePersistedTab';
+// Arquivo: frontend/src/pages/Empresas.jsx
 import React, { useState, useEffect } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Building, Plus, X, Edit, Trash2 } from 'lucide-react';
 import api from '../services/api';
 import { SAAS_CONFIG, TODOS_MODULOS } from '../config/saas';
 import toast from 'react-hot-toast';
 
 export default function Empresas() {
-    const [abaAtiva, setAbaAtiva] = usePersistedTab('geral', 'empresas');
-    const queryClient = useQueryClient();
-    const { data: empresas = [], isLoading: loading } = useQuery({ queryKey: ['empresas'], queryFn: async () => (await api.get('/empresas/')).data });
+    const [empresas, setEmpresas] = useState([]);
+    const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
     const [editandoId, setEditandoId] = useState(null); // NOVO
 
@@ -23,6 +21,21 @@ export default function Empresas() {
         setFormData({ ...formData, modulos_ativos: atuais });
     }
 
+    useEffect(() => {
+        carregarEmpresas();
+    }, []);
+
+    const carregarEmpresas = async () => {
+        try {
+            const res = await api.get('/empresas/');
+            setEmpresas(res.data);
+        } catch (error) {
+            console.error("Erro ao buscar empresas:", error);
+            toast.error("Erro ao carregar as empresas. Verifique se você é um Super Admin.");
+        } finally {
+            setLoading(false);
+        }
+    };
 
     function abrirModal(empresa = null) {
         if (empresa) {
@@ -53,7 +66,8 @@ export default function Empresas() {
                 toast.success("Empresa cadastrada com sucesso!");
             }
             setShowModal(false);
-            queryClient.invalidateQueries({ queryKey: ['empresas'] });
+            carregarEmpresas();
+            window.location.reload();
         } catch (error) {
             console.error("Erro ao salvar empresa:", error);
             toast.error(error.response?.data?.detail || "Erro ao salvar empresa.");
@@ -66,7 +80,7 @@ export default function Empresas() {
         try {
             await api.delete(`/empresas/${id}`);
             toast.success("Empresa excluída com sucesso.");
-            queryClient.invalidateQueries({ queryKey: ['empresas'] });
+            carregarEmpresas();
         } catch (error) {
             toast.error(error.response?.data?.detail || "Erro ao excluir empresa.");
         }
@@ -75,8 +89,8 @@ export default function Empresas() {
     return (
         <div>
             <div className="header-wrapper" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '15px' }}>
-                <h1 style={{ margin: 0, borderBottom: '2px solid #8B5CF6', paddingBottom: '5px' }}>
-                    <Building size={28} style={{ marginRight: '10px', verticalAlign: 'middle', color: '#8B5CF6' }} />
+                <h1 style={{ margin: 0, borderBottom: '2px solid #00d68f', paddingBottom: '5px' }}>
+                    <Building size={28} style={{ marginRight: '10px', verticalAlign: 'middle', color: '#00d68f' }} />
                     Gestão de Clientes (SaaS)
                 </h1>
                 <button className="btn-add" onClick={() => abrirModal()}>
@@ -84,7 +98,7 @@ export default function Empresas() {
                 </button>
             </div>
 
-            <div style={{ backgroundColor: 'rgba(139, 92, 246, 0.1)', borderLeft: '4px solid #8B5CF6', padding: '15px', marginBottom: '20px', borderRadius: '4px', fontSize: '0.9rem', color: '#e2e8f0' }}>
+            <div style={{ backgroundColor: 'rgba(0, 214, 143, 0.1)', borderLeft: '4px solid #00d68f', padding: '15px', marginBottom: '20px', borderRadius: '4px', fontSize: '0.9rem', color: '#e2e8f0' }}>
                 <strong>Modo Deus (Super Admin):</strong> Você está vendo todas as empresas do sistema. Use o seletor no menu lateral esquerdo para entrar dentro de uma empresa específica e gerenciar os dados dela (Gastos, Veículos, Usuários, etc).
             </div>
 
@@ -112,10 +126,10 @@ export default function Empresas() {
                                 empresas.map(emp => (
                                     <tr key={emp.id}>
                                         <td>#{emp.id}</td>
-                                        <td style={{ fontWeight: 'bold', color: '#8B5CF6' }}>{emp.nome_fantasia}</td>
+                                        <td style={{ fontWeight: 'bold', color: '#00d68f' }}>{emp.nome_fantasia}</td>
                                         <td>{emp.cnpj || 'Não informado'}</td>
                                         <td>
-                                            <span className={`status-badge ${emp.status === 'Ativo' ? 'status-open' : 'status-closed'}`} style={{ backgroundColor: emp.status === 'Ativo' ? '#8B5CF6' : '#4a5568', color: emp.status === 'Ativo' ? '#000' : '#fff' }}>
+                                            <span className={`status-badge ${emp.status === 'Ativo' ? 'status-open' : 'status-closed'}`} style={{ backgroundColor: emp.status === 'Ativo' ? '#00d68f' : '#4a5568', color: emp.status === 'Ativo' ? '#000' : '#fff' }}>
                                                 {emp.status}
                                             </span>
                                         </td>
@@ -143,7 +157,7 @@ export default function Empresas() {
                         <button className="btn-close-modal" onClick={() => setShowModal(false)}>
                             <X size={24} />
                         </button>
-                        <h2 style={{ marginTop: 0, color: '#8B5CF6', marginBottom: '20px' }}>
+                        <h2 style={{ marginTop: 0, color: '#00d68f', marginBottom: '20px' }}>
                             {editandoId ? 'Editar Empresa' : 'Cadastrar Nova Empresa'}
                         </h2>
 
@@ -185,7 +199,7 @@ export default function Empresas() {
 
                             {/* --- CHECKBOXES DE MÓDULOS (SAAS CONFIG-DRIVEN) --- */}
                             <div style={{ marginBottom: '20px' }}>
-                                <label style={{ color: '#8B5CF6', fontWeight: 'bold' }}>Páginas Contratadas (SaaS)</label>
+                                <label style={{ color: '#00d68f', fontWeight: 'bold' }}>Páginas Contratadas (SaaS)</label>
                                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '20px', marginTop: '10px', background: '#1a202c', padding: '15px', borderRadius: '5px', border: '1px solid #4a5568' }}>
                                     {['Gestão', 'Operação', 'Cadastros'].map(categoria => (
                                         <div key={categoria} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -220,3 +234,6 @@ export default function Empresas() {
         </div>
     );
 }
+
+
+
