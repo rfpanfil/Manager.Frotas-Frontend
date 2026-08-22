@@ -23,7 +23,6 @@ export default function Empresas() {
 
     useEffect(() => {
         carregarEmpresas();
-            window.location.reload(); // Força a atualização do sidebar SaaS
     }, []);
 
     const carregarEmpresas = async () => {
@@ -68,7 +67,7 @@ export default function Empresas() {
             }
             setShowModal(false);
             carregarEmpresas();
-            window.location.reload(); // Força a atualização do sidebar SaaS
+            window.location.reload();
         } catch (error) {
             console.error("Erro ao salvar empresa:", error);
             toast.error(error.response?.data?.detail || "Erro ao salvar empresa.");
@@ -82,7 +81,6 @@ export default function Empresas() {
             await api.delete(`/empresas/${id}`);
             toast.success("Empresa excluída com sucesso.");
             carregarEmpresas();
-            window.location.reload(); // Força a atualização do sidebar SaaS
         } catch (error) {
             toast.error(error.response?.data?.detail || "Erro ao excluir empresa.");
         }
@@ -236,3 +234,5 @@ export default function Empresas() {
         </div>
     );
 }
+
+
