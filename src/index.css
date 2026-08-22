@@ -1,0 +1,1119 @@
+:root {
+  --bg-dark: #1a1e29;        /* Fundo geral (igual ao Excel) */
+  --bg-card: #242936;        /* Fundo dos cartões/gráficos */
+  --accent-green: #8B5CF6;   /* O Verde Neon dos botões */
+  --text-white: #ffffff;
+  --text-gray: #a0aec0;
+  --nav-width: 250px;        /* Largura do menu lateral */
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif; /* Fonte moderna */
+  background-color: var(--bg-dark);
+  color: var(--text-white);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Layout Principal */
+.app-container {
+  display: flex;
+  min-height: 100vh; /* Mantém como garantia para navegadores muito velhos */
+  min-height: 100dvh; /* NOVA LINHA: Altura dinâmica (considera a barra do celular) */
+}
+
+/* Menu Lateral */
+.sidebar {
+  width: var(--nav-width);
+  background-color: var(--bg-card);
+  padding: 15px 15px 10px 15px; /* Menos padding geral e inferior */
+  border-right: 1px solid #333;
+  
+  /* PROPRIEDADES NOVAS (FIX DO SIDEBAR): */
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100vh !important;
+  height: 100dvh !important; /* NOVA LINHA: Ajusta o botão "Sair" para não sumir */
+  box-sizing: border-box !important;
+  position: sticky;
+  top: 0;
+  overflow-y: auto;
+}
+
+/* 2. Área do meio (Links) que vai rolar se faltar espaço */
+.nav-scrollable {
+  flex: 1;                /* Ocupa todo o espaço disponível no meio */
+  overflow-y: auto;       /* Cria barra de rolagem interna */
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 0 10px;
+  margin-bottom: 20px;
+  
+  /* Estilo da barra de rolagem fina */
+  scrollbar-width: thin;
+  scrollbar-color: #4a5568 transparent;
+}
+
+/* 3. Rodapé (Usuário/Sair) que fica fixo lá embaixo */
+.user-section {
+  padding: 15px 5px 5px 5px; /* Compacta bastante embaixo */
+  border-top: 1px solid #333;
+  margin-top: auto;       /* Empurra para baixo (segurança) */
+  flex-shrink: 0;         /* IMPEDE que ele seja esmagado */
+  background-color: var(--bg-card); /* Garante que o fundo cubra a rolagem */
+}
+
+.sidebar h2 {
+  color: var(--accent-green);
+  margin-bottom: 30px;
+  font-size: 1.5rem;
+}
+
+.nav-link {
+  color: var(--text-gray);
+  text-decoration: none;
+  padding: 12px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.2s;
+}
+
+.nav-link:hover {
+  background-color: rgba(139, 92, 246, 0.1); /* Violeta transparente */
+  color: var(--accent-green);
+}
+
+.nav-link.active-link {
+  background-color: var(--accent-green);
+  color: var(--text-white);
+  font-weight: 500;
+}
+
+/* Área de Conteúdo */
+.content {
+  flex: 1;
+  padding: 20px 20px 20px 10px; /* Redução do espaçamento à esquerda */
+  overflow-y: auto;
+}
+
+h1 {
+  border-bottom: 2px solid var(--accent-green);
+  display: inline-block;
+  padding-bottom: 5px;
+  margin-bottom: 20px;
+}
+
+/* --- ESTILOS DE TABELA (Estilo Excel Dark) --- */
+.table-container {
+  background-color: var(--bg-card);
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  /* CORREÇÃO 1: Garante scroll horizontal se a tela for pequena */
+  overflow-x: auto; 
+  width: 100%;
+  box-sizing: border-box;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  /* CORREÇÃO 2: Largura mínima para evitar que os dados fiquem espremidos */
+  min-width: 900px; 
+}
+
+th {
+  background-color: var(--accent-green);
+  color: var(--text-white); 
+  font-weight: bold;
+  text-align: left;
+  padding: 12px;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  white-space: nowrap; /* Cabeçalho não quebra linha */
+}
+
+/* Arredondar cantos do cabeçalho */
+th:first-child {
+  border-top-left-radius: 6px;
+}
+th:last-child {
+  border-top-right-radius: 6px;
+}
+
+td {
+  padding: 12px;
+  border-bottom: 1px solid #333;
+  color: var(--text-gray);
+  vertical-align: middle;
+  white-space: nowrap; /* Conteúdo não quebra linha */
+}
+
+/* --- CORREÇÃO 3: AÇÃO CRÍTICA PARA O LIXO NÃO SUMIR --- */
+th:last-child, 
+td:last-child {
+  text-align: right;       /* Alinha os ícones à direita */
+  width: 140px;            /* Reserva um espaço fixo para os botões */
+  padding-right: 30px;     /* MARGEM DE SEGURANÇA: Empurra o lixo para dentro */
+  box-sizing: border-box;
+}
+
+tr:hover td {
+  background-color: rgba(255, 255, 255, 0.05); /* Efeito hover */
+  color: var(--text-white);
+}
+
+/* Formulário simples no topo */
+.form-card {
+  background-color: var(--bg-card);
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  display: flex;
+  gap: 10px;
+  align-items: flex-end; /* Alinha botão com os inputs */
+  flex-wrap: wrap;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.input-group label {
+  font-size: 0.8rem;
+  color: var(--accent-green);
+}
+
+input,
+select {
+  background-color: #1a1e29;
+  border: 1px solid #444;
+  padding: 10px;
+  border-radius: 5px;
+  color: white;
+  min-width: 150px;
+}
+
+input:focus,
+select:focus {
+  outline: 1px solid var(--accent-green);
+  border-color: var(--accent-green);
+}
+
+/* Impede que o texto dos botões quebre (Ex: "Novo \n Gasto") */
+button,
+.btn-add,
+.btn-finish {
+  white-space: nowrap; /* <- corrigido (antes estava white_space) */
+}
+
+.btn-add {
+  background-color: var(--accent-green);
+  color: var(--text-white);
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.2s;
+  height: 38px; /* Mesma altura dos inputs */
+}
+
+.btn-add:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+/* --- CSS DE ROTAS --- */
+.status-badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.status-open {
+  background-color: #ecc94b; /* Amarelo */
+  color: #000;
+}
+
+.status-closed {
+  background-color: #4a5568; /* Cinza */
+  color: #fff;
+}
+
+/* Inputs pequenos para dentro da tabela */
+.input-small {
+  padding: 5px;
+  font-size: 0.8rem;
+  width: 110px;
+  background-color: #151821;
+}
+
+/* Botão de Encerrar */
+.btn-finish {
+  background-color: transparent;
+  border: 1px solid var(--accent-green);
+  color: var(--accent-green);
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: 0.2s;
+}
+
+.btn-finish:hover {
+  background-color: var(--accent-green);
+  color: var(--text-white);
+}
+
+/* --- DASHBOARD --- */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.card {
+  background-color: var(--bg-card);
+  padding: 20px;
+  border-radius: 8px;
+  border-left: 4px solid var(--accent-green);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  color: var(--text-gray);
+  font-size: 0.9rem;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  font-weight: bold;
+}
+
+.card-value {
+  font-size: 2rem;
+  font-weight: bold;
+  color: var(--text-white);
+}
+
+.card-desc {
+  font-size: 0.8rem;
+  color: #666;
+  margin-top: 5px;
+}
+
+.chart-section {
+  background-color: var(--bg-card);
+  padding: 20px;
+  border-radius: 8px;
+}
+
+/* --- BARRA DE FILTROS --- */
+.filter-bar {
+  background-color: var(--bg-card);
+  padding: 15px;
+  border-radius: 8px;
+  display: flex;
+  gap: 20px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  border-bottom: 2px solid var(--accent-green);
+}
+
+.filter-item {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  flex: 1;
+  min-width: 150px;
+}
+
+.filter-item label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: var(--text-gray);
+  font-weight: bold;
+}
+
+.filter-item select {
+  background-color: #151821;
+  color: white;
+  border: 1px solid #444;
+  padding: 8px;
+  border-radius: 4px;
+  min-width: 140px;
+  font-size: 0.9rem;
+}
+
+/* Força o fundo escuro nas opções do Select */
+select option {
+  background-color: #1a202c !important;
+  color: white !important;
+  padding: 10px;
+}
+
+/* Modal (card interno do popup) */
+.modal-card {
+  background-color: #1a202c;
+  border: 1px solid #4a5568;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch; /* <- importante */
+  box-sizing: border-box;
+}
+
+/* --- ANIMAÇÃO DE FROTA (SINCRONIA 3s) --- */
+
+/* 1. Alvo Específico: Ícone de Caminhão SVG */
+.custom-icon {
+  /* Transição de 3s para alinhar com o intervalo de envio do Backend */
+  transition: transform 3s linear;
+}
+
+/* 2. Alvo Genérico: Qualquer marcador do Leaflet */
+.leaflet-marker-icon {
+  transition: transform 3s linear;
+}
+
+/* --- RODAPÉ DO MODAL (Fixo no Desktop) --- */
+.modal-footer {
+  display: flex;
+  gap: 15px; /* Mais espaço entre os botões */
+  justify-content: flex-end; /* No PC: Alinha à direita */
+  margin-top: 20px;
+
+  /* Faz grudar no fundo do modal (Desktop) */
+  position: sticky;
+  bottom: -1px;
+  background-color: #1a202c;
+  padding: 15px 0 5px 0;
+  border-top: 1px solid #4a5568;
+  z-index: 5;
+}
+
+.modal-footer button {
+  min-width: 120px; /* Tamanho mínimo bonito no PC */
+}
+
+/* --- RESPONSIVIDADE (MOBILE) --- */
+
+/* Garante que a tabela tenha um tamanho mínimo para não esmagar os dados */
+table {
+  min-width: 600px; /* Força a tabela a ter pelo menos 600px */
+}
+
+/* O container da tabela ganha barra de rolagem se a tabela for maior que a tela */
+.table-container {
+  width: 100%;
+  overflow-x: auto; /* A MÁGICA: Cria scroll horizontal APENAS na tabela */
+  -webkit-overflow-scrolling: touch; /* Scroll suave no iPhone */
+}
+
+/* Botão de Menu (Hambúrguer) - Invisível no Desktop */
+.mobile-menu-btn {
+  display: none;
+}
+
+.sidebar-overlay {
+  display: none;
+}
+
+/* --- AJUSTE RESPONSIVO DO CABEÇALHO DE GASTOS (NOVO) --- */
+/* --- CONFIGURAÇÃO PADRÃO (PC/DESKTOP) --- */
+/* Alinha Busca, Filtro e Botões um ao lado do outro */
+.header-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+/* Mantém a busca pequena no computador para não ocupar muito espaço */
+.search-box {
+  width: 200px; 
+}
+
+/* REGRAS PARA CELULAR (< 768px) */
+@media (max-width: 768px) {
+  /* No Celular: o rodapé NÃO fica colado (rola junto) */
+  .modal-footer {
+    position: static; /* desliga sticky */
+    bottom: auto;
+    z-index: auto;
+    padding: 15px 0 0 0; /* opcional */
+  }
+
+  /* No Celular: botões do rodapé dividem a tela (50/50) */
+  .modal-footer button {
+    flex: 1;
+    width: auto;
+    min-width: 0; /* Garante que não estoure */
+  }
+
+  /* No Celular: Sobrescreve a largura fixa do PC e manda esticar */
+  .modal-footer .btn-add {
+    width: auto;  /* Reseta a largura fixa do PC */
+    flex: 1;      /* Força dividir o espaço (50% cada) */
+    min-width: 0; /* Garante que não estoure */
+  }
+
+  .app-container {
+    flex-direction: column;
+    width: 100%;
+    overflow-x: hidden;
+  }
+
+  /* Ajuste do cabeçalho */
+  h1 {
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+  }
+
+  /* BARRA DE BOTÕES E FILTROS (Ajuste Crítico) */
+  /* Seleciona o container que agrupa os botões no topo */
+  .content > div:first-child {
+    flex-direction: column;
+    align-items: stretch !important; /* Estica para ocupar a largura */
+    gap: 15px;
+  }
+
+  /* Container dos botões e inputs */
+  .content > div:first-child > div {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    width: 100%;
+  }
+
+  /* Inputs de busca e data ocupam 100% da linha cada um */
+  .content input,
+  .content select {
+    width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box;
+  }
+
+  /* Container dos inputs de busca ganha largura total */
+  .content > div:first-child > div > div {
+    width: 100%;
+  }
+
+  /* BOTÕES (PDF / NOVO GASTO) */
+  .btn-add {
+    flex: 1; /* Faz os botões dividirem o espaço disponível */
+    min-width: 100px; /* Garante um tamanho mínimo */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 0.85rem; /* Fonte levemente menor para caber */
+    padding: 10px 5px; /* Menos padding lateral */
+    height: 42px; /* Altura fixa confortável para o dedo */
+  }
+
+  /* Ajusta o ícone dentro do botão para não empurrar o texto */
+  .btn-add svg {
+    width: 16px;
+    height: 16px;
+    margin-right: 5px;
+  }
+
+  /* --- MENU MOBILE --- */
+  .mobile-menu-btn {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 20px;
+    background-color: var(--bg-card);
+    border-bottom: 1px solid #333;
+    position: sticky;
+    top: 0;
+    z-index: 1100;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .mobile-menu-btn h2 {
+    margin: 0;
+    color: var(--accent-green);
+    font-size: 1.2rem;
+  }
+
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: -100%;
+    height: 100vh; /* Fallback */
+    height: 100dvh !important; /* NOVA LINHA AQUI TAMBÉM */
+    z-index: 999;
+    transition: left 0.3s ease;
+  }
+    .sidebar.open {
+      left: 0 !important; /* Traz o menu de volta para a tela */
+    }
+
+  .sidebar-overlay {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 1150;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+
+  .sidebar-overlay.visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .content {
+    padding: 15px 15px 15px 5px; /* Redução do espaçamento à esquerda (Mobile) */
+    width: 100%;
+    box-sizing: border-box;
+    margin-left: 0 !important;
+  }
+
+  /* O CONTÊINER GERAL (Envolve Título H1 + Ações) */
+  /* Comportamento: Tira o alinhamento lateral e empilha verticalmente. */
+  /* Resultado: O Título "Gastos" fica no topo e todo o bloco de botões vai para baixo. */
+  .header-wrapper {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 15px;
+  }
+
+  /* O GRUPO DE AÇÕES (Busca + Filtro + Botões PDF/Novo) */
+  /* Comportamento: Ativa o modo "quebra de linha" (wrap). */
+  /* Resultado: Permite que a Busca fique numa linha, o Filtro em outra e os Botões em outra, se necessário. */
+  .header-actions {
+    display: flex;
+    flex-wrap: wrap; 
+    width: 100%;
+    gap: 10px;
+  }
+
+  /* O FILTRO DE PERÍODO (Div que envolve o botão "Últimos 30 dias") */
+  /* Comportamento: Define flex-grow: 1. */
+  /* Resultado: Faz o botão de filtro esticar para preencher qualquer buraco vazio na linha do meio. */
+  .header-actions > div {
+    flex-grow: 1; 
+  }
+
+  /* OS BOTÕES DE AÇÃO ("PDF" e "Novo Gasto") */
+  /* Comportamento: Define flex: 1 e Ordem 3. */
+  /* Resultado: Joga esses botões para o FINAL da lista e faz eles dividirem o espaço (50% para cada), ficando lado a lado. */
+  .header-actions .btn-add {
+    flex: 1;
+    white-space: nowrap; /* Impede que o texto "Novo Gasto" quebre em duas linhas */
+    justify-content: center;
+    order: 3;
+    min-width: 45%; /* Garante um tamanho mínimo clicável */
+  }
+
+  /* A BARRA DE BUSCA */
+  /* Comportamento: Define largura total e Ordem 1. */
+  /* Resultado: Força a busca a ser o PRIMEIRO item da lista e ocupar uma linha inteira sozinha. */
+  .search-box {
+    width: 100%;
+    order: 1; 
+  }
+
+  /* 1. Transforma o Modal para ocupar a tela toda e dar espaço embaixo */
+  .modal-content-responsivo {
+    max-width: 100% !important;
+    height: 100vh !important;
+    max-height: 100vh !important;
+    border-radius: 0 !important;
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 80px !important; /* Espaço extra para os botões não sumirem */
+  }
+
+  /* 2. Reorganiza o Item: Nome em cima, controles embaixo */
+  .checklist-item-grid {
+    grid-template-columns: 1fr 1fr !important; /* 2 Colunas */
+    grid-template-rows: auto auto auto;        /* 3 Linhas */
+    grid-template-areas:
+      "name name"     /* Linha 1: Nome (Ocupa tudo) */
+      "status obs"    /* Linha 2: Status e Obs lado a lado */
+      "foto foto";    /* Linha 3: Botão Foto (Ocupa tudo) */
+    gap: 8px;
+    padding: 12px;
+  }
+
+  /* Atribui os elementos às áreas definidas acima */
+  .chk-area-name   { grid-area: name; margin-bottom: 5px; }
+  .chk-area-status { grid-area: status; }
+  .chk-area-obs    { grid-area: obs; }
+  .chk-area-foto   { grid-area: foto; }
+
+  /* 3. Botões do Rodapé empilhados para facilitar o toque */
+  .checklist-footer {
+    flex-direction: column-reverse; /* "Fechar" fica embaixo */
+    gap: 10px;
+    padding-bottom: 20px; /* Margem de segurança */
+  }
+
+  .checklist-footer button {
+    width: 100%;       /* Botão largura total */
+    height: 45px;      /* Mais alto para o dedo */
+    justify-content: center;
+  }
+
+  /* Aumenta a área de rolagem dos itens para sobrar espaço para o rodapé */
+  .checklist-scroll-area {
+    flex: 1;           /* Ocupa o espaço que sobrar */
+    max-height: none !important; /* Remove limite fixo */
+  }
+}
+
+/* --- RASTREAMENTO (TRACKING) LAYOUT --- */
+
+/* Container principal (abaixo dos filtros) */
+.track-layout {
+  flex: 1;
+  display: flex;
+  position: relative; /* Necessário para posicionamento absoluto no mobile */
+  overflow: hidden;   /* Impede scroll duplo */
+}
+
+/* Sidebar de Resumo (Padrão Desktop) */
+.track-sidebar {
+  width: 300px;
+  background: #2d3748;
+  border-right: 1px solid #4a5568;
+  padding: 20px;
+  overflow-y: auto;
+  transition: transform 0.3s ease;
+  z-index: 1000;
+}
+
+/* Área do Mapa */
+.track-map {
+  flex: 1;
+  position: relative;
+}
+
+/* Botão Flutuante "Ver Resumo" (Escondido no PC) */
+.btn-track-toggle {
+  display: none;
+}
+
+/* Botão Fechar Resumo (Escondido no PC) */
+.btn-track-close {
+  display: none;
+}
+
+/* --- RASTREAMENTO MOBILE --- */
+@media (max-width: 768px) {
+
+  /* Oculta colunas menos importantes */
+  .hide-mobile {
+    display: none !important;
+  }
+  
+  /* Força a tabela de checklist a não esticar, cabendo na tela sem rolar */
+  table.table-mobile-fit {
+    min-width: 100% !important;
+  }
+  
+  /* Sidebar vira uma gaveta deslizando da esquerda */
+  .track-sidebar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 85%; /* Ocupa 85% da tela, deixa ver um pedacinho do mapa */
+    transform: translateX(-100%); /* Começa escondido */
+    box-shadow: 4px 0 15px rgba(0,0,0,0.5);
+  }
+
+  /* Classe para abrir a gaveta */
+  .track-sidebar.open {
+    transform: translateX(0);
+  }
+
+  /* Botão Flutuante no Mapa */
+  .btn-track-toggle {
+    display: flex;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 999; /* Acima do mapa */
+    background: #2d3748;
+    color: #8B5CF6;
+    border: 1px solid #8B5CF6;
+    padding: 8px 12px;
+    border-radius: 5px;
+    align-items: center;
+    gap: 5px;
+    font-weight: bold;
+    font-size: 0.85rem;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    cursor: pointer;
+  }
+
+  /* Botão X dentro do resumo */
+  .btn-track-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 15px;       /* Um pouco mais para baixo */
+    right: 40px;     /* Um pouco mais para a esquerda */
+    background: #171923; /* Fundo escuro para destacar */
+    border: 1px solid #e53e3e; /* Borda vermelha */
+    color: #e53e3e;  /* Ícone vermelho */
+    width: 40px;     /* Tamanho fixo */
+    height: 40px;    /* Tamanho fixo */
+    border-radius: 50%; /* Redondo */
+    cursor: pointer;
+    z-index: 2000;   /* Garante que fique acima de tudo */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+  }
+
+  /* Ajuste para o título não ficar embaixo do botão */
+  .track-sidebar h3 {
+    padding-right: 50px; /* Dá espaço para o botão X não cobrir o texto */
+  }
+}
+
+
+/* --- TABELA COM COLUNA FIXA (FREEZE) --- */
+/* Classe para a primeira célula (Nome da Permissão) */
+.sticky-left {
+  position: sticky;
+  left: 0;
+  z-index: 10; /* Fica acima do conteúdo normal */
+  background-color: var(--bg-card); /* Garante que o texto não fique transparente */
+  border-right: 2px solid #333; /* Borda para separar visualmente */
+  box-shadow: 2px 0 5px rgba(0,0,0,0.2); /* Sombra suave para dar profundidade */
+}
+
+/* Ajuste específico para o cabeçalho fixo */
+th.sticky-left {
+  z-index: 20; /* Fica acima de tudo */
+  background-color: var(--accent-green);
+  color: var(--text-white);
+}
+
+/* Ajuste para a linha de Módulo (para não quebrar o layout) */
+.module-header {
+  position: sticky;
+  left: 0;
+  z-index: 15;
+  background-color: #2d3748; /* Mesma cor do fundo da linha */
+}
+
+
+/* --- TABELA DE PERMISSÕES (ESTILO EXCEL / CONGELAR PAINÉIS) --- */
+
+/* 1. Container de Rolagem */
+/* Define a área visível e habilita as barras de rolagem */
+.permissoes-scroll-container {
+  max-height: 80vh;       /* Altura máxima da tabela antes de rolar */
+  overflow: auto;         /* Cria barras de rolagem vertical e horizontal automaticamente */
+  position: relative;     /* Contexto para o posicionamento sticky */
+  border: 1px solid #4a5568;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+}
+
+/* 2. Canto Superior Esquerdo (Cruzamento Fixo) */
+/* Esta célula nunca se move. Fica fixa no topo e na esquerda. */
+.sticky-corner {
+  position: sticky;
+  top: 0;
+  left: 0;
+  z-index: 30;            /* Camada MAIS ALTA: Fica por cima de tudo */
+  background-color: #1a202c; /* Cor de fundo sólida para não ver o texto passando por baixo */
+  border-right: 2px solid #4a5568;
+  border-bottom: 2px solid #4a5568;
+  min-width: 250px;       /* Largura fixa para a coluna de nomes das permissões */
+  padding: 15px;
+  color: #a0aec0;
+  font-weight: bold;
+}
+
+/* 3. Cabeçalho dos Cargos (Fixo no Topo) */
+/* Rola para os lados, mas fica fixo quando você desce a página. */
+.sticky-top {
+  position: sticky;
+  top: 0;                 /* Gruda no topo */
+  z-index: 20;            /* Camada MÉDIA: Fica por cima das células normais, mas abaixo do canto */
+  background-color: #1a202c;
+  border-bottom: 2px solid #4a5568;
+  padding: 15px;
+  min-width: 120px;       /* Largura mínima para o nome do cargo não quebrar */
+  color: white;
+  text-align: center;
+}
+
+/* 4. Coluna de Permissões (Fixa na Esquerda) */
+/* Rola para cima/baixo, mas fica fixa quando você vai para a direita. */
+.sticky-left {
+  position: sticky;
+  left: 0;                /* Gruda na esquerda */
+  z-index: 10;            /* Camada BAIXA: Fica por cima do conteúdo normal */
+  background-color: #2d3748; /* Fundo um pouco mais claro para destacar a coluna */
+  border-right: 2px solid #4a5568;
+  border-bottom: 1px solid #4a5568;
+  padding: 12px 15px;
+  color: white;
+  font-weight: 500;
+}
+
+/* 5. Título do Módulo (Separador) */
+/* Garante que o título "FINANCEIRO", "LOGÍSTICA" não suma ao rolar para a direita. */
+.sticky-module {
+  position: sticky;
+  left: 0;                
+  z-index: 5;             /* Menor prioridade de fixação */
+  background-color: #2d3748;
+  color: #8B5CF6;         /* Verde do seu tema */
+  font-weight: bold;
+  padding: 10px 15px;
+  text-align: left;
+  border-bottom: 1px solid #4a5568;
+}
+
+
+/* --- CUSTOMIZAÇÃO DO REACT-DATEPICKER (DARK MODE) --- */
+/* classes para lidar com o data picker em revisões e garantir que o calendário fique acima de modais/menus */
+.react-datepicker-popper { z-index: 9999 !important; }
+.react-datepicker-wrapper { display: block; }
+.react-datepicker__input-container { width: 100%; }
+
+/* Container Principal */
+.react-datepicker {
+  background-color: #2d3748 !important;
+  border: 1px solid #4a5568 !important;
+  font-family: 'Inter', sans-serif !important;
+  color: white !important;
+}
+
+/* Cabeçalho (Onde fica o Ano e as setas) */
+.react-datepicker__header {
+  background-color: #1a202c !important; /* Fundo mais escuro */
+  border-bottom: 1px solid #4a5568 !important;
+}
+
+/* Texto do Cabeçalho */
+.react-datepicker__current-month,
+.react-datepicker-time__header,
+.react-datepicker-year-header {
+  color: #8B5CF6 !important; /* Verde Neon */
+  font-weight: bold !important;
+}
+
+/* Texto dos Meses/Dias (Normal) */
+.react-datepicker__month-text,
+.react-datepicker__day,
+.react-datepicker__time-name {
+  color: #e2e8f0 !important;
+}
+
+/* Item ao passar o mouse (Hover) */
+.react-datepicker__month-text:hover,
+.react-datepicker__day:hover {
+  background-color: #4a5568 !important;
+  color: white !important;
+}
+
+/* Item Selecionado (O mês escolhido) */
+.react-datepicker__month-text--keyboard-selected,
+.react-datepicker__month-text--selected,
+.react-datepicker__day--selected {
+  background-color: #8B5CF6 !important; /* Verde do Tema */
+  color: #000 !important; /* Texto preto para contraste */
+  font-weight: bold !important;
+}
+
+/* Setas de navegação (Anterior/Próximo) */
+.react-datepicker__navigation-icon::before {
+  border-color: #a0aec0 !important;
+}
+.react-datepicker__navigation:hover .react-datepicker__navigation-icon::before {
+  border-color: #8B5CF6 !important;
+}
+
+/* Remove o triângulo do topo */
+.react-datepicker__triangle {
+  display: none !important;
+}
+
+
+/* ===== CHECKLIST: GERENCIAR ITENS (modal) ===== */
+.checklist-gerenciar .table-container {
+  overflow-x: hidden;         /* não cria scroll lateral */
+}
+
+.checklist-gerenciar table {
+  min-width: 0 !important;    /* anula min-width global */
+  width: 100% !important;
+  table-layout: fixed;        /* força colunas caberem no modal */
+}
+
+.checklist-gerenciar th,
+.checklist-gerenciar td {
+  white-space: normal !important;  /* permite quebrar linha */
+  word-break: break-word;
+}
+
+/* Centraliza e “enxuga” colunas curtas */
+.checklist-gerenciar th:nth-child(2),
+.checklist-gerenciar td:nth-child(2),
+.checklist-gerenciar th:nth-child(3),
+.checklist-gerenciar td:nth-child(3),
+.checklist-gerenciar th:nth-child(4),
+.checklist-gerenciar td:nth-child(4) {
+  text-align: center;
+}
+
+/* Larguras sugeridas (ajuste fino se quiser) */
+.checklist-gerenciar th:nth-child(2),
+.checklist-gerenciar td:nth-child(2) { width: 120px; } /* Cat. */
+.checklist-gerenciar th:nth-child(3),
+.checklist-gerenciar td:nth-child(3) { width: 70px; }  /* Qtd */
+.checklist-gerenciar th:nth-child(4),
+.checklist-gerenciar td:nth-child(4) { width: 110px; } /* Ações */
+
+
+
+/* ============================================================
+   CORREÇÃO CRÍTICA: MODAIS (POPUPS)
+   Isso força o modal a aparecer no Computador e Centraliza
+   ============================================================ */
+
+/* 1. Garante que o fundo escuro apareça quando tiver a classe 'visible' */
+.sidebar-overlay.visible {
+  display: flex !important;       /* Força a exibição (sobrescreve o display:none) */
+  align-items: center;            /* Centraliza verticalmente */
+  justify-content: center;        /* Centraliza horizontalmente */
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  z-index: 2000 !important;       /* Garante que fique em cima de tudo */
+  background-color: rgba(0, 0, 0, 0.7); /* Fundo escuro */
+  
+  /* Permite rolar a tela se o modal for muito comprido */
+  overflow-y: auto; 
+  padding: 20px 0;
+}
+
+/* 2. Ajuste fino para o Cartão do Modal */
+.modal-card {
+  /* Remove margens antigas que podem atrapalhar o Flexbox */
+  margin: 0 !important; 
+  max-height: 90vh; /* Impede que o modal seja maior que a tela */
+  overflow-y: auto; /* Cria barra de rolagem dentro do modal se precisar */
+  box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+  position: relative; /* Para o botão de fechar se posicionar bem */
+}
+
+/* No celular, mantemos uma margem para não colar nas bordas */
+@media (max-width: 768px) {
+  .modal-card {
+    width: 90% !important; /* Ocupa 90% da largura do celular */
+    margin: 10px !important;
+  }
+
+  /* 1. O Menu Lateral (Sidebar) sobe para o topo máximo */
+  .sidebar {
+    z-index: 9999 !important; /* Valor altíssimo para vencer qualquer outro */
+    position: fixed !important;
+  }
+
+  /* 2. A Película Preta fica logo abaixo do menu, mas acima do resto */
+  .sidebar-overlay.visible {
+    z-index: 9998 !important; /* Um número menor que o menu (9999 > 9998) */
+  }
+}
+
+
+/* ============================================================
+   MODAL PADRÃO (ESTILO "NOVO GASTO")
+   ============================================================ */
+
+/* Fundo escuro que cobre a tela toda */
+.modal-overlay {
+  position: fixed;
+  top: 0; 
+  left: 0; 
+  right: 0; 
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.75); /* Fundo preto 75% */
+  backdrop-filter: blur(3px);            /* Desfoque leve no fundo */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999 !important;              /* Fica na frente de tudo */
+  padding: 20px;
+}
+
+/* O cartão branco/cinza do meio */
+.modal-content {
+  background-color: var(--bg-card);      /* Cinza do tema (#242936) */
+  padding: 25px;
+  border-radius: 8px;
+  width: 100%;
+  max-width: 600px;                      /* Largura máxima padrão */
+  box-shadow: 0 20px 25px rgba(0,0,0,0.5);
+  max-height: 90vh;                      /* Não estoura a altura da tela */
+  overflow-y: auto;                      /* Barra de rolagem se precisar */
+  border: 1px solid #4a5568;             /* Borda sutil */
+  position: relative;
+}
+
+/* Botão Fechar (X) no topo direito */
+.btn-close-modal {
+  position: absolute;
+  top: 20px; right: 20px;
+  background: transparent; border: none;
+  color: #a0aec0; cursor: pointer;
+}
+.btn-close-modal:hover { color: white; }
+
+/* GRID DO ITEM DO CHECKLIST (Desktop Padrão) */
+.checklist-item-grid {
+  display: grid;
+  grid-template-columns: 30% 20% 30% 20%; /* Layout original */
+  gap: 10px;
+  margin-bottom: 8px;
+  padding: 10px;
+  background: #222;
+  border-radius: 5px;
+  align-items: center;
+}
+
+/* Áreas internas do grid */
+.chk-area-name   { grid-area: auto; }
+.chk-area-status { grid-area: auto; }
+.chk-area-obs    { grid-area: auto; }
+.chk-area-foto   { grid-area: auto; }
+
+/* BOTÕES DO RODAPÉ (Desktop Padrão) */
+.checklist-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+  padding-top: 10px;
+  border-top: 1px solid #4a5568;
+}
