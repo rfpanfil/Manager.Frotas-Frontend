@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Guia Secreto
+MEU_GUIA_DE_TESTES.md

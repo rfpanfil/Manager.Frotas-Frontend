@@ -1,16 +1,30 @@
-# React + Vite
+# Manager.Frotas 🚚
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+![Python](https://img.shields.io/badge/Python-3.11-blue?logo=python&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-009688?logo=fastapi&logoColor=white)
+![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=black)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-336791?logo=postgresql&logoColor=white)
+![Playwright](https://img.shields.io/badge/Playwright-Tested-2EAD33?logo=playwright&logoColor=white)
 
-Currently, two official plugins are available:
+**Manager.Frotas** é um sistema SaaS B2B completo para gestão de frotas, controle de compras, estoque e manutenção de veículos, desenvolvido sob uma arquitetura limpa (Domain-Driven Design) e projetado para escalar.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🏗 Estrutura do Projeto (Monorepo)
+Este repositório contém o código completo da aplicação, dividido em dois ecossistemas principais:
 
-## React Compiler
+- 📂 **/backend**: API RESTful robusta construída em Python (FastAPI). Responsável pelas regras de negócio, multi-tenancy (SaaS), segurança RBAC, e integração com banco de dados relacional PostgreSQL via SQLAlchemy.
+- 📂 **/frontend**: Aplicação SPA rica (React + Vite), focada em UX/UI com Zustand para controle de estado local, React Query para caching e integração visual moderna para desktops industriais.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 🎯 Módulos Principais
+- **Dashboards:** KPIs financeiros e métricas operacionais de veículos em tempo real.
+- **Módulo de Compras:** Solicitações, Cotações (comparativo de preços dinâmico), Ordens de Compra e Recebimentos.
+- **Gestão de Estoque:** Cadastro e movimentação de peças (unidades, litros) e componentes seriados (pneus).
+- **Gestão de Frota:** Controle de chassi, eixos (visual interativo), check-lists de manutenção e planos de revisão preditiva.
+- **Roteirização e Mapa:** Acompanhamento via mapas, otimizador de rotas com base em endereços, etc.
+- **Controle Administrativo:** Matriz de acessos e permissões (RBAC) extremamente detalhada.
 
-## Expanding the ESLint configuration
+## 🧪 Testes E2E (Automação de Qualidade)
+Este projeto é coberto por robôs de Automação de Interface (Playwright) localizados na sub-pasta rontend/e2e-tests. 
+A suíte garante a integridade dos módulos essenciais a cada modificação, varrendo logins, permissões e telas vitais simulando um usuário humano contra a nuvem.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+---
+*Este é um projeto proprietário (Portfólio de Engenharia de Software).*
