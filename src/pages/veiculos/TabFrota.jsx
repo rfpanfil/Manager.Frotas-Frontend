@@ -107,7 +107,7 @@ export default function Veiculos() {
         return matchBusca && matchStatus && matchBase && matchSeguro && matchPneu && matchAno;
     });
 
-    async function handleSelectChange(e, endpoint, stateUpdater, fieldName) {
+    async function handleSelectChange(e, endpoint, fieldName) {
         const valor = e.target.value;
         if (valor === 'ADD_NEW') {
             const novoNome = prompt(`Digite o nome para o novo ${fieldName}:`);
@@ -310,7 +310,7 @@ export default function Veiculos() {
 
                                 <div className="input-group">
                                     <label>Tipo Veículo</label>
-                                    <select name="tipo" value={form.tipo} onChange={(e) => handleSelectChange(e, '/opcoes/tipos-veiculo', setTiposVeiculo, 'tipo')}>
+                                    <select name="tipo" value={form.tipo} onChange={(e) => handleSelectChange(e, '/opcoes/tipos-veiculo', 'tipo')}>
                                         <option value="">Selecione...</option>
                                         {tiposVeiculo.map(t => <option key={t.id} value={t.nome}>{t.nome}</option>)}
                                         <option value="ADD_NEW" style={{ fontWeight: 'bold', color: '#8B5CF6' }}>+ Cadastrar Novo Tipo...</option>
@@ -332,7 +332,7 @@ export default function Veiculos() {
 
                                 <div className="input-group">
                                     <label>Marca</label>
-                                    <select name="marca" value={form.marca} onChange={(e) => handleSelectChange(e, '/opcoes/marcas-veiculo', setMarcasVeiculo, 'marca')}>
+                                    <select name="marca" value={form.marca} onChange={(e) => handleSelectChange(e, '/opcoes/marcas-veiculo', 'marca')}>
                                         <option value="">Selecione...</option>
                                         {marcasVeiculo.map(m => <option key={m.id} value={m.nome}>{m.nome}</option>)}
                                         <option value="ADD_NEW" style={{ fontWeight: 'bold', color: '#8B5CF6' }}>+ Cadastrar Nova Marca...</option>
