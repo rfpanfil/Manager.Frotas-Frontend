@@ -7,43 +7,34 @@
 ![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker&logoColor=white)
 ![Playwright](https://img.shields.io/badge/Playwright-Tested-2EAD33?logo=playwright&logoColor=white)
 
-**Manager.Frotas** é um sistema SaaS B2B completo para gestão de frotas, controle de compras, estoque e manutenção de veículos, desenvolvido sob uma arquitetura limpa (Domain-Driven Design) e projetado para escalar.
+**Manager.Frotas** é um ecossistema SaaS B2B corporativo para gestão de frotas, controle de compras, estoque e manutenção de veículos, construído com foco em escalabilidade, clean code e segurança de dados.
 
 ## 🧪 Ambiente de Demonstração
-
-Para facilitar a avaliação técnica, o sistema conta com dados fictícios e um banco de dados de demonstração.
-
 Acesse o frontend hospedado na Vercel: **[https://manager-frotas-frontend.vercel.app](https://manager-frotas-frontend.vercel.app)**
 
 🔐 **Credenciais de Acesso (Mock):**
-- O sistema possui um atalho rápido na tela de Login chamado **"Preencher com Usuário Demo"**. Basta clicar nele para carregar as credenciais administrativas e entrar no sistema instantaneamente.
+Utilize o atalho **"Preencher com Usuário Demo"** na tela de Login para acesso rápido via bypass seguro.
+> *Nota: O banco de dados relacional sofre wipes (reset) programados para manter a integridade do portfólio.*
 
-> **Nota:** Para evitar conflitos e manter o portfólio limpo, os dados do banco de demonstração são resetados rotineiramente. Sinta-se à vontade para explorar, cadastrar gastos e rotas.
+## 🏗 Arquitetura e Engenharia (Layered Architecture)
+O sistema adota uma separação rígida de responsabilidades:
+- **Frontend (SPA):** React com Zustand (State Management) e React Query para cache de dados e stale-while-revalidate. Interface componentizada e responsiva.
+- **Backend (API):** FastAPI orientado a serviços. As rotas (Controllers) são anêmicas e atuam apenas como portas HTTP, injetando dependências e delegando a orquestração pesada para a camada de *Services*.
 
-## 🏗 Arquitetura
+## 🛡️ Segurança e Governança (Zero Trust)
+A infraestrutura foi desenhada para resistir a ataques comuns (OWASP):
+- **Zero Trust:** A interface React é tratada apenas como uma camada de apresentação. Absolutamente todas as validações de papéis (RBAC) ocorrem no backend via dependências (`Depends(get_current_user)`).
+- **Isolamento de Tenant (SaaS):** Prevenção severa contra IDOR (Insecure Direct Object Reference). As queries do SQLAlchemy obrigatoriamente filtram os dados pela `empresa_id` vinculada ao token JWT do usuário, garantindo que os dados de uma frota jamais vazem para outra.
+- **Gestão de Segredos:** Remoção estrita de arquivos `.env` do controle de versão. Credenciais, strings do PostgreSQL (Neon.tech) e JWT Secrets são injetados puramente via ambiente.
 
-O Manager.Frotas utiliza uma separação estrita de camadas (Layered Architecture):
-
-- **Frontend:** React estruturado em componentes SPA com Hooks, Context API e Zustand para controle de estado. Interface rica desenhada para desktops e painéis de controle.
-- **Backend:** FastAPI modular. As rotas HTTP servem apenas como "portas" de entrada, delegando toda a lógica de negócios para as camadas de *Services*. Segurança rigorosa com JWT e isolamento Multi-Tenant (SaaS).
-- **Banco de Dados:** PostgreSQL relacional.
+## 🏆 Desafios Técnicos Vencidos
+1. **Automação E2E com Busca Cega:** Para garantir regressão zero, a suíte do Playwright foi programada para ignorar classes CSS (que são voláteis) e utilizar *Role-Based Locators* (ex: buscar pelo papel de botão ou texto), simulando exatamente a acessibilidade de um usuário humano na esteira de CI/CD.
+2. **Concorrência de Estoque:** Lidar com a lógica de baixa de peças em tempo real exigiu transações atômicas no PostgreSQL para evitar *race conditions* quando múltiplos mecânicos requisitam a mesma peça simultaneamente.
 
 ## 🎯 Módulos Principais
-- **Dashboards:** KPIs financeiros e métricas operacionais de veículos em tempo real.
-- **Módulo de Compras:** Solicitações, Cotações dinâmicas, Ordens de Compra e Recebimentos.
-- **Gestão de Estoque:** Movimentação de peças (unidades, litros) e componentes seriados (pneus).
-- **Gestão de Frota:** Controle de chassi, eixos interativos, check-lists e planos de revisão preditiva.
-- **Roteirização e Mapa:** Acompanhamento e telemetria.
-
-## 🤖 Testes Automatizados E2E (Playwright)
-Este projeto conta com uma suíte de testes ponta a ponta (E2E) construída com **Playwright**, que simula a interação de um usuário real no navegador. A suíte varre logins, permissões e fluxos vitais contra o ambiente de produção para garantir regressão zero.
-
-### Como rodar os testes localmente
-1. Navegue até a pasta de testes: cd e2e-tests
-2. Instale as dependências: 
-pm install
-3. Execute a suíte de testes: 
-pm run test:e2e
+- **Dashboards:** KPIs financeiros e operacionais.
+- **Compras & Estoque:** Cotações dinâmicas, Ordens de Compra, controle de peças em litros/unidades e serialização (chassi/pneus).
+- **Roteirização:** Acompanhamento telemétrico em mapa.
 
 ---
-*Este é um projeto proprietário (Portfólio de Engenharia de Software).*
+*Projeto proprietário - Portfólio de Engenharia de Software.*
