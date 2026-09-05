@@ -16,6 +16,25 @@ Acesse o frontend hospedado na Vercel: **[https://manager-frotas-frontend.vercel
 Utilize o atalho **"Preencher com Usuário Demo"** na tela de Login para acesso rápido via bypass seguro.
 > *Nota: O banco de dados relacional sofre wipes (reset) programados para manter a integridade do portfólio.*
 
+## 🛠️ Stack Tecnológico
+
+**Frontend**
+- **Framework:** React 18 + Vite
+- **Gestão de Estado & Fetching:** Zustand (Global State) e React Query (Caching e Stale-while-revalidate)
+- **Estilização & UI:** Componentização moderna e responsiva focada em Dashboards B2B
+- **Deploy:** Vercel
+
+**Backend**
+- **Framework:** Python + FastAPI (Alta performance e assíncrono)
+- **Banco de Dados:** PostgreSQL Serverless (Hospedado na Neon.tech)
+- **ORM & Conexão:** SQLAlchemy
+- **Segurança:** Autenticação JWT, Passlib (Bcrypt) e mitigação severa de IDOR
+
+**DevOps & Automação de Qualidade (QA)**
+- **Testes E2E:** Playwright (Suíte completa cobrindo fluxos de CRUD e RBAC)
+- **Infraestrutura:** Render.com (API) e Vercel (Front)
+- **Conteinerização:** Docker Ready
+
 ## 🏗 Arquitetura e Engenharia (Layered Architecture)
 O sistema adota uma separação rígida de responsabilidades:
 - **Frontend (SPA):** React com Zustand (State Management) e React Query para cache de dados e stale-while-revalidate. Interface componentizada e responsiva.
@@ -38,3 +57,4 @@ A infraestrutura foi desenhada para resistir a ataques comuns (OWASP):
 
 ---
 *Projeto proprietário - Portfólio de Engenharia de Software.*
+
