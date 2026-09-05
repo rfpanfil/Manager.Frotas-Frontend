@@ -13,7 +13,9 @@
 Acesse o frontend hospedado na Vercel: **[https://manager-frotas-frontend.vercel.app](https://manager-frotas-frontend.vercel.app)**
 
 🔐 **Credenciais de Acesso (Mock):**
-Utilize o atalho **"Preencher com Usuário Demo"** na tela de Login para acesso rápido via bypass seguro.
+- **E-mail:** `admin@demo.com`
+- **Senha:** `Demo@2026`
+- **Acesso Rápido:** Você também pode utilizar o atalho **"Preencher com Usuário Demo"** direto na tela de Login.
 > *Nota: O banco de dados relacional sofre wipes (reset) programados para manter a integridade do portfólio.*
 
 ## 🛠️ Stack Tecnológico
@@ -35,8 +37,9 @@ Utilize o atalho **"Preencher com Usuário Demo"** na tela de Login para acesso 
 - **Infraestrutura:** Render.com (API) e Vercel (Front)
 - **Conteinerização:** Docker Ready
 
-## 🏗 Arquitetura e Engenharia
-> 🔒 **Nota de Privacidade:** O código-fonte do Backend (API em FastAPI) e a infraestrutura de banco de dados encontram-se em um repositório **privado** por diretrizes de segurança e proteção de propriedade intelectual. Toda a arquitetura e governança descritas neste documento referem-se ao motor que opera ativamente em produção na nuvem para alimentar esta interface. (Layered Architecture)
+## 🏗 Arquitetura e Engenharia (Layered Architecture)
+> 🔒 **Nota de Privacidade:** O código-fonte do Backend (API em FastAPI) e a infraestrutura de banco de dados encontram-se em um repositório **privado** por diretrizes de segurança e proteção de propriedade intelectual. Toda a arquitetura e governança descritas neste documento referem-se ao motor que opera ativamente em produção na nuvem para alimentar esta interface.
+
 O sistema adota uma separação rígida de responsabilidades:
 - **Frontend (SPA):** React com Zustand (State Management) e React Query para cache de dados e stale-while-revalidate. Interface componentizada e responsiva.
 - **Backend (API):** FastAPI orientado a serviços. As rotas (Controllers) são anêmicas e atuam apenas como portas HTTP, injetando dependências e delegando a orquestração pesada para a camada de *Services*.
@@ -64,25 +67,22 @@ A infraestrutura foi desenhada para resistir a ataques comuns (OWASP):
 - Instância PostgreSQL (Local ou Cloud)
 
 **1. Inicializando a API (Backend):**
-`ash
+```bash
 cd backend
 python -m venv venv
-# Ative o ambiente virtual (Windows: venv\Scripts\activate | Mac/Linux: source venv/bin/activate)
+# Ative o ambiente virtual (Windows: venv\Scriptsctivate | Mac/Linux: source venv/bin/activate)
 pip install -r requirements.txt
 # Crie um arquivo .env baseado nas variáveis necessárias (DATABASE_URL, SECRET_KEY, etc)
 uvicorn main:app --reload
-`
+```
 
 **2. Inicializando a Aplicação (Frontend):**
-`ash
+```bash
 cd frontend
 npm install
 # Configure o .env local apontando para o backend (ex: VITE_API_URL=http://localhost:8000)
 npm run dev
-`
+```
 
 ---
 *Projeto proprietário - Portfólio de Engenharia de Software.*
-
-
-
