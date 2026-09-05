@@ -35,7 +35,8 @@ Utilize o atalho **"Preencher com Usuário Demo"** na tela de Login para acesso 
 - **Infraestrutura:** Render.com (API) e Vercel (Front)
 - **Conteinerização:** Docker Ready
 
-## 🏗 Arquitetura e Engenharia (Layered Architecture)
+## 🏗 Arquitetura e Engenharia
+> 🔒 **Nota de Privacidade:** O código-fonte do Backend (API em FastAPI) e a infraestrutura de banco de dados encontram-se em um repositório **privado** por diretrizes de segurança e proteção de propriedade intelectual. Toda a arquitetura e governança descritas neste documento referem-se ao motor que opera ativamente em produção na nuvem para alimentar esta interface. (Layered Architecture)
 O sistema adota uma separação rígida de responsabilidades:
 - **Frontend (SPA):** React com Zustand (State Management) e React Query para cache de dados e stale-while-revalidate. Interface componentizada e responsiva.
 - **Backend (API):** FastAPI orientado a serviços. As rotas (Controllers) são anêmicas e atuam apenas como portas HTTP, injetando dependências e delegando a orquestração pesada para a camada de *Services*.
@@ -82,5 +83,6 @@ npm run dev
 
 ---
 *Projeto proprietário - Portfólio de Engenharia de Software.*
+
 
 
