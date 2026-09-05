@@ -55,6 +55,32 @@ A infraestrutura foi desenhada para resistir a ataques comuns (OWASP):
 - **Compras & Estoque:** Cotações dinâmicas, Ordens de Compra, controle de peças em litros/unidades e serialização (chassi/pneus).
 - **Roteirização:** Acompanhamento telemétrico em mapa.
 
+## ⚙️ Como Executar Localmente
+
+**Pré-requisitos:**
+- Node.js v18+
+- Python 3.11+
+- Instância PostgreSQL (Local ou Cloud)
+
+**1. Inicializando a API (Backend):**
+`ash
+cd backend
+python -m venv venv
+# Ative o ambiente virtual (Windows: venv\Scripts\activate | Mac/Linux: source venv/bin/activate)
+pip install -r requirements.txt
+# Crie um arquivo .env baseado nas variáveis necessárias (DATABASE_URL, SECRET_KEY, etc)
+uvicorn main:app --reload
+`
+
+**2. Inicializando a Aplicação (Frontend):**
+`ash
+cd frontend
+npm install
+# Configure o .env local apontando para o backend (ex: VITE_API_URL=http://localhost:8000)
+npm run dev
+`
+
 ---
 *Projeto proprietário - Portfólio de Engenharia de Software.*
+
 
