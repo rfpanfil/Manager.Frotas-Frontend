@@ -28,7 +28,7 @@ export default function ModalGerenciarTipos({
                 <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
                     <input
                         value={novoTipo}
-                        onChange={e => setNovoTipo(e.target.value)}
+                        onChange={e => setNovoTipo(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleSalvarNovoTipo()}
                         placeholder="Criar novo tipo (Ex: Hospedagem)"
                         style={{ flex: 1, padding: '10px', borderRadius: '5px', border: '1px solid #4a5568', background: '#2d3748', color: 'white', boxSizing: 'border-box' }}
                     />
@@ -45,7 +45,7 @@ export default function ModalGerenciarTipos({
                                         {isEditing ? (
                                             <input
                                                 value={editandoTipoNome}
-                                                onChange={e => setEditandoTipoNome(e.target.value)}
+                                                onChange={e => setEditandoTipoNome(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleSalvarEdicaoTipo(t.id)}
                                                 style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #8B5CF6', background: '#1a202c', color: 'white', boxSizing: 'border-box' }}
                                             />
                                         ) : (
@@ -77,3 +77,4 @@ export default function ModalGerenciarTipos({
         </div>
     );
 }
+

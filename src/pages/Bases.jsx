@@ -29,7 +29,7 @@ export default function Bases() {
     );
 
     async function handleAdd() {
-        if (!novaBase) return;
+        if (!novaBase.trim()) { toast('? Digite o nome da base antes de adicionar!', { icon: '?' }); return; }
         try {
             await api.post('/bases/', { nome: novaBase });
             setNovaBase('');
@@ -68,7 +68,7 @@ export default function Bases() {
                     <input 
                         placeholder="Nome da Nova Base (Ex: Matriz)" 
                         value={novaBase} 
-                        onChange={e => setNovaBase(e.target.value)} 
+                        onChange={e => setNovaBase(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleAdd()} 
                         style={{flex: 1, padding: '10px', borderRadius: '5px', border: '1px solid #4a5568', background: '#2d3748', color: 'white'}}
                     />
                     <button onClick={handleAdd} className="btn-add" style={{background: '#8B5CF6', color: '#fff'}}>
