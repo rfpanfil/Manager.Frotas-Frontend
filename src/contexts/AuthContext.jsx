@@ -24,6 +24,11 @@ export function AuthProvider({ children }) {
     if (token && userStorage) {
       try {
         const parsedUser = JSON.parse(userStorage);
+        // Sessões antigas guardaram o hash da senha (o login devolvia o registro inteiro); apaga.
+        if ('senha_hash' in parsedUser) {
+          delete parsedUser.senha_hash;
+          localStorage.setItem('loop_user', JSON.stringify(parsedUser));
+        }
         api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
         setUser(parsedUser);
         Sentry.setUser({ id: parsedUser.id, empresa_id: parsedUser.empresa_id, cargo: parsedUser.cargo });

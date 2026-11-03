@@ -17,7 +17,10 @@ export default function Login() {
       await login(identifier, password);
       navigate('/');
     } catch (err) {
-      setError('Credenciais inválidas. Verifique login e senha.');
+      const detalhe = err.response?.data?.detail;
+      setError(err.response?.status === 429 && typeof detalhe === 'string'
+        ? detalhe
+        : 'Credenciais inválidas. Verifique login e senha.');
     }
   }
 
