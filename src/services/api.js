@@ -1,5 +1,6 @@
 
 import axios from 'axios';
+import toast from 'react-hot-toast';
 
 const getBaseURL = () => {
   if (import.meta.env.VITE_API_URL) {
@@ -49,5 +50,22 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+
+// Arquivos enviados (CNH, anexos) exigem login: baixa com o token e abre numa aba nova.
+// A aba é aberta antes do download para o navegador não bloqueá-la como pop-up.
+export async function abrirArquivo(caminho) {
+  if (!caminho) return toast.error('Nenhum arquivo anexado.');
+  const aba = window.open('', '_blank');
+  try {
+    const url = '/files/' + caminho.split('/').map(encodeURIComponent).join('/');
+    const { data } = await api.get(url, { responseType: 'blob' });
+    const local = URL.createObjectURL(data);
+    if (aba) aba.location.href = local; else window.open(local, '_blank');
+    setTimeout(() => URL.revokeObjectURL(local), 60_000);
+  } catch {
+    aba?.close();
+    toast.error('Não foi possível abrir o arquivo.');
+  }
+}
 
 export default api;

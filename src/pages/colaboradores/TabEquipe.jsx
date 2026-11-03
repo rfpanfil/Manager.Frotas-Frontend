@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import api from '../../services/api';
+import api, { abrirArquivo } from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
 import useCan from '../../hooks/useCan';
 import { PlusCircle, Users, Edit, Trash2, XCircle, FileText, X, Search, Filter, AlertTriangle, CheckCircle, Clock, Eye, UploadCloud } from 'lucide-react';
@@ -296,8 +296,7 @@ export default function TabEquipe() {
 
     function abrirCNH(path) {
         if (!path) return toast.error("Nenhum arquivo anexado.");
-        const url = `http://localhost:8000/files/${path}`;
-        window.open(url, '_blank');
+        abrirArquivo(path);
     }
 
     return (
@@ -437,7 +436,7 @@ export default function TabEquipe() {
                                     <td style={{ textAlign: 'center' }}>
                                         {/* Botão Categoria */}
                                         {m.cnh_path ? (
-                                            <a href={`${api.defaults.baseURL}/colaboradores/${m.id}/cnh`} target="_blank" rel="noopener noreferrer"
+                                            <a href="#" onClick={e => { e.preventDefault(); abrirCNH(m.cnh_path); }}
                                                 style={{ fontWeight: 'bold', color: '#fff', backgroundColor: '#8B5CF6', padding: '4px 10px', borderRadius: '15px', textDecoration: 'none', fontSize: '0.8rem' }}
                                             >
                                                 {m.tipo_cnh}
@@ -450,7 +449,7 @@ export default function TabEquipe() {
 
                                         {/* Ícone Olho (se houver anexo) */}
                                         {m.cnh_path && (
-                                            <a href={`${api.defaults.baseURL}/colaboradores/${m.id}/cnh`} target="_blank" rel="noopener noreferrer"
+                                            <a href="#" onClick={e => { e.preventDefault(); abrirCNH(m.cnh_path); }}
                                                 style={{ marginLeft: '10px', color: '#63b3ed', verticalAlign: 'middle' }} title="Ver Documento">
                                                 <Eye size={16} />
                                             </a>

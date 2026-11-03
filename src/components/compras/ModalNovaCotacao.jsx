@@ -1,6 +1,6 @@
 import useCan from '../../hooks/useCan';
 import { X, Calendar, Truck, Paperclip, PlusCircle, CheckCircle } from 'lucide-react';
-import { baseURL } from '../../services/api';
+import { abrirArquivo } from '../../services/api';
 
 const inputStyle = { width: '100%', padding: '10px', borderRadius: '5px', border: '1px solid #4a5568', background: '#2d3748', color: 'white', outline: 'none', boxSizing: 'border-box' };
 const tableHeaderStyle = { padding: '10px', textAlign: 'left', color: 'white', fontSize: '0.9rem', borderBottom: '2px solid #4a5568' };
@@ -105,7 +105,7 @@ export default function ModalNovaCotacao({
                                         <div>
                                             <label style={{ display: 'block', marginBottom: 5, fontSize: '0.85rem' }}><Paperclip size={14} style={{ display: 'inline' }} /> Anexo {orc.id && "(Novo substitui)"}</label>
                                             <input type="file" onChange={e => handleFileChange(index, e.target.files[0])} style={{ ...inputStyle, padding: '6px', fontSize: '0.8rem' }} accept=".pdf,.jpg,.jpeg,.png" />
-                                            {orc.arquivo_url && <a href={`${baseURL}/files/${orc.arquivo_url}`} target="_blank" rel="noreferrer" style={{ fontSize: '0.8rem', color: '#63b3ed', display: 'block', marginTop: 5 }}>Ver arquivo salvo</a>}
+                                            {orc.arquivo_url && <button type="button" onClick={() => abrirArquivo(orc.arquivo_url)} style={{ fontSize: '0.8rem', color: '#63b3ed', display: 'block', marginTop: 5, background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}>Ver arquivo salvo</button>}
                                         </div>
                                     </div>
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import api, { baseURL } from '../../services/api';
+import api from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
 import toast from 'react-hot-toast';
 
@@ -229,7 +229,6 @@ export default function TabOrcamentos({ scPreSelecionada, clearScPreSelecionada,
                 formatarMoeda={formatarMoeda}
                 can={can}
                 onAprovar={onAprovar}
-                baseURL={baseURL}
             />
         </div>
     );

@@ -1,4 +1,5 @@
 import { X, DollarSign, Calendar, Download, CheckCircle } from 'lucide-react';
+import { abrirArquivo } from '../../services/api';
 
 export default function ModalComparativoOrcamentos({
     modalDetalhes,
@@ -8,8 +9,7 @@ export default function ModalComparativoOrcamentos({
     getNomeItem,
     formatarMoeda,
     can,
-    onAprovar,
-    baseURL
+    onAprovar
 }) {
     if (!modalDetalhes) return null;
 
@@ -75,9 +75,9 @@ export default function ModalComparativoOrcamentos({
 
                                 {orc.anexo_path && (
                                     <div style={{ marginTop: 10 }}>
-                                        <a href={`${baseURL}/files/${encodeURI(orc.anexo_path)}`} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: 5, color: '#63b3ed', textDecoration: 'none', background: '#2d3748', padding: '5px 10px', borderRadius: 4, border: '1px solid #63b3ed' }}>
+                                        <button type="button" onClick={() => abrirArquivo(orc.anexo_path)} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, color: '#63b3ed', background: '#2d3748', padding: '5px 10px', borderRadius: 4, border: '1px solid #63b3ed', cursor: 'pointer' }}>
                                             <Download size={14} /> Baixar Arquivo Anexo
-                                        </a>
+                                        </button>
                                     </div>
                                 )}
                             </div>
