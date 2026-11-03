@@ -25,3 +25,8 @@ dist-ssr
 
 # Guia Secreto
 MEU_GUIA_DE_TESTES.md
+
+# Segredos / configuração local (use .env.example como modelo)
+.env
+.env.*
+!.env.example

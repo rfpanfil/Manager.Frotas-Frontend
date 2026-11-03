@@ -154,6 +154,10 @@ export default function Usuarios() {
   }
 
   const isAdmin = can('usuarios.gerenciar');
+  // Ninguém altera o próprio cargo (o backend também recusa)
+  const editandoASiMesmo = !!formData.id && formData.id === currentUser?.id;
+  // O cargo atual (ex.: superadmin) precisa aparecer mesmo fora da lista de cargos da empresa
+  const cargoForaDaLista = formData.cargo && !cargos.some(c => c.nome === formData.cargo);
 
   // --- A SUA LÓGICA DE VOLTA ---
   // Define os cargos que SÃO de escritório. Qualquer coisa diferente disso, abre os campos de CPF.
@@ -184,8 +188,9 @@ export default function Usuarios() {
             <div className="input-group" style={{ flex: 1, minWidth: '200px' }}><label>E-mail</label><input type="email" name="email" value={formData.email} onChange={handleChange} /></div>
             <div className="input-group" style={{ flex: 1, minWidth: '200px' }}>
               <label>Cargo</label>
-              <select name="cargo" value={formData.cargo} onChange={handleCargoChange} disabled={!isAdmin}>
+              <select name="cargo" value={formData.cargo} onChange={handleCargoChange} disabled={!isAdmin || editandoASiMesmo}>
                 <option value="">Selecione...</option>
+                {cargoForaDaLista && <option value={formData.cargo}>{formData.cargo.toUpperCase()}</option>}
                 {cargos.map(c => <option key={c.id} value={c.nome}>{c.nome.toUpperCase()}</option>)}
               </select>
             </div>
