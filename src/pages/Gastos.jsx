@@ -401,7 +401,7 @@ export default function Gastos() {
             toast.success(editandoId ? 'Atualizado!' : 'Lançado!');
             fecharModal();
             queryClient.invalidateQueries({ queryKey: ['gastos'] }); queryClient.invalidateQueries({ queryKey: ['dashboardFinanceiro'] }); queryClient.invalidateQueries({ queryKey: ['homeMetrics'] });
-        } catch (error) { toast.error("Erro ao salvar."); }
+        } catch (error) { toast.error(typeof error.response?.data?.detail === "string" ? error.response.data.detail : "Erro ao salvar."); }
     }
 
     async function handleDelete(id) {

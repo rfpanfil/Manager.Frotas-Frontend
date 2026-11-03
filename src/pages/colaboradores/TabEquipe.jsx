@@ -121,7 +121,7 @@ export default function TabEquipe() {
                 setForm(prev => ({ ...prev, cnh_path: res.data.path }));
                 toast.success("Documento anexado com sucesso!");
                 queryClient.invalidateQueries({ queryKey: ['colaboradores'] });
-            } catch (error) { toast.error("Erro ao enviar documento."); }
+            } catch (error) { toast.error(typeof error.response?.data?.detail === "string" ? error.response.data.detail : "Erro ao enviar documento."); }
         } else if (e.target.files && e.target.files[0]) {
             // Apenas guarda o arquivo se for cadastro novo
             setArquivoCNH(e.target.files[0]);
