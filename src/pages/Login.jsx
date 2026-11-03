@@ -23,7 +23,7 @@ export default function Login() {
 
   function fillDemo() {
     setIdentifier('admin@demo.com');
-    setPassword('Demo@2026');
+    setPassword('Demo@admin');
   }
 
   if (loading) {
