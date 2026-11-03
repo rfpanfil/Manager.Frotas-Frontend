@@ -5,6 +5,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import api from '../services/api';
 import { Shield, PlusCircle, Pencil, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import ModalGerenciarCargos from '../components/cargos/ModalGerenciarCargos';
 
 export default function AdminPermissoes() {
     const { user } = useAuth();
@@ -16,8 +17,7 @@ export default function AdminPermissoes() {
     const modulos = data?.estrutura?.modulos || {};
     const [matriz, setMatriz] = useState({}); 
     const [cargoSelecionado, setCargoSelecionado] = useState(null);
-    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-    const [cargoParaEditar, setCargoParaEditar] = useState({ id: null, nome: '' });
+    const [gerenciarCargos, setGerenciarCargos] = useState(false);
 
     useEffect(() => {
         if (data?.matriz) setMatriz(data.matriz);
@@ -53,57 +53,6 @@ export default function AdminPermissoes() {
         }
     }
 
-    async function handleAddCargo() {
-        const nome = prompt("Nome do Novo Cargo:");
-        if (!nome) return;
-        try {
-            await api.post('/usuarios/cargos/', { nome });
-            toast.success(`Cargo '${nome}' criado!`);
-            queryClient.invalidateQueries({ queryKey: ['permissoesMatriz'] });
-        } catch (error) {
-            toast.error("Erro ao criar cargo: " + (error.response?.data?.detail || error.message));
-        }
-    }
-
-        async function confirmEditCargo() {
-        if (!cargoParaEditar.nome || cargoParaEditar.nome.trim() === '') return;
-        try {
-            await api.put(`/usuarios/cargos/${cargoParaEditar.id}`, { nome: cargoParaEditar.nome.trim() });
-            toast.success("Cargo atualizado!");
-            setIsEditModalOpen(false);
-            queryClient.invalidateQueries({ queryKey: ['permissoesMatriz'] });
-        } catch (error) {
-            toast.error(error.response?.data?.detail || "Erro ao editar cargo.");
-        }
-    }
-
-    function openEditModal(cargoId, nomeAtual) {
-        setCargoParaEditar({ id: cargoId, nome: nomeAtual });
-        setIsEditModalOpen(true);
-    }
-    async function handleEditCargo_OLD(cargoId, nomeAtual) {
-        const novoNome = prompt("Novo nome do cargo:", nomeAtual);
-        if (!novoNome || novoNome === nomeAtual) return;
-        try {
-            await api.put(`/usuarios/cargos/${cargoId}`, { nome: novoNome });
-            toast.success("Cargo atualizado!");
-            queryClient.invalidateQueries({ queryKey: ['permissoesMatriz'] });
-        } catch (error) {
-            toast.error(error.response?.data?.detail || "Erro ao editar cargo.");
-        }
-    }
-
-    async function handleDeleteCargo(cargoId) {
-        if (!confirm("Tem certeza que deseja excluir este cargo? Usuários atrelados precisarão ser reatribuídos.")) return;
-        try {
-            await api.delete(`/usuarios/cargos/${cargoId}`);
-            toast.success("Cargo excluído!");
-            queryClient.invalidateQueries({ queryKey: ['permissoesMatriz'] });
-        } catch (error) {
-            toast.error(error.response?.data?.detail || "Erro ao excluir cargo.");
-        }
-    }
-
     if (loading) return <div style={{padding:30, color:'white'}}>Carregando...</div>;
 
     const isAdmin = cargoSelecionado?.nome === 'admin';
@@ -113,8 +62,8 @@ export default function AdminPermissoes() {
             <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom: '20px', flexWrap: 'wrap', gap: '15px'}}>
                 <h1 style={{margin: 0}}>Gerenciamento de Permissões</h1>
                 <div style={{display:'flex', gap:'10px'}}>
-                    <button onClick={handleAddCargo} className="btn-add" style={{backgroundColor: '#8B5CF6', color: '#fff', height:'40px', padding:'0 15px', fontSize:'0.9rem', borderRadius: 8, display: 'flex', alignItems: 'center', border: 'none', cursor: 'pointer'}}>
-                        <PlusCircle size={18} style={{marginRight:8}}/> Novo Cargo
+                    <button onClick={() => setGerenciarCargos(true)} className="btn-add" style={{backgroundColor: '#8B5CF6', color: '#fff', height:'40px', padding:'0 15px', fontSize:'0.9rem', borderRadius: 8, display: 'flex', alignItems: 'center', border: 'none', cursor: 'pointer'}}>
+                        <PlusCircle size={18} style={{marginRight:8}}/> Gerenciar Cargos
                     </button>
                     {user?.cargo?.toLowerCase() === 'superadmin' && ( <button onClick={() => api.post('/permissoes/setup-inicial').then(() => queryClient.invalidateQueries({ queryKey: ['permissoesMatriz'] }))} className="btn-add" style={{fontSize:'0.9rem', background:'#4a5568', color:'white', height:'40px', borderRadius: 8, border: 'none', padding: '0 15px', cursor: 'pointer'}}>
                         Restaurar Padrões
@@ -144,12 +93,12 @@ export default function AdminPermissoes() {
                                 border: isSelected ? '1px solid #a78bfa' : '1px solid #4a5568'
                             }} onClick={() => setCargoSelecionado(c)}>
                                 <span style={{textTransform: 'capitalize'}}>{c.nome}</span>
-                                {c.nome !== 'admin' && (
+                                {!['admin', 'operador', 'tecnico', 'cliente'].includes(c.nome) && (
                                     <div style={{display: 'flex', gap: '5px', marginLeft: '10px'}} onClick={e => e.stopPropagation()}>
-                                        <button onClick={() => openEditModal(c.id, c.nome)} style={{background: 'none', border: 'none', color: isSelected ? '#fff' : '#a0aec0', cursor: 'pointer', padding: '2px', display: 'flex', alignItems: 'center'}}>
+                                        <button onClick={() => setGerenciarCargos(true)} title="Renomear em Gerenciar Cargos" style={{background: 'none', border: 'none', color: isSelected ? '#fff' : '#a0aec0', cursor: 'pointer', padding: '2px', display: 'flex', alignItems: 'center'}}>
                                             <Pencil size={14} />
                                         </button>
-                                        <button onClick={() => handleDeleteCargo(c.id)} style={{background: 'none', border: 'none', color: '#fc8181', cursor: 'pointer', padding: '2px', display: 'flex', alignItems: 'center'}}>
+                                        <button onClick={() => setGerenciarCargos(true)} title="Excluir em Gerenciar Cargos" style={{background: 'none', border: 'none', color: '#fc8181', cursor: 'pointer', padding: '2px', display: 'flex', alignItems: 'center'}}>
                                             <Trash2 size={14} />
                                         </button>
                                     </div>
@@ -234,53 +183,7 @@ export default function AdminPermissoes() {
                 )}
             </div>
 
-            {/* MODAL DE EDIÇÃO DE CARGO */}
-            {isEditModalOpen && (
-                <div style={{
-                    position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-                    backgroundColor: 'rgba(0, 0, 0, 0.6)', backdropFilter: 'blur(4px)',
-                    display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000
-                }}>
-                    <div style={{
-                        background: '#1a202c', border: '1px solid #2d3748', borderRadius: '12px',
-                        padding: '25px', width: '90%', maxWidth: '400px', boxShadow: '0 4px 20px rgba(0,0,0,0.5)'
-                    }}>
-                        <h3 style={{color: 'white', marginTop: 0, display: 'flex', alignItems: 'center', gap: 10}}>
-                            <Pencil size={20} color="#8B5CF6"/> Editar Nome do Cargo
-                        </h3>
-                        <p style={{color: '#a0aec0', fontSize: '0.85rem', marginBottom: '20px'}}>
-                            Atenção: A alteração se aplicará a todos os usuários atuais.
-                        </p>
-                        
-                        <input 
-                            type="text" 
-                            value={cargoParaEditar.nome}
-                            onChange={(e) => setCargoParaEditar({...cargoParaEditar, nome: e.target.value})}
-                            style={{
-                                width: '100%', padding: '10px 15px', borderRadius: '8px',
-                                border: '1px solid #4a5568', background: '#2d3748', color: 'white',
-                                marginBottom: '25px', fontSize: '1rem', boxSizing: 'border-box'
-                            }}
-                            autoFocus
-                        />
-                        
-                        <div style={{display: 'flex', justifyContent: 'flex-end', gap: '10px'}}>
-                            <button onClick={() => setIsEditModalOpen(false)} style={{
-                                padding: '10px 15px', borderRadius: '8px', border: 'none',
-                                background: '#4a5568', color: 'white', cursor: 'pointer', fontWeight: 'bold'
-                            }}>
-                                Cancelar
-                            </button>
-                            <button onClick={confirmEditCargo} style={{
-                                padding: '10px 15px', borderRadius: '8px', border: 'none',
-                                background: '#8B5CF6', color: 'white', cursor: 'pointer', fontWeight: 'bold'
-                            }}>
-                                Salvar Alterações
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
+            <ModalGerenciarCargos aberto={gerenciarCargos} onFechar={() => setGerenciarCargos(false)} />
         </div>
     );
 }

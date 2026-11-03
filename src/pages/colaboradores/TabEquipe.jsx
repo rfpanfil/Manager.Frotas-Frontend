@@ -8,6 +8,7 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import Select from 'react-select'; // Importando o Select para os novos filtros
 import toast from 'react-hot-toast';
+import ModalGerenciarCargos from '../../components/cargos/ModalGerenciarCargos';
 
 // Estilos para o React Select (Modo Escuro)
 const customSelectStyles = {
@@ -51,6 +52,7 @@ export default function TabEquipe() {
     const [modalAberto, setModalAberto] = useState(false);
     const [editandoId, setEditandoId] = useState(null);
     const [arquivoCNH, setArquivoCNH] = useState(null);
+    const [gerenciarCargos, setGerenciarCargos] = useState(false);
     const [precisaAcesso, setPrecisaAcesso] = useState(false);
 
     // --- ESTADOS DE FILTRO ---
@@ -307,6 +309,11 @@ export default function TabEquipe() {
                 <h1>Colaboradores</h1>
 
                 <div style={{ display: 'flex', gap: '10px' }}>
+                    {can('permissoes.gerenciar') && (
+                        <button onClick={() => setGerenciarCargos(true)} className="btn-add" style={{ backgroundColor: '#4a5568', color: 'white', height: '38px' }}>
+                            <Users size={18} style={{ marginRight: 5 }} /> Cargos
+                        </button>
+                    )}
                     <button onClick={exportarPDF} className="btn-add" style={{ backgroundColor: '#e53e3e', color: 'white', height: '38px' }}>
                         <FileText size={18} style={{ marginRight: 5 }} /> PDF
                     </button>
@@ -494,7 +501,10 @@ export default function TabEquipe() {
 
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
                                 <div className="input-group">
-                                    <label>Cargo / Função</label>
+                                    <label style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                        Cargo / Função
+                                        {can('permissoes.gerenciar') && <button type="button" onClick={() => setGerenciarCargos(true)} style={{ background: 'none', border: 'none', color: '#63b3ed', cursor: 'pointer', fontSize: '0.75rem', padding: 0 }}>Gerenciar cargos</button>}
+                                    </label>
                                     <select name="tipo_colaborador" value={form.tipo_colaborador} onChange={handleChange} required>
                                         <option value="">Selecione...</option>
                                         {cargos.map(c => {
@@ -567,6 +577,7 @@ export default function TabEquipe() {
                     </div>
                 </div>
             )}
+            <ModalGerenciarCargos aberto={gerenciarCargos} onFechar={() => setGerenciarCargos(false)} />
         </div>
     );
 }
