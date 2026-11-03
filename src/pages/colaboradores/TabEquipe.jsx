@@ -76,7 +76,7 @@ export default function TabEquipe() {
     });
 
     // Adicionado campo 'tipo_colaborador' e 'status' no formulário
-    const initialForm = { nome: '', tipo_colaborador: 'Técnico', cpf: '', tipo_cnh: 'B', vencimento_cnh: '', base: '', status: 'Ativo' };
+    const initialForm = { nome: '', tipo_colaborador: '', cpf: '', tipo_cnh: 'B', vencimento_cnh: '', base: '', status: 'Ativo' };
     const [form, setForm] = useState(initialForm);
 
     // --- MUDANÇA: Usa a permissão dinâmica em vez de chumbar a palavra 'cliente' ---
@@ -113,9 +113,10 @@ export default function TabEquipe() {
             const formData = new FormData();
             formData.append('arquivo', file);
             try {
-                await api.post(`/colaboradores/${editandoId}/cnh`, formData, {
+                const res = await api.post(`/colaboradores/${editandoId}/cnh`, formData, {
                     headers: { 'Content-Type': 'multipart/form-data' }
                 });
+                setForm(prev => ({ ...prev, cnh_path: res.data.path }));
                 toast.success("Documento anexado com sucesso!");
                 queryClient.invalidateQueries({ queryKey: ['colaboradores'] });
             } catch (error) { toast.error("Erro ao enviar documento."); }
@@ -500,6 +501,9 @@ export default function TabEquipe() {
                                             const nomeF = c.nome.charAt(0).toUpperCase() + c.nome.slice(1);
                                             return <option key={c.id} value={nomeF}>{nomeF}</option>;
                                         })}
+                                        {form.tipo_colaborador && !opcoesCargos.some(o => o.value === form.tipo_colaborador) && (
+                                            <option value={form.tipo_colaborador}>{form.tipo_colaborador} (cargo não cadastrado)</option>
+                                        )}
                                     </select>
                                 </div>
                                 <div className="input-group"><label>CPF</label><input name="cpf" value={form.cpf} onChange={handleChange} required placeholder="000.000.000-00" /></div>
@@ -531,8 +535,14 @@ export default function TabEquipe() {
                                 <div className="input-group" style={{ marginTop: '0px', border: '1px dashed #4a5568', padding: '10px', borderRadius: '5px' }}>
                                     <label htmlFor="upload-cnh" style={{ display: 'flex', alignItems: 'center', gap: '5px', cursor: 'pointer', color: '#a0aec0', fontSize: '0.85rem' }}>
                                         <UploadCloud size={18} />
-                                        {arquivoCNH ? arquivoCNH.name : (form.cnh_path ? "Substituir Doc..." : "Anexar CNH/Doc")}
+                                        {arquivoCNH ? arquivoCNH.name : (form.cnh_path ? "Substituir documento" : "Anexar CNH/Doc")}
                                     </label>
+                                    {form.cnh_path && !arquivoCNH && (
+                                        <button type="button" onClick={() => abrirCNH(form.cnh_path)} title="Ver documento anexado"
+                                            style={{ display: 'flex', alignItems: 'center', gap: '5px', marginTop: '8px', background: 'none', border: 'none', padding: 0, color: '#68d391', fontSize: '0.8rem', cursor: 'pointer', textAlign: 'left', wordBreak: 'break-all' }}>
+                                            <CheckCircle size={14} /> Anexado: {form.cnh_path.split('/').pop()} <Eye size={14} />
+                                        </button>
+                                    )}
                                     <input id="upload-cnh" type="file" accept="image/*,application/pdf" onChange={handleUploadCNH} style={{ display: 'none' }} />
                                 </div>
                             </div>
