@@ -43,9 +43,11 @@ export default function TabEquipe() {
     const queryClient = useQueryClient();
     const { data: bases = [] } = useQuery({ queryKey: ['bases'], queryFn: async () => (await api.get('/bases/')).data , staleTime: 300000 });
     const { data: cargos = [] } = useQuery({ queryKey: ['cargos'], queryFn: async () => (await api.get('/usuarios/cargos/lista')).data , staleTime: 300000 });
-    const { data: responseColab } = useQuery({ queryKey: ['colaboradores'], queryFn: async () => await api.get('/colaboradores/') , staleTime: 300000 });
+    // Mesmo formato (a lista) que Rastreamento, Rotas e Otimizador guardam nesta chave do cache: antes esta tela
+    // guardava a resposta inteira do axios, e quem abria uma depois da outra via a tela quebrar ou a lista vazia.
+    const { data: listaColab } = useQuery({ queryKey: ['colaboradores'], queryFn: async () => (await api.get('/colaboradores/')).data, staleTime: 300000 });
     
-    const colaboradores = (responseColab?.data || []).sort((a, b) => {
+    const colaboradores = [...(Array.isArray(listaColab) ? listaColab : [])].sort((a, b) => {
         if (!a.vencimento_cnh) return 1;
         if (!b.vencimento_cnh) return -1;
         return new Date(a.vencimento_cnh) - new Date(b.vencimento_cnh);
