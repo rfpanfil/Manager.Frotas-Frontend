@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import useCan from '../../hooks/useCan';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import api from '../../services/api';
+import api, { mensagemDeErro } from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
 import { Settings, CheckCircle, AlertCircle, Camera, Eye, Trash2, X, Save, FileText, Clock, Plus, Shield, Edit } from 'lucide-react';
 import Select from 'react-select';
@@ -189,14 +189,14 @@ export default function TabChecklistColab() {
         try {
             await api.post('/checklists-colab/', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
             toast('Checklist salvo!'); setShowModalChecklist(false); setFabOpen(false); carregarTudo();
-        } catch (e) { toast.error("Erro ao salvar"); }
+        } catch (e) { toast.error(mensagemDeErro(e, "Erro ao salvar")); }
     }
 
     async function handleStatusChange(st) {
         try {
             await api.patch(`/checklists-colab/${colabSelecionado.checklist_id}/status`, { status: st });
             toast.success("Status atualizado!"); setShowModalChecklist(false); setFabOpen(false); carregarTudo();
-        } catch (e) { toast.error("Erro"); }
+        } catch (e) { toast.error(mensagemDeErro(e, "Erro ao atualizar status.")); }
     }
 
     // --- FUNÇÕES DE GERENCIAMENTO (MODAL) ---

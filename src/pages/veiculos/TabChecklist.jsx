@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import api from '../../services/api';
+import api, { mensagemDeErro } from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
 import useCan from '../../hooks/useCan';
 import toast from 'react-hot-toast';
@@ -272,7 +272,7 @@ export default function ChecklistMensal() {
             toast(statusFinal === 'PENDENTE' ? 'Rascunho salvo!' : 'Checklist finalizado!');
             setShowModalChecklist(false);
             queryClient.invalidateQueries({ queryKey: ['checklistsDashboard'] }); queryClient.invalidateQueries({ queryKey: ['veiculosResumo'] }); queryClient.invalidateQueries({ queryKey: ['checklistsDefinicoes'] });
-        } catch (error) { toast.error("Erro ao salvar: " + (error.response?.data?.detail || error.message)); }
+        } catch (error) { toast.error(mensagemDeErro(error, "Erro ao salvar o checklist.")); }
         finally { setLoading(false); }
     }
 
@@ -283,13 +283,13 @@ export default function ChecklistMensal() {
             toast.success("Status atualizado!");
             setShowModalChecklist(false);
             queryClient.invalidateQueries({ queryKey: ['checklistsDashboard'] }); queryClient.invalidateQueries({ queryKey: ['veiculosResumo'] }); queryClient.invalidateQueries({ queryKey: ['checklistsDefinicoes'] });
-        } catch (error) { toast.error("Erro ao atualizar status."); }
+        } catch (error) { toast.error(mensagemDeErro(error, "Erro ao atualizar status.")); }
     }
 
     async function handleExcluirChecklist(id) {
         if (!confirm("Excluir este checklist realizado?")) return;
         try { await api.delete(`/checklists/${id}`); toast.success("Excluído!"); queryClient.invalidateQueries({ queryKey: ['checklistsDashboard'] }); queryClient.invalidateQueries({ queryKey: ['veiculosResumo'] }); queryClient.invalidateQueries({ queryKey: ['checklistsDefinicoes'] }); }
-        catch (error) { toast.error("Erro ao excluir."); }
+        catch (error) { toast.error(mensagemDeErro(error, "Erro ao excluir.")); }
     }
 
     async function handleSaveItem(e) {
