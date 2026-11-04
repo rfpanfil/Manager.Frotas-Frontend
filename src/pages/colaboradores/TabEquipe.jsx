@@ -9,6 +9,7 @@ import autoTable from 'jspdf-autotable';
 import Select from 'react-select'; // Importando o Select para os novos filtros
 import toast from 'react-hot-toast';
 import ModalGerenciarCargos from '../../components/cargos/ModalGerenciarCargos';
+import ConfigRastreador from '../../components/colaboradores/ConfigRastreador';
 
 // Estilos para o React Select (Modo Escuro)
 const customSelectStyles = {
@@ -556,6 +557,8 @@ export default function TabEquipe() {
                                     <input id="upload-cnh" type="file" accept="image/*,application/pdf" onChange={handleUploadCNH} style={{ display: 'none' }} />
                                 </div>
                             </div>
+
+                            {editandoId && can('colaboradores.editar') && <ConfigRastreador colaboradorId={editandoId} />}
 
                                                         <div style={{ marginTop: 15, background: '#2d3748', padding: 15, borderRadius: 8 }}>
                                 <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', color: 'white' }}>
