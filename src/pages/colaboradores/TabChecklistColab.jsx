@@ -134,7 +134,7 @@ export default function TabChecklistColab() {
             const options = {
                 maxSizeMB: 0.8,
                 maxWidthOrHeight: 1920,
-                useWebWorker: true
+                useWebWorker: false // o worker baixaria a biblioteca do cdn.jsdelivr.net, bloqueado pela CSP
             };
             const compressedFile = await imageCompression(file, options);
             setFormData(p => ({ ...p, respostas: { ...p.respostas, [chave]: { ...p.respostas[chave], foto: compressedFile } } }));
