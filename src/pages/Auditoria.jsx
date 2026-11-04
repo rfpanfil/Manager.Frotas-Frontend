@@ -6,7 +6,7 @@ import api from '../services/api';
 import { ShieldAlert, Search, Filter, FileText, Download, Activity } from 'lucide-react';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import * as XLSX from 'xlsx';
+import { baixarCsv } from '../utils/csv';
 
 // --- COMPONENTE AUXILIAR PARA RENDERIZAR OS DADOS MUDADOS (JSON) ---
 function RenderJSON({ str }) {
@@ -74,7 +74,7 @@ export default function Auditoria() {
     }
 
     // --- EXPORTAÇÕES ---
-    function exportarExcel() {
+    function exportarCsv() {
         const wsData = logs.map(l => ({
             "Data/Hora": new Date(l.data_hora).toLocaleString('pt-BR'),
             "Usuário": l.usuario_nome || 'Sistema',
@@ -84,10 +84,7 @@ export default function Auditoria() {
             "Dados Antigos": l.dados_antigos,
             "Dados Novos": l.dados_novos
         }));
-        const ws = XLSX.utils.json_to_sheet(wsData);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Log_Auditoria");
-        XLSX.writeFile(wb, `Auditoria_${new Date().getTime()}.xlsx`);
+        baixarCsv(`Auditoria_${new Date().getTime()}.csv`, wsData);
     }
 
     function exportarPDF() {
@@ -99,8 +96,8 @@ export default function Auditoria() {
             l.acao,
             l.tabela,
             l.registro_id || '-',
-            l.dados_antigos && l.dados_antigos !== 'null' ? "Sim (Ver Excel)" : "-",
-            l.dados_novos && l.dados_novos !== 'null' ? "Sim (Ver Excel)" : "-"
+            l.dados_antigos && l.dados_antigos !== 'null' ? "Sim (ver CSV)" : "-",
+            l.dados_novos && l.dados_novos !== 'null' ? "Sim (ver CSV)" : "-"
         ]);
         autoTable(doc, {
             head: [["Data/Hora", "Usuário", "Ação", "Tabela", "ID", "Tinha Dados Antigos", "Tinha Dados Novos"]],
@@ -123,8 +120,8 @@ export default function Auditoria() {
                         <option value="999999">Mostrar Tudo</option>
                     </select>
 
-                    {can('relatorios.baixar') && ( <button onClick={exportarExcel} className="btn-add" style={{ backgroundColor: '#3182ce', color: 'white', height: '40px' }} title="Baixar Planilha">
-                        <Download size={18} style={{ marginRight: 5 }} /> Excel
+                    {can('relatorios.baixar') && ( <button onClick={exportarCsv} className="btn-add" style={{ backgroundColor: '#3182ce', color: 'white', height: '40px' }} title="Baixar planilha (CSV, abre no Excel)">
+                        <Download size={18} style={{ marginRight: 5 }} /> CSV (Excel)
                     </button> )}
 
                     {can('relatorios.baixar') && ( <button onClick={exportarPDF} className="btn-add" style={{ backgroundColor: '#e53e3e', color: 'white', height: '40px' }}>

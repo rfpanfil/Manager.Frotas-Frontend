@@ -39,8 +39,7 @@
     "react-select": "^5.10.2",
     "recharts": "^3.6.0",
     "save-svg-as-png": "^1.4.17",
-    "svg2canvas": "^0.0.14",
-    "xlsx": "^0.18.5"
+    "svg2canvas": "^0.0.14"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
