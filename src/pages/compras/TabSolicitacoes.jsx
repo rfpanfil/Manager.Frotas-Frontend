@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '../../contexts/AuthContext';
-import api from '../../services/api';
+import api, { mensagemDeErro } from '../../services/api';
 import toast from 'react-hot-toast';
 
 import FiltrosSolicitacoes from '../../components/compras/FiltrosSolicitacoes';
@@ -191,7 +191,7 @@ export default function TabSolicitacoes({ onCriarOrcamento }) {
 
     async function handleDelete(id) {
         if (!confirm("Excluir esta SC? Todos os itens atrelados serão apagados.")) return;
-        try { await api.delete(`/compras/sc/${id}`); queryClient.invalidateQueries({ queryKey: ['scs'] }); } catch (e) { toast.error("Erro."); }
+        try { await api.delete(`/compras/sc/${id}`); queryClient.invalidateQueries({ queryKey: ['scs'] }); } catch (e) { toast.error(mensagemDeErro(e, "Erro ao excluir a solicitação.")); }
     }
 
     function abrirModalNovaSC() {

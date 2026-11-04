@@ -51,6 +51,12 @@ api.interceptors.response.use(
   }
 );
 
+// Mensagem do servidor (detail) quando for texto; senão, a mensagem padrão da tela.
+export function mensagemDeErro(error, padrao) {
+  const detalhe = error?.response?.data?.detail;
+  return typeof detalhe === 'string' ? detalhe : padrao;
+}
+
 // Arquivos enviados (CNH, anexos) exigem login: baixa com o token e abre numa aba nova.
 // A aba é aberta antes do download para o navegador não bloqueá-la como pop-up.
 export async function abrirArquivo(caminho) {

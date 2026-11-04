@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import api from '../../services/api';
+import api, { mensagemDeErro } from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
 import toast from 'react-hot-toast';
 
@@ -154,7 +154,7 @@ export default function TabOrcamentos({ scPreSelecionada, clearScPreSelecionada,
             }
             if (enviadas === 0) return toast.error("Preencha o Fornecedor e os Valores de pelo menos uma cotação.");
             toast.success("Orçamentos salvos com sucesso!"); setModalAberto(false); queryClient.invalidateQueries({ queryKey: ['orcamentos'] }); queryClient.invalidateQueries({ queryKey: ['scs'] });
-        } catch (error) { toast.error("Erro ao salvar: " + error.message); }
+        } catch (error) { toast.error(mensagemDeErro(error, "Erro ao salvar o orçamento.")); }
     }
 
     async function excluirOrcamentoUnico(orcId, index) {
@@ -165,7 +165,7 @@ export default function TabOrcamentos({ scPreSelecionada, clearScPreSelecionada,
                 const novos = [...formOrcamentos]; novos.splice(index, 1);
                 if (novos.length < 3) novos.push(gerarOrcamentoVazio(todasScs.find(s => s.id === parseInt(scSelecionadaId))));
                 setFormOrcamentos(novos); queryClient.invalidateQueries({ queryKey: ['orcamentos'] }); queryClient.invalidateQueries({ queryKey: ['scs'] });
-            } catch (e) { toast.error("Erro ao excluir."); }
+            } catch (e) { toast.error(mensagemDeErro(e, "Erro ao excluir.")); }
         } else { removerOpcaoCotacao(index); }
     }
 

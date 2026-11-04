@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '../../contexts/AuthContext';
-import api from '../../services/api';
+import api, { mensagemDeErro } from '../../services/api';
 import toast from 'react-hot-toast';
 
 import FiltrosOrdensCompra from '../../components/compras/FiltrosOrdensCompra';
@@ -144,7 +144,7 @@ export default function TabOrdensCompra({ orcAprovado, clearOrcAprovado }) {
             toast.success("Ordem de Compra Emitida com Sucesso!");
             setModalAprovacao(false);
             queryClient.invalidateQueries({ queryKey: ['ocs'] });
-        } catch (error) { toast.error("Erro ao emitir OC: " + (error.response?.data?.detail || error.message)); }
+        } catch (error) { toast.error(mensagemDeErro(error, "Erro ao emitir OC.")); }
     }
 
     // --- LÓGICA DO CARRINHO OC MANUAL ---
@@ -183,7 +183,7 @@ export default function TabOrdensCompra({ orcAprovado, clearOrcAprovado }) {
             await api.post('/compras/oc', payload);
             toast.success("OC Manual Criada com Sucesso!");
             setModalOCManual(false); queryClient.invalidateQueries({ queryKey: ['ocs'] });
-        } catch (error) { toast.error("Erro ao criar OC: " + (error.response?.data?.detail || error.message)); }
+        } catch (error) { toast.error(mensagemDeErro(error, "Erro ao criar OC.")); }
     }
 
     async function handleCriarNovoItemEstoque(e) {
