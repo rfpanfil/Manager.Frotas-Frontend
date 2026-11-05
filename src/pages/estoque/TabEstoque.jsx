@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import api from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
@@ -8,6 +8,7 @@ import toast from 'react-hot-toast';
 // Componentes Modularizados
 import { initialFormMolde, initialFormMov } from '../../components/estoque/estoqueConstants';
 import { exportarPdfEstoque } from '../../utils/pdfEstoque';
+import { novaChaveIdempotencia } from '../../utils/idempotencia';
 import EstoqueHeaderFiltros from '../../components/estoque/EstoqueHeaderFiltros';
 import EstoqueTabelaPrincipal from '../../components/estoque/EstoqueTabelaPrincipal';
 import ModalCadastroMolde from '../../components/estoque/ModalCadastroMolde';
@@ -50,6 +51,9 @@ export default function TabEstoque() {
     const [tipoMov, setTipoMov] = useState('ENTRADA');
     const [formMov, setFormMov] = useState(initialFormMov);
     const [erroMovimentacao, setErroMovimentacao] = useState(null);
+    // Uma chave por abertura da janela: clique duplo ou reenvio não lançam a movimentação duas vezes
+    const chaveMovRef = useRef(null);
+    useEffect(() => { if (modalMov) chaveMovRef.current = novaChaveIdempotencia(); }, [modalMov]);
 
     const [modalHist, setModalHist] = useState(false);
     const [tituloHist, setTituloHist] = useState('');
@@ -297,7 +301,7 @@ export default function TabEstoque() {
             Object.keys(payload).forEach(k => {
                 if (payload[k] === '') payload[k] = null;
             });
-            await api.post('/estoque/movimentar', payload);
+            await api.post('/estoque/movimentar', payload, { headers: { 'Idempotency-Key': chaveMovRef.current } });
             toast.success(`Sucesso! ${tipoMov} registrada no histórico.`);
             setModalMov(false);
             queryClient.invalidateQueries({ queryKey: ['itensEstoquePrincipal'] });

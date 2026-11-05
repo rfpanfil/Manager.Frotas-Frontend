@@ -61,7 +61,7 @@ export default function ModalListaStatus({
                                         {can('pneus.gerenciar') && (
                                             <button onClick={() => abrirModalEdicao(p)} title="Editar Dados" style={{ background: 'none', border: 'none', color: '#ecc94b', cursor: 'pointer', marginRight: 15 }}><Edit size={18} /></button>
                                         )}
-                                        {can('pneus.gerenciar') && (
+                                        {can('pneus.excluir') && (
                                             <button onClick={() => excluirPneu(p.id)} title="Excluir Pneu" style={{ background: 'none', border: 'none', color: '#e53e3e', cursor: 'pointer' }}><Trash2 size={18} /></button>
                                         )}
                                     </td>
