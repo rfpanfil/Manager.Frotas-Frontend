@@ -139,7 +139,7 @@ export default function EstoqueTabelaPrincipal({
                                                                         <td style={{ textAlign: 'left', padding: '8px' }}>{sub.marca || '-'}</td>
                                                                         <td style={{ textAlign: 'left', padding: '8px' }}>
                                                                             {sub.status?.replace('_', ' ')}
-                                                                            {sub.status === 'EM_USO' && sub.placa_veiculo && (
+                                                                            {sub.placa_veiculo && (
                                                                                 <span style={{ color: '#63b3ed', fontSize: '0.8rem', marginLeft: 6, fontWeight: 'bold' }}>
                                                                                     ({sub.placa_veiculo})
                                                                                 </span>

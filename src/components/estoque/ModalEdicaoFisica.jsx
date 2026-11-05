@@ -70,10 +70,22 @@ export default function ModalEdicaoFisica({
 
                     <label>Status</label>
                     <select value={formFisico.status} onChange={e => setFormFisico({ ...formFisico, status: e.target.value })} style={inputStyle}>
-                        <option value="ESTOQUE">Estoque (Disponível)</option>
-                        <option value="SUCATA">Sucata (Descarte)</option>
-                        <option value="EM_USO">Em Uso (Montado)</option>
-                        <option value="MANUTENCAO">Em Manutenção</option>
+                        {formFisico.tipo === 'PNEU' ? (
+                            <>
+                                <option value="ESTOQUE">Estoque (Disponível)</option>
+                                <option value="SUCATA">Sucata (Descarte)</option>
+                                <option value="EM_USO">Em Uso (Montado)</option>
+                                <option value="MANUTENCAO">Em Manutenção</option>
+                            </>
+                        ) : (
+                            // Equipamentos usam o status do servidor; só "Disponível" conta no saldo
+                            <>
+                                <option value="Disponível">Disponível (no estoque)</option>
+                                <option value="Em uso">Em uso</option>
+                                <option value="Em manutenção">Em manutenção</option>
+                                <option value="Sucata">Sucata (Descarte)</option>
+                            </>
+                        )}
                     </select>
 
                     <div style={{ display: 'flex', gap: 10, marginTop: 10 }}>

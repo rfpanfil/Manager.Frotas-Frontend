@@ -202,7 +202,7 @@ export default function TabEstoque() {
     }
 
     async function excluirItemPai(item) {
-        if (!window.confirm(`ATENÇÃO: Você tem certeza que deseja excluir o modelo "${item.nome}"?\n\nIsso apagará o histórico associado a ele. O sistema só permitirá a exclusão se o saldo for ZERO.`)) return;
+        if (!window.confirm(`ATENÇÃO: Você tem certeza que deseja excluir o modelo "${item.nome}"?\n\nO sistema só permite excluir um item sem saldo, sem itens físicos e que nunca foi movimentado (o histórico é sempre mantido).`)) return;
         try {
             await api.delete(`/estoque/itens/${item.id}`);
             toast.success("Item excluído com sucesso!");
@@ -272,7 +272,7 @@ export default function TabEstoque() {
     }
 
     async function excluirFisico(id, tipo) {
-        if (!window.confirm("ATENÇÃO: Isso excluirá este item específico do estoque.\nTem certeza?")) return;
+        if (!window.confirm("ATENÇÃO: Isso excluirá este item específico do estoque.\nEquipamento só é excluído se estiver Disponível, sem veículo nem responsável.\nTem certeza?")) return;
         try {
             if (tipo === 'PNEU') {
                 await api.delete(`/pneus/${id}`);
