@@ -255,7 +255,10 @@ export default function Rotas() {
     }
 
     async function handleDelete(id) {
-        if (window.confirm("Excluir?")) { await api.delete(`/rotas/${id}`); queryClient.invalidateQueries({ queryKey: ['rotas'] }); queryClient.invalidateQueries({ queryKey: ['dashboardFrota'] }); }
+        if (window.confirm("Excluir?")) {
+            try { await api.delete(`/rotas/${id}`); queryClient.invalidateQueries({ queryKey: ['rotas'] }); queryClient.invalidateQueries({ queryKey: ['dashboardFrota'] }); }
+            catch (error) { toast.error(error.response?.data?.detail || "Erro ao excluir a rota."); }
+        }
     }
 
     function exportarPDF() {

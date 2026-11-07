@@ -231,7 +231,7 @@ export default function TabEquipe() {
     async function handleDelete(id) {
         if (confirm("Tem certeza que deseja excluir este colaborador?")) {
             try { await api.delete(`/colaboradores/${id}`); queryClient.invalidateQueries({ queryKey: ['colaboradores'] }); }
-            catch (error) { toast.error("Erro ao excluir."); }
+            catch (error) { toast.error(error.response?.data?.detail || "Erro ao excluir."); }
         }
     }
 
