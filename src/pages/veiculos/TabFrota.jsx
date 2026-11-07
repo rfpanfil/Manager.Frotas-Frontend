@@ -175,7 +175,7 @@ export default function Veiculos() {
 
     async function handleDelete(id) {
         if (!confirm("Excluir?")) return;
-        try { await api.delete(`/veiculos/${id}`); queryClient.invalidateQueries({ queryKey: ['veiculosLista'] }); } catch (error) { toast.error("Erro."); }
+        try { await api.delete(`/veiculos/${id}`); queryClient.invalidateQueries({ queryKey: ['veiculosLista'] }); } catch (error) { toast.error(error.response?.data?.detail || "Erro ao excluir o veículo."); }
     }
 
     async function abrirModal(v = null) {
