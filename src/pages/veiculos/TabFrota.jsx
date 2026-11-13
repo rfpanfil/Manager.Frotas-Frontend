@@ -313,7 +313,7 @@ export default function Veiculos() {
                                     <select name="tipo" value={form.tipo} onChange={(e) => handleSelectChange(e, '/opcoes/tipos-veiculo', 'tipo')}>
                                         <option value="">Selecione...</option>
                                         {tiposVeiculo.map(t => <option key={t.id} value={t.nome}>{t.nome}</option>)}
-                                        <option value="ADD_NEW" style={{ fontWeight: 'bold', color: '#8B5CF6' }}>+ Cadastrar Novo Tipo...</option>
+                                        {can('veiculos.editar') && <option value="ADD_NEW" style={{ fontWeight: 'bold', color: '#8B5CF6' }}>+ Cadastrar Novo Tipo...</option>}
                                     </select>
                                 </div>
 
@@ -335,7 +335,7 @@ export default function Veiculos() {
                                     <select name="marca" value={form.marca} onChange={(e) => handleSelectChange(e, '/opcoes/marcas-veiculo', 'marca')}>
                                         <option value="">Selecione...</option>
                                         {marcasVeiculo.map(m => <option key={m.id} value={m.nome}>{m.nome}</option>)}
-                                        <option value="ADD_NEW" style={{ fontWeight: 'bold', color: '#8B5CF6' }}>+ Cadastrar Nova Marca...</option>
+                                        {can('veiculos.editar') && <option value="ADD_NEW" style={{ fontWeight: 'bold', color: '#8B5CF6' }}>+ Cadastrar Nova Marca...</option>}
                                     </select>
                                 </div>
 

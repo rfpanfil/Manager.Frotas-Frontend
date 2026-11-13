@@ -30,6 +30,12 @@ const customSelectStyles = {
     multiValueRemove: (base) => ({ ...base, color: 'white', ':hover': { backgroundColor: '#e53e3e', color: 'white' } })
 };
 
+// Para quem não pode criar opções: com a lista vazia o select obrigatório trava o envio, então explica o motivo.
+function SemOpcoes({ lista }) {
+    if (lista && lista.length > 0) return null;
+    return <small style={{ color: '#f6ad55' }}>Nenhuma opção cadastrada. Peça a um administrador ou a quem tem a permissão "Gerenciar Tipos de Gasto".</small>;
+}
+
 export default function ModalGastoForm({
     editandoId,
     fecharModal,
@@ -57,6 +63,8 @@ export default function ModalGastoForm({
     arquivos,
     setArquivos
 }) {
+    // "+ Novo..." cria uma opção do sistema: o servidor exige "Gerenciar Tipos de Gasto".
+    const podeCriarOpcao = can('gastos.tipos.gerenciar');
     return (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 99999, padding: '10px' }}>
             <div className="modal-card" style={{
@@ -102,8 +110,9 @@ export default function ModalGastoForm({
                             <select value={form.tipo_gasto} onChange={(e) => handleSelectChange(e, '/opcoes/tipos-gasto', null, 'tipo_gasto')} required>
                                 <option value="">Selecione...</option>
                                 {tiposGasto.map(t => <option key={t.id} value={t.nome}>{t.nome}</option>)}
-                                <option value="ADD_NEW" style={{ fontWeight: 'bold', color: '#f6ad55' }}>+ Novo...</option>
+                                {podeCriarOpcao && <option value="ADD_NEW" style={{ fontWeight: 'bold', color: '#f6ad55' }}>+ Novo...</option>}
                             </select>
+                            {!podeCriarOpcao && <SemOpcoes lista={tiposGasto} />}
                         </div>
 
                         <div className="input-group"><label>Valor (R$)</label><input type="text" value={form.valor} onChange={e => setForm({ ...form, valor: e.target.value })} required placeholder="0,00" /></div>
@@ -125,8 +134,9 @@ export default function ModalGastoForm({
                                 <select value={form.combustivel} onChange={(e) => handleSelectChange(e, '/opcoes/tipos-combustivel', null, 'combustivel')} required>
                                     <option value="">Selecione...</option>
                                     {tiposCombustivel.map(c => <option key={c.id} value={c.nome}>{c.nome}</option>)}
-                                    <option value="ADD_NEW" style={{ fontWeight: 'bold', color: '#f6ad55' }}>+ Novo...</option>
+                                    {podeCriarOpcao && <option value="ADD_NEW" style={{ fontWeight: 'bold', color: '#f6ad55' }}>+ Novo...</option>}
                                 </select>
+                                {!podeCriarOpcao && <SemOpcoes lista={tiposCombustivel} />}
                             </div>
 
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
@@ -208,16 +218,18 @@ export default function ModalGastoForm({
                                     <select value={form.tipo_manutencao} onChange={(e) => handleSelectChange(e, '/opcoes/tipos-manutencao', null, 'tipo_manutencao')} required>
                                         <option value="">Selecione...</option>
                                         {tiposManutencao.map(t => <option key={t.id} value={t.nome}>{t.nome}</option>)}
-                                        <option value="ADD_NEW" style={{ fontWeight: 'bold', color: '#e53e3e' }}>+ Novo...</option>
+                                        {podeCriarOpcao && <option value="ADD_NEW" style={{ fontWeight: 'bold', color: '#e53e3e' }}>+ Novo...</option>}
                                     </select>
+                                    {!podeCriarOpcao && <SemOpcoes lista={tiposManutencao} />}
                                 </div>
                                 <div className="input-group">
                                     <label style={{ color: '#e53e3e' }}>Status</label>
                                     <select value={form.status_manutencao} onChange={(e) => handleSelectChange(e, '/opcoes/status-manutencao', null, 'status_manutencao')} required>
                                         <option value="">Selecione...</option>
                                         {statusManutencao.map(s => <option key={s.id} value={s.nome}>{s.nome}</option>)}
-                                        <option value="ADD_NEW" style={{ fontWeight: 'bold', color: '#e53e3e' }}>+ Novo...</option>
+                                        {podeCriarOpcao && <option value="ADD_NEW" style={{ fontWeight: 'bold', color: '#e53e3e' }}>+ Novo...</option>}
                                     </select>
+                                    {!podeCriarOpcao && <SemOpcoes lista={statusManutencao} />}
                                 </div>
                             </div>
 
