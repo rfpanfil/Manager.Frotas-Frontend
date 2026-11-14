@@ -39,6 +39,13 @@ api.interceptors.response.use(
   // Tratamento centralizado de erros HTTP
   (error) => {
     if (error.response?.status === 401) {
+      // Resposta atrasada de um token que já foi trocado (ex.: superadmin trocou de empresa e o token antigo foi
+      // revogado no servidor): não derruba a sessão nova que está no navegador.
+      const enviado = String(error.config?.headers?.Authorization || '').replace(/^Bearer /, '');
+      const atual = localStorage.getItem('loop_token');
+      if (enviado && atual && enviado !== atual) {
+        return Promise.reject(error);
+      }
       // Token expirado ou inválido — força logout imediato
       localStorage.removeItem('loop_token');
       localStorage.removeItem('loop_user');

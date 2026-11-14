@@ -111,6 +111,12 @@ export function AuthProvider({ children }) {
   }
 
   function logout() {
+    // Revoga o token no servidor (best-effort): não espera a resposta nem mostra erro se falhar.
+    // O header vai explícito porque o localStorage é limpo logo abaixo, antes do interceptor rodar.
+    const token = localStorage.getItem('loop_token');
+    if (token) {
+      api.post('/usuarios/logout', null, { headers: { Authorization: `Bearer ${token}` } }).catch(() => {});
+    }
     localStorage.removeItem('loop_token');
     localStorage.removeItem('loop_user');
     localStorage.removeItem('loop_perms');
