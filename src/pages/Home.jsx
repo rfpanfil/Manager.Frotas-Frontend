@@ -30,12 +30,12 @@ export default function Home() {
   });
 
   const kpis = {
-    hoje: homeData?.cards?.hoje || 0,
+    hoje: Number(homeData?.cards?.hoje || 0),
     ontem: 0,
-    mesAtual: homeData?.cards?.mes || 0
+    mesAtual: Number(homeData?.cards?.mes || 0)
   };
 
-  const chartData = (homeData?.grafico_semanal || []).map((d) => ({ dia: d.dia, valor: d.valor }));
+  const chartData = (homeData?.grafico_semanal || []).map((d) => ({ dia: d.dia, valor: Number(d.valor || 0) }));
 
   // --- LEITURA DE MÓDULOS ATIVOS (GRANULARES) ---
   const modulos = user?.modulos_ativos || ["dash_gastos", "dash_frota", "gastos", "compras", "estoque", "otimizador", "rotas", "rastreamento", "veiculos", "colaboradores", "bases"];
@@ -49,7 +49,7 @@ export default function Home() {
     { name: 'Rotas', path: '/rotas', icon: Map, color: '#d69e2e', render: modulos.includes('rotas') },
     { name: 'Lançar Gasto', path: '/gastos', icon: Wallet, color: '#f6ad55', render: modulos.includes('gastos') },
     { name: 'Veículos', path: '/veiculos', icon: Truck, color: '#38a169', render: modulos.includes('veiculos') },
-    { name: 'Colaboradores', path: '/motoristas', icon: Users, color: '#e53e3e', render: modulos.includes('colaboradores') },
+    { name: 'Colaboradores', path: '/colaboradores', icon: Users, color: '#e53e3e', render: modulos.includes('colaboradores') && can('colaboradores.ver') },
     // Usa a permissão dinâmica para decidir se mostra o botão de Usuários
     { name: 'Usuários', path: '/usuarios', icon: UserCog, color: '#718096', render: can('usuarios.ver') }
   ].filter(item => item.render !== false);
