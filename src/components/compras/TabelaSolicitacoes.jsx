@@ -39,7 +39,7 @@ export default function TabelaSolicitacoes({
                                 <td>
                                     {sc.itens.length === 1 ? getNomeItem(sc.itens[0]) : `${sc.itens.length} itens (Lista)`}
                                 </td>
-                                <td style={{ fontWeight: 'bold' }}>{sc.itens.reduce((acc, i) => acc + i.quantidade, 0)}</td>
+                                <td style={{ fontWeight: 'bold' }}>{sc.itens.reduce((acc, i) => acc + Number(i.quantidade || 0), 0).toLocaleString('pt-BR', { maximumFractionDigits: 3 })}</td>
                                 <td>{sc.solicitante?.nome}</td>
                                 <td><span className={`tag ${sc.status.replace(' ', '_')}`}>{sc.status}</span></td>
                                 <td>

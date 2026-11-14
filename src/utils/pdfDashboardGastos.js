@@ -161,8 +161,9 @@ export async function exportarPDFDashboardGastos({
 
         currentY = ensureSpace(doc, currentY, 40);
         
-        const totalGastoTabela = dados.grafico_pizza.reduce((sum, item) => sum + (item.value || 0), 0);
-        const categoriasRows = dados.grafico_pizza
+        const pizzaNumerica = dados.grafico_pizza.map(item => ({ ...item, value: Number(item.value || 0) }));
+        const totalGastoTabela = pizzaNumerica.reduce((sum, item) => sum + item.value, 0);
+        const categoriasRows = pizzaNumerica
             .filter(d => d.value > 0)
             .sort((a,b) => b.value - a.value)
             .map(c => {

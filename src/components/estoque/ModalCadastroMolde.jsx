@@ -78,7 +78,7 @@ export default function ModalCadastroMolde({
                                     <option value="NOVA" style={{ fontWeight: 'bold', color: '#8B5CF6' }}>➕ Criar Nova Unidade</option>
                                 </select>
                             </div>
-                            <div><label>Qtd Mínima (Opcional)</label><input type="number" value={form.estoque_minimo} onChange={e => setForm({ ...form, estoque_minimo: e.target.value })} style={inputStyle} /></div>
+                            <div><label>Qtd Mínima (Opcional)</label><input type="number" step="0.001" value={form.estoque_minimo} onChange={e => setForm({ ...form, estoque_minimo: e.target.value })} style={inputStyle} /></div>
                         </div>
                         <div><label>Observações Gerais</label><textarea rows="2" value={form.observacoes} onChange={e => setForm({ ...form, observacoes: e.target.value })} style={{ ...inputStyle, fontFamily: 'inherit' }} /></div>
                     </div>
@@ -111,7 +111,7 @@ export default function ModalCadastroMolde({
                         ) : (
                             form.tipo_controle === 'QUANTIDADE' ? (
                                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 15 }}>
-                                    <div><label>Qtd Inicial (Opcional)</label><input type="number" placeholder="0" value={form.quantidade_inicial} onChange={e => setForm({ ...form, quantidade_inicial: e.target.value })} style={inputStyle} /></div>
+                                    <div><label>Qtd Inicial (Opcional)</label><input type="number" step="0.001" placeholder="0" value={form.quantidade_inicial} onChange={e => setForm({ ...form, quantidade_inicial: e.target.value })} style={inputStyle} /></div>
                                     <div><label>Valor Unitário (R$) (Opcional)</label><input placeholder="0,00" value={form.valor_aquisicao} onChange={e => setForm({ ...form, valor_aquisicao: e.target.value })} style={inputStyle} /></div>
                                 </div>
                             ) : (
@@ -121,7 +121,7 @@ export default function ModalCadastroMolde({
 
                                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 15 }}>
                                         <div><label>Quantidade a Adicionar (Opcional)</label><input type="number" placeholder="Ex: 1" value={form.quantidade_inicial} onChange={e => setForm({ ...form, quantidade_inicial: e.target.value })} style={inputStyle} /></div>
-                                        <div><label>Valor Unitário (R$) (Opcional)</label><input type="number" step="0.01" placeholder="0.00" value={form.valor_aquisicao} onChange={e => setForm({ ...form, valor_aquisicao: e.target.value })} style={inputStyle} /></div>
+                                        <div><label>Valor Unitário (R$) (Opcional)</label><input type="number" step="0.0001" placeholder="0.00" value={form.valor_aquisicao} onChange={e => setForm({ ...form, valor_aquisicao: e.target.value })} style={inputStyle} /></div>
                                     </div>
 
                                     {form.categoria === 'PNEUS' ? (

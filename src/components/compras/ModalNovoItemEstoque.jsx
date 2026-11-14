@@ -65,7 +65,7 @@ export default function ModalNovoItemEstoque({
                                 <option value="SERIALIZADO">Serializado (Único)</option>
                             </select>
                         </div>
-                        <div><label>Estoque Mínimo de Alerta</label><input type="number" placeholder="0" value={formNovoItem.estoque_minimo} onChange={e => setFormNovoItem({ ...formNovoItem, estoque_minimo: e.target.value })} style={inputStyle} /></div>
+                        <div><label>Estoque Mínimo de Alerta</label><input type="number" step="0.001" placeholder="0" value={formNovoItem.estoque_minimo} onChange={e => setFormNovoItem({ ...formNovoItem, estoque_minimo: e.target.value })} style={inputStyle} /></div>
                     </div>
 
                     <div><label>Observações / Link</label><textarea rows="2" value={formNovoItem.observacoes} onChange={e => setFormNovoItem({ ...formNovoItem, observacoes: e.target.value })} style={inputStyle} /></div>

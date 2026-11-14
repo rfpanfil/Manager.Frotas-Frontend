@@ -68,13 +68,13 @@ export default function ModalMovimentacao({
                     {tipoMov === 'ENTRADA' ? (
                         <>
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-                                <div><label>Quantidade</label><input type="number" min="1" required placeholder="Ex: 50" onChange={e => setFormMov({ ...formMov, quantidade: e.target.value })} style={inputStyle} /></div>
-                                <div><label>Valor Unitário (R$)</label><input type="number" step="0.01" placeholder="R$ 0,00" onChange={e => setFormMov({ ...formMov, valor_aquisicao: e.target.value })} style={inputStyle} /></div>
+                                <div><label>Quantidade</label><input type="number" min={itemSelecionado?.tipo_controle === 'SERIALIZADO' ? '1' : '0.001'} step={itemSelecionado?.tipo_controle === 'SERIALIZADO' ? '1' : '0.001'} required placeholder="Ex: 50" onChange={e => setFormMov({ ...formMov, quantidade: e.target.value })} style={inputStyle} /></div>
+                                <div><label>Valor Unitário (R$)</label><input type="number" step="0.0001" placeholder="R$ 0,00" onChange={e => setFormMov({ ...formMov, valor_aquisicao: e.target.value })} style={inputStyle} /></div>
                             </div>
 
                             {/* CÁLCULO VISUAL DO TOTAL */}
                             <div style={{ textAlign: 'right', fontSize: '0.9rem', color: '#8B5CF6', fontWeight: 'bold' }}>
-                                Custo Total: R$ {((formMov.quantidade || 0) * (formMov.valor_aquisicao || 0)).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                                Custo Total: R$ {((formMov.quantidade || 0) * (formMov.valor_aquisicao || 0)).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                             </div>
 
                             <div><label>Número da NF (Opcional)</label><input placeholder="Série e Número" onChange={e => setFormMov({ ...formMov, numero_nf: e.target.value })} style={inputStyle} /></div>
@@ -117,7 +117,7 @@ export default function ModalMovimentacao({
                     ) : (
                         <>
                             {/* SAÍDA */}
-                            <div><label>Qtd. a Retirar</label><input type="number" required placeholder="Ex: 2" onChange={e => setFormMov({ ...formMov, quantidade: e.target.value })} style={inputStyle} /></div>
+                            <div><label>Qtd. a Retirar</label><input type="number" step="0.001" required placeholder="Ex: 2" onChange={e => setFormMov({ ...formMov, quantidade: e.target.value })} style={inputStyle} /></div>
                             <div>
                                 <label>Centro de Custo / Base</label>
                                 <select required onChange={e => setFormMov({ ...formMov, base_id: e.target.value })} style={inputStyle}>

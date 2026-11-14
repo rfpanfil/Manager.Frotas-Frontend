@@ -13,14 +13,16 @@ export default function GraficoDistribuicaoCustos({
 }) {
     const { pizzaLimpa, itensOutros, itensPrincipais } = useMemo(() => {
         if (!dados) return { pizzaLimpa: [], itensOutros: [], itensPrincipais: [] };
+        // O valor pode chegar como texto (Decimal serializado); converte antes de somar/comparar.
+        const dadosNumericos = dados.map(d => ({ ...d, value: Number(d.value || 0) }));
 
-        const totalPizza = dados.reduce((acc, curr) => acc + (curr.value || 0), 0);
+        const totalPizza = dadosNumericos.reduce((acc, curr) => acc + curr.value, 0);
         const _pizzaLimpa = [];
         let valorOutros = 0;
         const _itensOutros = [];
         const _itensPrincipais = [];
 
-        const dadosOrdenados = [...dados].filter(d => d.value > 0).sort((a, b) => b.value - a.value);
+        const dadosOrdenados = [...dadosNumericos].filter(d => d.value > 0).sort((a, b) => b.value - a.value);
 
         dadosOrdenados.forEach(item => {
             const percent = totalPizza > 0 ? item.value / totalPizza : 0;

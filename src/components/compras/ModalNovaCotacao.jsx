@@ -93,7 +93,7 @@ export default function ModalNovaCotacao({
                                                     <tr key={iIdx} style={{ borderBottom: '1px solid #2d3748' }}>
                                                         <td style={{ padding: '8px 5px', fontSize: '0.8rem', color: '#e2e8f0' }}>{item.nome_exibicao}</td>
                                                         <td style={{ padding: '8px 5px', textAlign: 'center', fontWeight: 'bold' }}>{item.quantidade}</td>
-                                                        <td style={{ padding: '8px 5px' }}><input type="number" step="0.01" required={index === 0 || !!orc.id} placeholder="0.00" value={item.valor_unitario} onChange={e => handleItemChange(index, iIdx, e.target.value)} style={{ ...inputStyle, padding: '6px', fontSize: '0.85rem', minWidth: '80px' }} /></td>
+                                                        <td style={{ padding: '8px 5px' }}><input type="number" step="0.0001" required={index === 0 || !!orc.id} placeholder="0.00" value={item.valor_unitario} onChange={e => handleItemChange(index, iIdx, e.target.value)} style={{ ...inputStyle, padding: '6px', fontSize: '0.85rem', minWidth: '80px' }} /></td>
                                                     </tr>
                                                 ))}
                                             </tbody>

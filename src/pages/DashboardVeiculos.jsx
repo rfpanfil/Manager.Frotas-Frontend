@@ -142,20 +142,20 @@ export default function DashboardVeiculos() {
                 // 1. LINHA PRINCIPAL
                 tableRows.push([
                     d.veiculo,
-                    `R$ ${(d.total_gasto || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
+                    `R$ ${Number(d.total_gasto || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
 
                     // --- ADICIONADO AQUI: COMBUSTÍVEL ---
-                    `R$ ${(d.gastos_abastecimento || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
+                    `R$ ${Number(d.gastos_abastecimento || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
 
-                    `R$ ${(d.gastos_revisoes || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
+                    `R$ ${Number(d.gastos_revisoes || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
                     `${(d.km_rodado || 0).toLocaleString('pt-BR')} km`,
                     `${(d.media_consumo || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })} km/l`,
-                    `R$ ${valorPerformance.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} /km`
+                    `R$ ${Number(valorPerformance).toLocaleString('pt-BR', { minimumFractionDigits: 2 })} /km`
                 ]);
 
                 // 2. LINHA DE DETALHES (EXPANDIDA AUTOMATICAMENTE)
                 const textoDetalhes = Object.entries(d.detalhamento)
-                    .map(([tipo, valor]) => `${tipo}: R$ ${valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`)
+                    .map(([tipo, valor]) => `${tipo}: R$ ${Number(valor || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`)
                     .join('    |    ');
 
                 if (textoDetalhes) {
@@ -380,17 +380,17 @@ export default function DashboardVeiculos() {
 
                                         {/* TOTAL GERAL */}
                                         <td style={{ textAlign: 'right', fontWeight: 'bold', color: '#8B5CF6' }}>
-                                            R$ {linha.total_gasto.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                                            R$ {Number(linha.total_gasto || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                                         </td>
 
                                         {/* COLUNA COMBUSTÍVEL LIMPA */}
                                         <td style={{ textAlign: 'right', color: '#a0aec0' }}>
-                                            R$ {(linha.gastos_abastecimento || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                                            R$ {Number(linha.gastos_abastecimento || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                                         </td>
 
                                         {/* COLUNA REVISÕES */}
                                         <td style={{ textAlign: 'right', color: '#a0aec0' }}>
-                                            R$ {linha.gastos_revisoes.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                                            R$ {Number(linha.gastos_revisoes || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                                         </td>
 
                                         {/* KM RODADO */}
@@ -443,7 +443,7 @@ export default function DashboardVeiculos() {
                                                         <div key={tipo} style={{ background: '#2d3748', padding: '8px', borderRadius: '4px', border: '1px solid #4a5568' }}>
                                                             <div style={{ fontSize: '0.75rem', color: '#a0aec0', textTransform: 'uppercase' }}>{tipo}</div>
                                                             <div style={{ color: '#8B5CF6', fontWeight: 'bold' }}>
-                                                                R$ {valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                                                                R$ {Number(valor || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                                                             </div>
                                                         </div>
                                                     ))}

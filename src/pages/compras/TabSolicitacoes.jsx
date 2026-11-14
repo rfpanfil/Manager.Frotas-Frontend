@@ -201,7 +201,7 @@ export default function TabSolicitacoes({ onCriarOrcamento }) {
         setModalAberto(true);
     }
 
-    const opcoesEstoque = itensEstoque.map(i => ({ value: i.id, label: `${i.nome} (${i.codigo_referencia})` }));
+    const opcoesEstoque = itensEstoque.map(i => ({ value: i.id, label: `${i.nome} (${i.codigo_referencia})`, tipo_controle: i.tipo_controle }));
 
     return (
         <div style={{ paddingTop: 10 }}>

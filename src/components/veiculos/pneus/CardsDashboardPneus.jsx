@@ -16,7 +16,7 @@ export default function CardsDashboardPneus({ resumo, setModalListaStatus, setBu
             <CardDashboard titulo="Sucata / Descartados" valor={resumo.sucata} cor="#e53e3e" statusFiltro="SUCATA" setModalListaStatus={setModalListaStatus} setBuscaModalStatus={setBuscaModalStatus} />
             <div style={{ background: '#2d3748', padding: 15, borderRadius: 8, flex: 1, borderLeft: `4px solid #805ad5` }}>
                 <div style={{ fontSize: '0.8rem', color: '#a0aec0' }}>CPK Médio</div>
-                <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: 'white' }}>R$ {resumo.cpk_medio?.toFixed(2).replace('.', ',') || '0,00'}</div>
+                <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: 'white' }}>R$ {Number(resumo.cpk_medio || 0).toFixed(2).replace('.', ',')}</div>
             </div>
         </div>
     );

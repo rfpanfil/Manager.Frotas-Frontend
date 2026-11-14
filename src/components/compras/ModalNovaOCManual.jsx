@@ -88,8 +88,8 @@ export default function ModalNovaOCManual({
                                     </>
                                 )}
                             </div>
-                            <div style={{ width: '100px' }}><label style={{ display: 'block', marginBottom: 5 }}>Qtd.</label><input type="number" value={itemAtual.quantidade} onChange={e => setItemAtual({ ...itemAtual, quantidade: e.target.value })} style={inputStyle} placeholder="Ex: 4" /></div>
-                            <div style={{ width: '120px' }}><label style={{ display: 'block', marginBottom: 5 }}>V. Unit (R$)</label><input type="number" step="0.01" value={itemAtual.valor_unitario} onChange={e => setItemAtual({ ...itemAtual, valor_unitario: e.target.value })} style={inputStyle} placeholder="0.00" /></div>
+                            <div style={{ width: '100px' }}><label style={{ display: 'block', marginBottom: 5 }}>Qtd.</label><input type="number" min="0" step={opcoesEstoque.find(o => o.value === itemAtual.estoque_item_id)?.tipo_controle === 'SERIALIZADO' ? '1' : '0.001'} value={itemAtual.quantidade} onChange={e => setItemAtual({ ...itemAtual, quantidade: e.target.value })} style={inputStyle} placeholder="Ex: 4" /></div>
+                            <div style={{ width: '120px' }}><label style={{ display: 'block', marginBottom: 5 }}>V. Unit (R$)</label><input type="number" step="0.0001" value={itemAtual.valor_unitario} onChange={e => setItemAtual({ ...itemAtual, valor_unitario: e.target.value })} style={inputStyle} placeholder="0.00" /></div>
                             <div><button type="button" onClick={adicionarItemOC} style={{ height: '42px', padding: '0 20px', background: '#3182ce', color: 'white', border: 'none', borderRadius: 5, cursor: 'pointer', fontWeight: 'bold' }}><PlusCircle size={18} style={{ display: 'inline' }} /> Inserir</button></div>
                         </div>
                     </div>
@@ -131,7 +131,7 @@ export default function ModalNovaOCManual({
 
                                         {regrasManual.isCombustivel && (
                                             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 10 }}>
-                                                <div><label style={{ display: 'block', marginBottom: 5 }}>Litros Abastecidos *</label><input required type="number" step="0.01" value={formCapa.litros} onChange={e => setFormCapa({ ...formCapa, litros: e.target.value })} style={inputStyle} /></div>
+                                                <div><label style={{ display: 'block', marginBottom: 5 }}>Litros Abastecidos *</label><input required type="number" step="0.001" value={formCapa.litros} onChange={e => setFormCapa({ ...formCapa, litros: e.target.value })} style={inputStyle} /></div>
                                                 <div><label style={{ display: 'block', marginBottom: 5 }}>KM Atual *</label><input required type="number" value={formCapa.km_atual} onChange={e => setFormCapa({ ...formCapa, km_atual: e.target.value })} style={inputStyle} /></div>
                                             </div>
                                         )}

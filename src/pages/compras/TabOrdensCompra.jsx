@@ -124,7 +124,7 @@ export default function TabOrdensCompra({ orcAprovado, clearOrcAprovado }) {
     };
     const regrasManual = verificarRegrasManual(carrinhoItens);
 
-    const opcoesEstoque = itensEstoque.map(i => ({ value: i.id, label: `${i.nome} (${i.codigo_referencia})` }));
+    const opcoesEstoque = itensEstoque.map(i => ({ value: i.id, label: `${i.nome} (${i.codigo_referencia})`, tipo_controle: i.tipo_controle }));
 
     // --- SALVAR APROVAÇÃO (GERAR OC A PARTIR DE ORÇAMENTO) ---
     async function salvarAprovacao(e) {

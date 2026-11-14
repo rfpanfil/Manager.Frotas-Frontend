@@ -45,13 +45,13 @@ export default function EstoqueTabelaPrincipal({
                                 <td style={{ textAlign: 'center' }}><span className="tag" style={{ display: 'inline-block' }}>{item.categoria}</span></td>
                                 <td style={{ textAlign: 'center' }}>{item.tipo_controle === 'QUANTIDADE' ? 'Volume' : 'Unitário'}</td>
                                 <td style={{
-                                    color: item.estoque_minimo > 0 && item.saldo_atual <= item.estoque_minimo ? '#e53e3e' : (item.saldo_atual === 0 ? '#a0aec0' : '#8B5CF6'),
+                                    color: Number(item.estoque_minimo) > 0 && Number(item.saldo_atual) <= Number(item.estoque_minimo) ? '#e53e3e' : (Number(item.saldo_atual) === 0 ? '#a0aec0' : '#8B5CF6'),
                                     fontWeight: 'bold',
                                     textAlign: 'center'
                                 }}>
-                                    {item.tipo_controle === 'SERIALIZADO' && item.saldo_atual === 0
+                                    {item.tipo_controle === 'SERIALIZADO' && Number(item.saldo_atual) === 0
                                         ? <span style={{ opacity: 0.6 }}>0 (Molde)</span>
-                                        : <>{item.saldo_atual} <span style={{ fontSize: '0.8rem', fontWeight: 'normal' }}>{item.unidade_medida === 'UNIDADE' ? 'UND' : item.unidade_medida}</span></>}
+                                        : <>{Number(item.saldo_atual || 0).toLocaleString('pt-BR', { maximumFractionDigits: 3 })} <span style={{ fontSize: '0.8rem', fontWeight: 'normal' }}>{item.unidade_medida === 'UNIDADE' ? 'UND' : item.unidade_medida}</span></>}
                                 </td>
                                 <td>
                                     <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>

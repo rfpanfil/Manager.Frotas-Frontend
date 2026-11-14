@@ -40,7 +40,7 @@ export default function ModalFichaFornecedor({
                                     <li key={oc.id} style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px dashed #444', padding: '5px 0' }}>
                                         <span style={{ color: '#63b3ed' }}>{oc.numero}</span>
                                         <span style={{ color: '#a0aec0' }}>{new Date(oc.data_emissao).toLocaleDateString()}</span>
-                                        <span style={{ fontWeight: 'bold' }}>R$ {oc.valor_total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                                        <span style={{ fontWeight: 'bold' }}>R$ {Number(oc.valor_total || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                                         <span style={{ fontSize: '0.8rem', color: oc.status === 'Cancelada' ? '#e53e3e' : '#8B5CF6' }}>{oc.status}</span>
                                     </li>
                                 ))}

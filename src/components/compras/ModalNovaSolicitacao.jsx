@@ -136,7 +136,7 @@ export default function ModalNovaSolicitacao({
                             </div>
                             <div style={{ width: '100px' }}>
                                 <label style={{ display: 'block', marginBottom: 5 }}>Qtd.</label>
-                                <input type="number" value={itemAtual.quantidade} onChange={e => setItemAtual({ ...itemAtual, quantidade: e.target.value })} style={inputStyle} placeholder="Ex: 4" />
+                                <input type="number" min="0" step={opcoesEstoque.find(o => o.value === itemAtual.estoque_item_id)?.tipo_controle === 'SERIALIZADO' ? '1' : '0.001'} value={itemAtual.quantidade} onChange={e => setItemAtual({ ...itemAtual, quantidade: e.target.value })} style={inputStyle} placeholder="Ex: 4" />
                             </div>
                             <div>
                                 <button type="button" onClick={adicionarItemAoCarrinho} style={{ height: '42px', padding: '0 20px', background: '#3182ce', color: 'white', border: 'none', borderRadius: 5, cursor: 'pointer', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 5 }}>

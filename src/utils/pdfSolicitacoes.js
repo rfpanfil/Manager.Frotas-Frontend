@@ -13,7 +13,7 @@ export const baixarListaPDF = (dadosFiltrados, getNomeItem) => {
             sc.data_criacao ? new Date(sc.data_criacao).toLocaleDateString() : '-',
             sc.solicitante?.nome || '-',
             sc.itens.length === 1 ? getNomeItem(sc.itens[0]) : `${sc.itens.length} itens`,
-            sc.itens.reduce((acc, i) => acc + i.quantidade, 0),
+            sc.itens.reduce((acc, i) => acc + Number(i.quantidade || 0), 0).toLocaleString('pt-BR', { maximumFractionDigits: 3 }),
             sc.status
         ]),
         styles: { fontSize: 8 }
@@ -83,7 +83,7 @@ export const baixarResumoPDF = async (sc, bases, getNomeItem) => {
     const tableData = sc.itens.map(i => [
         (i.tipo_item === 'PRODUTO' || i.tipo_item === 'ESTOQUE' || i.classificacao === 'PRODUTO' || i.classificacao === 'ESTOQUE') ? getNomeItem(i) : (i.nome_novo_item || 'Item Genérico'),
         i.tipo_gasto || 'Geral',
-        i.quantidade,
+        Number(i.quantidade || 0).toLocaleString('pt-BR', { maximumFractionDigits: 3 }),
         "UN"
     ]);
 

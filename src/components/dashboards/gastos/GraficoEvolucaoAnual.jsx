@@ -28,7 +28,7 @@ export default function GraficoEvolucaoAnual({
                                     fill="#8B5CF6" 
                                     fontSize={12} 
                                     fontWeight="bold"
-                                    formatter={(val) => val > 0 ? `R$ ${val.toFixed(2)}` : ''} 
+                                    formatter={(val) => Number(val) > 0 ? `R$ ${Number(val).toFixed(2)}` : ''} 
                                 />
                             </Bar>
                         </BarChart>
