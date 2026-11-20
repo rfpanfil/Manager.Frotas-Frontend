@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import api from '../../services/api';
+import api, { mensagemDeErro } from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
 import useCan from '../../hooks/useCan';
 import toast from 'react-hot-toast';
@@ -132,7 +132,7 @@ export default function TabEstoque() {
             }
             setFormCategoria({ id: null, nome: '', tipo_padrao: 'LIVRE' });
             queryClient.invalidateQueries({ queryKey: ['categoriasEstoque'] }); queryClient.invalidateQueries({ queryKey: ['unidadesBD'] }); queryClient.invalidateQueries({ queryKey: ['bases'] }); queryClient.invalidateQueries({ queryKey: ['usuarios'] }); queryClient.invalidateQueries({ queryKey: ['seriaisPatrimonios'] });
-        } catch (e) { toast.error("Erro: " + (e.response?.data?.detail || "Falha ao salvar")); }
+        } catch (e) { toast.error("Erro: " + mensagemDeErro(e, "Falha ao salvar")); }
     }
 
     async function handleExcluirCategoria(id) {
@@ -140,13 +140,14 @@ export default function TabEstoque() {
         try {
             await api.delete(`/estoque/categorias/${id}`);
             queryClient.invalidateQueries({ queryKey: ['categoriasEstoque'] }); queryClient.invalidateQueries({ queryKey: ['unidadesBD'] }); queryClient.invalidateQueries({ queryKey: ['bases'] }); queryClient.invalidateQueries({ queryKey: ['usuarios'] }); queryClient.invalidateQueries({ queryKey: ['seriaisPatrimonios'] });
-        } catch (e) { toast.error("Erro: " + (e.response?.data?.detail || "Em uso por algum item")); }
+        } catch (e) { toast.error("Erro: " + mensagemDeErro(e, "Em uso por algum item")); }
     }
 
     function handleNovaUnidade() {
         const nova = window.prompt("Digite a sigla da Nova Unidade (Ex: PCT, M2):");
         if (!nova || nova.trim() === '') return;
         const nomeUpper = nova.trim().toUpperCase();
+        if (!/^[A-Z0-9]{1,10}$/.test(nomeUpper)) return toast.error("Unidade inválida: use até 10 letras ou números, sem espaços (ex.: PCT, M2).");
         if (!unidadesBD.find(u => u.nome === nomeUpper)) {
             queryClient.invalidateQueries({ queryKey: ['unidadesBD'] });
         }
@@ -199,9 +200,7 @@ export default function TabEstoque() {
             setForm(initialFormMolde);
             queryClient.invalidateQueries({ queryKey: ['itensEstoquePrincipal'] });
         } catch (error) {
-            const det = error.response?.data?.detail;
-            const msgErro = Array.isArray(det) ? JSON.stringify(det, null, 2) : (typeof det === 'object' ? JSON.stringify(det) : (det || error.message));
-            toast.error("Erro ao Salvar:\n\n" + msgErro);
+            toast.error("Erro ao Salvar:\n\n" + mensagemDeErro(error, error.message));
         }
     }
 
@@ -216,7 +215,7 @@ export default function TabEstoque() {
             }
             queryClient.invalidateQueries({ queryKey: ['itensEstoquePrincipal'] });
             queryClient.invalidateQueries({ queryKey: ['categoriasEstoque'] }); queryClient.invalidateQueries({ queryKey: ['unidadesBD'] }); queryClient.invalidateQueries({ queryKey: ['bases'] }); queryClient.invalidateQueries({ queryKey: ['usuarios'] }); queryClient.invalidateQueries({ queryKey: ['seriaisPatrimonios'] });
-        } catch (error) { toast.error("Erro ao excluir: " + (error.response?.data?.detail || error.message)); }
+        } catch (error) { toast.error("Erro ao excluir: " + mensagemDeErro(error, error.message)); }
     }
 
     // --- HANDLERS: SUB-ITENS ---
@@ -243,6 +242,7 @@ export default function TabEstoque() {
     function abrirEditarFisico(subItem) {
         setFormFisico({
             ...subItem,
+            status_original: subItem.status,
             medida: subItem.medida || '',
             sulco_novo: subItem.sulco_novo || 0,
             sulco_atual: subItem.sulco_atual || 0
@@ -269,7 +269,7 @@ export default function TabEstoque() {
             const res = await api.get(`/estoque/itens/${expandedItem}/fisicos`);
             setSubItens(res.data);
         } catch (e) {
-            const msg = e.response?.data?.detail || e.message;
+            const msg = mensagemDeErro(e, e.message);
             if (msg.includes('Duplicado')) setErroEdicaoItem(msg);
             else toast.error("Erro ao salvar: " + msg);
         }
@@ -286,7 +286,7 @@ export default function TabEstoque() {
             const res = await api.get(`/estoque/itens/${expandedItem}/fisicos`);
             setSubItens(res.data);
             queryClient.invalidateQueries({ queryKey: ['itensEstoquePrincipal'] });
-        } catch (e) { toast.error("Erro: " + (e.response?.data?.detail || e.message)); }
+        } catch (e) { toast.error("Erro: " + mensagemDeErro(e, e.message)); }
     }
 
     // --- HANDLERS: MOVIMENTAÇÃO ---
@@ -310,8 +310,7 @@ export default function TabEstoque() {
                 setSubItens(res.data);
             }
         } catch (error) {
-            const det = error.response?.data?.detail;
-            const msg = typeof det === 'string' ? det : JSON.stringify(det || "Erro na movimentação.");
+            const msg = mensagemDeErro(error, "Erro na movimentação.");
             if (msg.includes('Duplicado')) setErroMovimentacao(msg);
             else toast.error("Erro: " + msg);
         }

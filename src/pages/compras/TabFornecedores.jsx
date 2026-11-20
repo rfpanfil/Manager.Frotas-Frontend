@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '../../contexts/AuthContext';
-import api from '../../services/api';
+import api, { mensagemDeErro } from '../../services/api';
 import toast from 'react-hot-toast';
 
 import FiltrosFornecedores from '../../components/compras/FiltrosFornecedores';
@@ -46,7 +46,7 @@ export default function TabFornecedores() {
             queryClient.invalidateQueries({ queryKey: ['fornecedores'] });
         } catch (error) {
             console.error(error);
-            toast.error("Erro ao salvar. Verifique os dados.");
+            toast.error(mensagemDeErro(error, "Erro ao salvar. Verifique os dados."));
         }
     }
 
@@ -77,7 +77,7 @@ export default function TabFornecedores() {
             } catch (error) {
                 console.error(error);
                 // Mostra a mensagem de erro vinda do backend (ex: tem vínculos)
-                toast.error(error.response?.data?.detail || "Erro ao excluir fornecedor.");
+                toast.error(mensagemDeErro(error, "Erro ao excluir fornecedor."));
             }
         }
     }

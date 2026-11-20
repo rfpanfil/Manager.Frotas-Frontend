@@ -2,7 +2,8 @@ import usePersistedTab from '../hooks/usePersistedTab';
 import useCan from '../hooks/useCan';
 import { useState, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import api from '../services/api';
+import api, { mensagemDeErro } from '../services/api';
+import { MAX, KM_MAX } from '../utils/campos';
 import {
     Plus, Navigation, Trash2, Calculator, Map,
     PlayCircle, Flag, Edit2, Check, X, FileText, ExternalLink
@@ -223,6 +224,7 @@ export default function Otimizador() {
         if (!origem) return toast("Digite o endereço de partida.");
         const validos = servicos.filter(s => s.endereco && s.valor);
         if (validos.length === 0) return toast("Adicione serviços.");
+        if (validos.length > 25) return toast.error("O otimizador aceita no máximo 25 serviços por cálculo.");
 
         setLoading(true);
         try {
@@ -233,7 +235,7 @@ export default function Otimizador() {
             });
             setResultado(response.data);
         } catch (error) {
-            toast.error("Erro: " + (error.response?.data?.detail || error.message));
+            toast.error("Erro: " + mensagemDeErro(error, error.message));
         } finally { setLoading(false); }
     }
 
@@ -259,7 +261,7 @@ export default function Otimizador() {
             await api.post('/rotas/', payload);
             navigate('/rotas');
         } catch (error) {
-            toast.error("Erro ao salvar. Verifique a conexão.");
+            toast.error(mensagemDeErro(error, "Erro ao salvar. Verifique a conexão."));
         }
     }
 
@@ -319,12 +321,12 @@ export default function Otimizador() {
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', width: '100%' }}>
                             <div className="input-group">
                                 <label style={{ fontSize: '1.2rem', fontWeight: 'bold', color: '#fff' }}>Ponto de Partida (Início)</label>
-                                <input placeholder="Ex: Garagem da Empresa" value={origem} onChange={e => setOrigem(e.target.value)} style={{ width: '95%', height: '30px', fontSize: '1rem' }} />
+                                <input maxLength={MAX.MEDIO} placeholder="Ex: Garagem da Empresa" value={origem} onChange={e => setOrigem(e.target.value)} style={{ width: '95%', height: '30px', fontSize: '1rem' }} />
                             </div>
 
                             <div className="input-group">
                                 <label style={{ fontSize: '1.2rem', fontWeight: 'bold', color: '#fff' }}>Ponto de Retorno (Fim)</label>
-                                <input placeholder="Deixe vazio para mesmo endereço do ponto de partida" value={destinoFinal} onChange={e => setDestinoFinal(e.target.value)} style={{ width: '95%', height: '30px', fontSize: '1rem' }} />
+                                <input maxLength={MAX.MEDIO} placeholder="Deixe vazio para mesmo endereço do ponto de partida" value={destinoFinal} onChange={e => setDestinoFinal(e.target.value)} style={{ width: '95%', height: '30px', fontSize: '1rem' }} />
                             </div>
                         </div>
                     </div>
@@ -352,6 +354,7 @@ export default function Otimizador() {
                                     <label style={{ fontSize: '1.2rem', color: '#fff' }}>Endereço / Coordenada</label>
                                     <input
                                         placeholder="Rua, Nº, Cidade OU -25.42, -49.27"
+                                        maxLength={MAX.MEDIO}
                                         value={servico.endereco}
                                         onChange={e => handleServiceChange(index, 'endereco', e.target.value)}
                                         style={{ width: '110%', height: '40px', padding: '0 10px', fontSize: '1.1rem' }}
@@ -362,6 +365,8 @@ export default function Otimizador() {
                                     <label style={{ fontSize: '1.2rem', color: '#fff' }}>Valor (R$)</label>
                                     <input
                                         type="number"
+                                        min="0"
+                                        step="0.01"
                                         placeholder="0,00"
                                         value={servico.valor}
                                         onChange={e => handleServiceChange(index, 'valor', e.target.value)}
@@ -503,7 +508,7 @@ export default function Otimizador() {
                                             <option key={m.id} value={m.id}>{m.nome}</option>
                                         ))}
                                     </select>
-                                    <input type="number" placeholder="KM Painel" className="input-small" style={{ width: '100px' }} value={selecaoFinal.km_saida} onChange={e => setSelecaoFinal({ ...selecaoFinal, km_saida: e.target.value })} />
+                                    <input type="number" min="0" max={KM_MAX} step="1" placeholder="KM Painel" className="input-small" style={{ width: '100px' }} value={selecaoFinal.km_saida} onChange={e => setSelecaoFinal({ ...selecaoFinal, km_saida: e.target.value })} />
                                 </div>
                                 {can('rotas.criar') && (
                                     <button

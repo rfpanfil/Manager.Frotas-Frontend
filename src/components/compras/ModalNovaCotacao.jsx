@@ -1,6 +1,7 @@
 import useCan from '../../hooks/useCan';
 import { X, Calendar, Truck, Paperclip, PlusCircle, CheckCircle } from 'lucide-react';
 import { abrirArquivo } from '../../services/api';
+import { MAX, FORMAS_PAGAMENTO, limitesDataPrazo } from '../../utils/campos';
 
 const inputStyle = { width: '100%', padding: '10px', borderRadius: '5px', border: '1px solid #4a5568', background: '#2d3748', color: 'white', outline: 'none', boxSizing: 'border-box' };
 const tableHeaderStyle = { padding: '10px', textAlign: 'left', color: 'white', fontSize: '0.9rem', borderBottom: '2px solid #4a5568' };
@@ -74,13 +75,13 @@ export default function ModalNovaCotacao({
                                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 10 }}>
                                             <div>
                                                 <label style={{ display: 'block', marginBottom: 5, fontSize: '0.85rem' }}>Condição de Pagamento</label>
-                                                <select value={orc.tipo_pagamento} onChange={e => handleChange(index, 'tipo_pagamento', e.target.value)} style={inputStyle}><option value="">Selecione...</option><option value="À Vista">À Vista</option><option value="Boleto Bancário">Boleto Bancário</option><option value="Pix">Pix</option><option value="Cartão de Crédito">Cartão de Crédito</option><option value="A Prazo / Faturado">A Prazo / Faturado</option></select>
+                                                <select value={orc.tipo_pagamento} onChange={e => handleChange(index, 'tipo_pagamento', e.target.value)} style={inputStyle}><option value="">Selecione...</option>{FORMAS_PAGAMENTO.map(f => <option key={f} value={f}>{f}</option>)}</select>
                                             </div>
-                                            <div><label style={{ display: 'block', marginBottom: 5, fontSize: '0.85rem' }}><Calendar size={12} style={{ display: 'inline' }} /> Vencimento</label><input type="date" value={orc.prazo_pagamento} onChange={e => handleChange(index, 'prazo_pagamento', e.target.value)} style={inputStyle} /></div>
+                                            <div><label style={{ display: 'block', marginBottom: 5, fontSize: '0.85rem' }}><Calendar size={12} style={{ display: 'inline' }} /> Vencimento</label><input type="date" {...limitesDataPrazo()} value={orc.prazo_pagamento} onChange={e => handleChange(index, 'prazo_pagamento', e.target.value)} style={inputStyle} /></div>
                                         </div>
                                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 10 }}>
-                                            <div><label style={{ display: 'block', marginBottom: 5, fontSize: '0.85rem' }}><Truck size={12} style={{ display: 'inline' }} /> Prazo Entrega</label><input type="date" value={orc.prazo_entrega} onChange={e => handleChange(index, 'prazo_entrega', e.target.value)} style={inputStyle} /></div>
-                                            <div><label style={{ display: 'block', marginBottom: 5, fontSize: '0.85rem' }}>Frete (R$)</label><input type="number" step="0.01" placeholder="0.00" value={orc.frete} onChange={e => handleChange(index, 'frete', e.target.value)} style={inputStyle} /></div>
+                                            <div><label style={{ display: 'block', marginBottom: 5, fontSize: '0.85rem' }}><Truck size={12} style={{ display: 'inline' }} /> Prazo Entrega</label><input type="date" {...limitesDataPrazo()} value={orc.prazo_entrega} onChange={e => handleChange(index, 'prazo_entrega', e.target.value)} style={inputStyle} /></div>
+                                            <div><label style={{ display: 'block', marginBottom: 5, fontSize: '0.85rem' }}>Frete (R$)</label><input type="number" min="0" step="0.01" placeholder="0.00" value={orc.frete} onChange={e => handleChange(index, 'frete', e.target.value)} style={inputStyle} /></div>
                                         </div>
                                     </div>
 
@@ -93,7 +94,7 @@ export default function ModalNovaCotacao({
                                                     <tr key={iIdx} style={{ borderBottom: '1px solid #2d3748' }}>
                                                         <td style={{ padding: '8px 5px', fontSize: '0.8rem', color: '#e2e8f0' }}>{item.nome_exibicao}</td>
                                                         <td style={{ padding: '8px 5px', textAlign: 'center', fontWeight: 'bold' }}>{item.quantidade}</td>
-                                                        <td style={{ padding: '8px 5px' }}><input type="number" step="0.0001" required={index === 0 || !!orc.id} placeholder="0.00" value={item.valor_unitario} onChange={e => handleItemChange(index, iIdx, e.target.value)} style={{ ...inputStyle, padding: '6px', fontSize: '0.85rem', minWidth: '80px' }} /></td>
+                                                        <td style={{ padding: '8px 5px' }}><input type="number" min="0" step="0.0001" required={index === 0 || !!orc.id} placeholder="0.00" value={item.valor_unitario} onChange={e => handleItemChange(index, iIdx, e.target.value)} style={{ ...inputStyle, padding: '6px', fontSize: '0.85rem', minWidth: '80px' }} /></td>
                                                     </tr>
                                                 ))}
                                             </tbody>
@@ -101,7 +102,7 @@ export default function ModalNovaCotacao({
                                     </div>
 
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                                        <div><label style={{ display: 'block', marginBottom: 5, fontSize: '0.85rem' }}>Observação / Link</label><textarea rows="1" value={orc.obs} onChange={e => handleChange(index, 'obs', e.target.value)} style={inputStyle} /></div>
+                                        <div><label style={{ display: 'block', marginBottom: 5, fontSize: '0.85rem' }}>Observação / Link</label><textarea rows="1" maxLength={MAX.LONGO} value={orc.obs} onChange={e => handleChange(index, 'obs', e.target.value)} style={inputStyle} /></div>
                                         <div>
                                             <label style={{ display: 'block', marginBottom: 5, fontSize: '0.85rem' }}><Paperclip size={14} style={{ display: 'inline' }} /> Anexo {orc.id && "(Novo substitui)"}</label>
                                             <input type="file" onChange={e => handleFileChange(index, e.target.files[0])} style={{ ...inputStyle, padding: '6px', fontSize: '0.8rem' }} accept=".pdf,.jpg,.jpeg,.png" />

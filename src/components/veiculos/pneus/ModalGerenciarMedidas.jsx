@@ -1,6 +1,7 @@
 import React from 'react';
 import { X, Edit, Trash2 } from 'lucide-react';
 import { inputStyle } from '../../../utils/pneusUtils';
+import { MAX } from '../../../utils/campos';
 
 export default function ModalGerenciarMedidas({
     modalMedidas,
@@ -22,7 +23,7 @@ export default function ModalGerenciarMedidas({
                 </div>
 
                 <form onSubmit={handleSalvarMedida} style={{ display: 'flex', gap: 10, marginBottom: 20 }}>
-                    <input required value={medidaForm.nome} onChange={e => setMedidaForm({ ...medidaForm, nome: e.target.value })} placeholder="Nome da Medida..." style={{ ...inputStyle, marginTop: 0, flex: 1 }} />
+                    <input required maxLength={MAX.CURTO} value={medidaForm.nome} onChange={e => setMedidaForm({ ...medidaForm, nome: e.target.value })} placeholder="Nome da Medida..." style={{ ...inputStyle, marginTop: 0, flex: 1 }} />
                     <button type="submit" className="btn-add">{medidaForm.id ? 'Salvar' : 'Adicionar'}</button>
                     {medidaForm.id && <button type="button" onClick={() => setMedidaForm({ id: null, nome: '' })} className="btn-close-modal" style={{ position: 'static' }}>Cancelar</button>}
                 </form>

@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Loader2, MapPin } from 'lucide-react';
+import { MAX } from '../../utils/campos';
 
 // --- COMPONENTE DE AUTOCOMPLETAR (NOMINATIM / OPENSTREETMAP) ---
 export default function AddressInput({ value, onChange, placeholder, required = false }) {
@@ -92,6 +93,7 @@ export default function AddressInput({ value, onChange, placeholder, required = 
                     onFocus={() => value.length > 2 && setMostrandoLista(true)}
                     placeholder={placeholder}
                     required={required}
+                    maxLength={MAX.MEDIO}
                     autoComplete="off"
                     style={{ width: '100%', paddingRight: loading ? '30px' : '10px' }}
                 />

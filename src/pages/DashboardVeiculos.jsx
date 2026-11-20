@@ -3,6 +3,7 @@ import useCan from '../hooks/useCan';
 import React, { useState, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import api from '../services/api';
+import { erroPeriodo } from '../utils/campos';
 import { Truck, FileText, Filter, ChevronDown, ChevronRight } from 'lucide-react';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -265,12 +266,15 @@ export default function DashboardVeiculos() {
 
                                 <input
                                     type="date"
+                                    min="2000-01-01"
+                                    max={periodo.fim || undefined}
                                     value={periodo.inicio}
                                     onChange={e => setPeriodo({ ...periodo, inicio: e.target.value })}
                                     style={{ width: '100%', marginBottom: '5px', padding: '5px', background: '#2d3748', border: '1px solid #444', color: 'white', borderRadius: '3px' }}
                                 />
                                 <input
                                     type="date"
+                                    min={periodo.inicio || '2000-01-01'}
                                     value={periodo.fim}
                                     onChange={e => setPeriodo({ ...periodo, fim: e.target.value })}
                                     style={{ width: '100%', padding: '5px', background: '#2d3748', border: '1px solid #444', color: 'white', borderRadius: '3px' }}
@@ -278,7 +282,9 @@ export default function DashboardVeiculos() {
 
                                 <button
                                     onClick={() => {
-                                        if (periodo.inicio && periodo.fim) {
+                                        if (erroPeriodo(periodo.inicio, periodo.fim)) {
+                                            toast.error(erroPeriodo(periodo.inicio, periodo.fim));
+                                        } else if (periodo.inicio && periodo.fim) {
                                             setPeriodo({ ...periodo, label: 'Personalizado' });
                                             setUsarFiltroPeriodo(true);
                                             setMenuPeriodoAberto(false);

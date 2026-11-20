@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import api from '../../services/api';
+import api, { mensagemDeErro } from '../../services/api';
+import { MAX, KM_MAX, INTERVALO_REVISAO_MAX, limitesDataEvento } from '../../utils/campos';
 import { useAuth } from '../../contexts/AuthContext';
 import { Wrench, PlusCircle, Trash2, AlertTriangle, CheckCircle, Clock, X, Search, FileText, CheckSquare, History, User } from 'lucide-react';
 import jsPDF from 'jspdf';
@@ -105,21 +106,22 @@ export default function Revisoes() {
             toast.success("Plano configurado com sucesso! Agora você já pode registrar a primeira execução na lista.");
             setModalNovoPlanoAberto(false);
             queryClient.invalidateQueries({ queryKey: ['revisoes'] }); queryClient.invalidateQueries({ queryKey: ['veiculosResumo'] });
-        } catch (error) { toast.error("Erro ao salvar: " + (error.response?.data?.detail || error.message)); }
+        } catch (error) { toast.error("Erro ao salvar: " + mensagemDeErro(error, error.message)); }
     }
 
     async function registrarExecucao(e) {
         e.preventDefault();
+        if (formRegistro.observacao.trim().length < 5) return toast.error("A observação precisa ter pelo menos 5 caracteres.");
         try {
             await api.post(`/revisoes/${revisaoSelecionada.id}/realizar`, {
                 data_revisao: formRegistro.data_revisao,
                 km_revisao: parseFloat(formRegistro.km_revisao),
-                observacao: formRegistro.observacao
+                observacao: formRegistro.observacao.trim()
             });
             toast.success("Revisão registrada com sucesso!");
             setModalRegistroAberto(false);
             queryClient.invalidateQueries({ queryKey: ['revisoes'] }); queryClient.invalidateQueries({ queryKey: ['veiculosResumo'] });
-        } catch (error) { toast.error("Erro ao registrar: " + (error.response?.data?.detail || error.message)); }
+        } catch (error) { toast.error("Erro ao registrar: " + mensagemDeErro(error, error.message)); }
     }
 
     async function abrirHistorico(r) {
@@ -134,7 +136,7 @@ export default function Revisoes() {
     async function handleDelete(id) {
         if (confirm("Excluir este plano de revisão completamente? (O histórico também será apagado)")) {
             try { await api.delete(`/revisoes/${id}`); queryClient.invalidateQueries({ queryKey: ['revisoes'] }); queryClient.invalidateQueries({ queryKey: ['veiculosResumo'] }); }
-            catch (error) { toast.error("Erro ao excluir."); }
+            catch (error) { toast.error(mensagemDeErro(error, "Erro ao excluir.")); }
         }
     }
 
@@ -265,17 +267,17 @@ export default function Revisoes() {
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
                                 <div className="input-group">
                                     <label>Data da Manutenção</label>
-                                    <input type="date" value={formRegistro.data_revisao} onChange={e => setFormRegistro({ ...formRegistro, data_revisao: e.target.value })} required />
+                                    <input type="date" {...limitesDataEvento()} value={formRegistro.data_revisao} onChange={e => setFormRegistro({ ...formRegistro, data_revisao: e.target.value })} required />
                                 </div>
                                 <div className="input-group">
                                     {/* LABEL ALTERADO CONFORME PEDIDO */}
                                     <label>KM da revisão</label>
-                                    <input type="number" value={formRegistro.km_revisao} onChange={e => setFormRegistro({ ...formRegistro, km_revisao: e.target.value })} required />
+                                    <input type="number" min="0" max={KM_MAX} step="1" value={formRegistro.km_revisao} onChange={e => setFormRegistro({ ...formRegistro, km_revisao: e.target.value })} required />
                                 </div>
                             </div>
                             <div className="input-group">
                                 <label style={{ color: '#f6ad55', fontWeight: 'bold' }}>Observação / Justificativa (Obrigatório)*</label>
-                                <textarea rows="3" placeholder="Ex: Feita com 500km de atraso pois a peça não chegou a tempo..." value={formRegistro.observacao} onChange={e => setFormRegistro({ ...formRegistro, observacao: e.target.value })} required minLength="5" style={{ width: '100%', background: '#2d3748', border: '1px solid #4a5568', color: 'white', padding: 10, borderRadius: 5 }} />
+                                <textarea rows="3" placeholder="Ex: Feita com 500km de atraso pois a peça não chegou a tempo..." value={formRegistro.observacao} onChange={e => setFormRegistro({ ...formRegistro, observacao: e.target.value })} required minLength="5" maxLength={MAX.LONGO} style={{ width: '100%', background: '#2d3748', border: '1px solid #4a5568', color: 'white', padding: 10, borderRadius: 5 }} />
                             </div>
                             <button type="submit" className="btn-add" style={{ backgroundColor: '#8B5CF6', color: '#fff', padding: 15, fontSize: '1rem', marginTop: 10 }}>
                                 Confirmar Execução
@@ -341,7 +343,7 @@ export default function Revisoes() {
 
                             <div className="input-group">
                                 <label>Intervalo a cada (Km)</label>
-                                <input type="number" placeholder="Ex: 10000" value={formPlano.intervalo_km} onChange={e => setFormPlano({ ...formPlano, intervalo_km: e.target.value })} required />
+                                <input type="number" min="1" max={INTERVALO_REVISAO_MAX} step="1" placeholder="Ex: 10000" value={formPlano.intervalo_km} onChange={e => setFormPlano({ ...formPlano, intervalo_km: e.target.value })} required />
                             </div>
                             <button type="submit" className="btn-add" style={{ backgroundColor: '#3182ce', color: '#fff', padding: 15 }}>Criar Plano</button>
                         </form>

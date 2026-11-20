@@ -1,7 +1,8 @@
 import usePersistedTab from '../hooks/usePersistedTab';
 import React, { useState, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import api from '../services/api';
+import api, { mensagemDeErro } from '../services/api';
+import { MAX, LIMITE_PAGINA } from '../utils/campos';
 import { useAuth } from '../contexts/AuthContext';
 import toast from 'react-hot-toast';
 
@@ -128,12 +129,19 @@ export default function Gastos() {
         queryKey: ['gastos', limite, periodo.inicio, periodo.fim],
         queryFn: async () => {
             if (!usarFiltroPeriodo) return [];
-            const params = { skip: 0, limit: limite };
+            const params = {};
             if (periodo.inicio) params.data_inicio = periodo.inicio;
             if (periodo.fim) params.data_fim = periodo.fim;
-            const res = await api.get('/gastos/', { params });
-            setTemMais(res.data.length === limite);
-            return res.data;
+            // O servidor entrega no máximo LIMITE_PAGINA por vez: busca em páginas até chegar ao limite escolhido.
+            let todos = [];
+            while (todos.length < limite) {
+                const pedido = Math.min(LIMITE_PAGINA, limite - todos.length);
+                const res = await api.get('/gastos/', { params: { ...params, skip: todos.length, limit: pedido } });
+                todos = todos.concat(res.data);
+                if (res.data.length < pedido) break;
+            }
+            setTemMais(todos.length === limite);
+            return todos;
         },
         enabled: usarFiltroPeriodo
     });
@@ -186,20 +194,20 @@ export default function Gastos() {
     async function handleSalvarNovoTipo() {
         if (!novoTipo.trim()) return;
         try {
-            const res = await api.post('/opcoes/tipos-gasto', { nome: novoTipo });
+            const res = await api.post('/opcoes/tipos-gasto', { nome: novoTipo.trim() });
             queryClient.invalidateQueries({ queryKey: ['tiposGasto'] });
             setNovoTipo('');
-        } catch (e) { toast.error("Erro ao criar tipo de gasto."); }
+        } catch (e) { toast.error(mensagemDeErro(e, "Erro ao criar tipo de gasto.")); }
     }
 
     async function handleSalvarEdicaoTipo(id) {
         if (!editandoTipoNome.trim()) return;
         try {
-            await api.put(`/opcoes/tipos-gasto/${id}`, { nome: editandoTipoNome });
+            await api.put(`/opcoes/tipos-gasto/${id}`, { nome: editandoTipoNome.trim() });
             queryClient.invalidateQueries({ queryKey: ['tiposGasto'] });
             setEditandoTipoId(null);
             queryClient.invalidateQueries({ queryKey: ['gastos'] }); queryClient.invalidateQueries({ queryKey: ['dashboardFinanceiro'] }); queryClient.invalidateQueries({ queryKey: ['homeMetrics'] });
-        } catch (e) { toast.error(e.response?.data?.detail || "Erro ao editar tipo de gasto."); }
+        } catch (e) { toast.error(mensagemDeErro(e, "Erro ao editar tipo de gasto.")); }
     }
 
     async function handleExcluirTipo(id) {
@@ -207,13 +215,14 @@ export default function Gastos() {
         try {
             await api.delete(`/opcoes/tipos-gasto/${id}`);
             queryClient.invalidateQueries({ queryKey: ['tiposGasto'] });
-        } catch (e) { toast(e.response?.data?.detail || "Não foi possível excluir. O tipo pode estar em uso."); }
+        } catch (e) { toast(mensagemDeErro(e, "Não foi possível excluir. O tipo pode estar em uso.")); }
     }
 
     async function handleSelectChange(e, endpoint, stateUpdater, fieldName) {
         const valor = e.target.value;
         if (valor === 'ADD_NEW') {
-            const novoNome = prompt(`Novo item para ${fieldName}:`);
+            const novoNome = (prompt(`Novo item para ${fieldName}:`) || '').trim();
+            if (novoNome.length > MAX.NOME) return toast.error(`O nome pode ter no máximo ${MAX.NOME} caracteres.`);
             if (novoNome) {
                 try {
                     const res = await api.post(endpoint, { nome: novoNome });
@@ -229,7 +238,7 @@ export default function Gastos() {
                         queryClient.invalidateQueries({ queryKey: ['statusManutencao'] });
                     }
                     setForm(prev => ({ ...prev, [fieldName]: novoNome }));
-                } catch (e) { toast.error("Erro ao criar item."); }
+                } catch (e) { toast.error(mensagemDeErro(e, "Erro ao criar item.")); }
             }
         } else {
             setForm(prev => ({ ...prev, [fieldName]: valor }));
@@ -312,7 +321,7 @@ export default function Gastos() {
         try {
             await api.delete(`/gastos/${editandoId}/arquivo`, { params: { nome_arquivo: nomeArquivo } });
             setAnexosExistentes(prev => prev.filter(nome => nome !== nomeArquivo));
-        } catch (error) { toast.error("Erro ao excluir arquivo."); }
+        } catch (error) { toast.error(mensagemDeErro(error, "Erro ao excluir arquivo.")); }
     }
 
     function verificarSeTemAnexos(comprovanteString) {
@@ -401,7 +410,7 @@ export default function Gastos() {
             toast.success(editandoId ? 'Atualizado!' : 'Lançado!');
             fecharModal();
             queryClient.invalidateQueries({ queryKey: ['gastos'] }); queryClient.invalidateQueries({ queryKey: ['dashboardFinanceiro'] }); queryClient.invalidateQueries({ queryKey: ['homeMetrics'] });
-        } catch (error) { toast.error(typeof error.response?.data?.detail === "string" ? error.response.data.detail : "Erro ao salvar."); }
+        } catch (error) { toast.error(mensagemDeErro(error, "Erro ao salvar.")); }
     }
 
     async function handleDelete(id) {

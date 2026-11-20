@@ -1,6 +1,7 @@
 import useCan from '../../hooks/useCan';
 import { X, FileText, Package, ShoppingCart, PlusCircle, Trash2, CheckCircle } from 'lucide-react';
 import Select from 'react-select';
+import { MAX, limitesDataPrazo } from '../../utils/campos';
 
 const customSelectStyles = {
     control: (base, state) => ({
@@ -51,7 +52,7 @@ export default function ModalNovaSolicitacao({
                         <h3 style={{ marginTop: 0, color: '#8B5CF6', marginBottom: 15, display: 'flex', alignItems: 'center', gap: 10 }}><FileText size={20} /> 1. Informações Gerais do Pedido</h3>
 
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 15, marginBottom: 15 }}>
-                            <div><label style={{ display: 'block', marginBottom: 5 }}>Data Limite / Necessidade</label><input type="date" value={formCapa.data_necessidade} onChange={e => setFormCapa({ ...formCapa, data_necessidade: e.target.value })} style={inputStyle} /></div>
+                            <div><label style={{ display: 'block', marginBottom: 5 }}>Data Limite / Necessidade</label><input type="date" {...limitesDataPrazo()} value={formCapa.data_necessidade} onChange={e => setFormCapa({ ...formCapa, data_necessidade: e.target.value })} style={inputStyle} /></div>
                             <div>
                                 <label style={{ display: 'block', marginBottom: 5 }}>Local Entrega (Base) <span style={{ color: '#e53e3e' }}>*</span></label>
                                 <select required value={formCapa.local_entrega_id} onChange={e => setFormCapa({ ...formCapa, local_entrega_id: e.target.value })} style={inputStyle}>
@@ -82,7 +83,7 @@ export default function ModalNovaSolicitacao({
                                     {tiposGasto.map(t => <option key={t.id} value={t.nome}>{t.nome}</option>)}
                                 </select>
                             </div>
-                            <div style={{ gridColumn: '1 / -1' }}><label style={{ display: 'block', marginBottom: 5 }}>Justificativa / Observação Geral</label><textarea rows="2" value={formCapa.observacoes} onChange={e => setFormCapa({ ...formCapa, observacoes: e.target.value })} style={inputStyle} /></div>
+                            <div style={{ gridColumn: '1 / -1' }}><label style={{ display: 'block', marginBottom: 5 }}>Justificativa / Observação Geral</label><textarea rows="2" maxLength={MAX.LONGO} value={formCapa.observacoes} onChange={e => setFormCapa({ ...formCapa, observacoes: e.target.value })} style={inputStyle} /></div>
                         </div>
                     </div>
 
@@ -136,7 +137,7 @@ export default function ModalNovaSolicitacao({
                             </div>
                             <div style={{ width: '100px' }}>
                                 <label style={{ display: 'block', marginBottom: 5 }}>Qtd.</label>
-                                <input type="number" min="0" step={opcoesEstoque.find(o => o.value === itemAtual.estoque_item_id)?.tipo_controle === 'SERIALIZADO' ? '1' : '0.001'} value={itemAtual.quantidade} onChange={e => setItemAtual({ ...itemAtual, quantidade: e.target.value })} style={inputStyle} placeholder="Ex: 4" />
+                                <input type="number" min={opcoesEstoque.find(o => o.value === itemAtual.estoque_item_id)?.tipo_controle === 'SERIALIZADO' ? '1' : '0.001'} step={opcoesEstoque.find(o => o.value === itemAtual.estoque_item_id)?.tipo_controle === 'SERIALIZADO' ? '1' : '0.001'} value={itemAtual.quantidade} onChange={e => setItemAtual({ ...itemAtual, quantidade: e.target.value })} style={inputStyle} placeholder="Ex: 4" />
                             </div>
                             <div>
                                 <button type="button" onClick={adicionarItemAoCarrinho} style={{ height: '42px', padding: '0 20px', background: '#3182ce', color: 'white', border: 'none', borderRadius: 5, cursor: 'pointer', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 5 }}>

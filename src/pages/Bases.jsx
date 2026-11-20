@@ -2,7 +2,8 @@ import usePersistedTab from '../hooks/usePersistedTab';
 import { useState, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '../contexts/AuthContext';
-import api from '../services/api';
+import api, { mensagemDeErro } from '../services/api';
+import { MAX } from '../utils/campos';
 import { Building, Plus, Trash2, Search, Pencil } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -31,16 +32,16 @@ export default function Bases() {
     async function handleAdd() {
         if (!novaBase.trim()) { toast('? Digite o nome da base antes de adicionar!', { icon: '?' }); return; }
         try {
-            await api.post('/bases/', { nome: novaBase });
+            await api.post('/bases/', { nome: novaBase.trim() });
             setNovaBase('');
             toast.success("Base criada com sucesso!"); // <--- ALERTA ADICIONADO AQUI
             queryClient.invalidateQueries({ queryKey: ['bases'] });
-        } catch (e) { toast.error("Erro ao criar base. Verifique se já existe."); }
+        } catch (e) { toast.error(mensagemDeErro(e, "Erro ao criar base. Verifique se já existe.")); }
     }
 
     async function handleDelete(id) {
         if(!confirm("Excluir esta base?")) return;
-        try { await api.delete(`/bases/${id}`); queryClient.invalidateQueries({ queryKey: ['bases'] }); } catch(e) { toast.error("Erro ao excluir."); }
+        try { await api.delete(`/bases/${id}`); queryClient.invalidateQueries({ queryKey: ['bases'] }); } catch(e) { toast.error(mensagemDeErro(e, "Erro ao excluir.")); }
     }
 
     return (
@@ -66,7 +67,8 @@ export default function Bases() {
             {can('bases.gerenciar') && (
                 <div style={{display: 'flex', gap: '10px', marginBottom: '20px'}}>
                     <input 
-                        placeholder="Nome da Nova Base (Ex: Matriz)" 
+                        placeholder="Nome da Nova Base (Ex: Matriz)"
+                        maxLength={MAX.NOME}
                         value={novaBase} 
                         onChange={e => setNovaBase(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleAdd()} 
                         style={{flex: 1, padding: '10px', borderRadius: '5px', border: '1px solid #4a5568', background: '#2d3748', color: 'white'}}

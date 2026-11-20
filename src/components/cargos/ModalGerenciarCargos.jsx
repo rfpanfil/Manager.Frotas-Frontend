@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { X, PlusCircle, Pencil, Trash2, Lock, Users, AlertTriangle } from 'lucide-react';
 import toast from 'react-hot-toast';
-import api from '../../services/api';
+import api, { mensagemDeErro } from '../../services/api';
 
 // Cargos são gravados como texto em usuários, colaboradores e checklist. O backend leva todos junto
 // ao renomear e exige um destino ao excluir um cargo em uso; aqui a tela mostra quem será afetado antes.
@@ -53,7 +53,7 @@ export default function ModalGerenciarCargos({ aberto, onFechar }) {
             atualizarTelas();
             return true;
         } catch (error) {
-            toast.error(error.response?.data?.detail || 'Não foi possível concluir.');
+            toast.error(mensagemDeErro(error, 'Não foi possível concluir.'));
             return false;
         } finally {
             setSalvando(false);

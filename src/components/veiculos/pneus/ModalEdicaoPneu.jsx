@@ -2,6 +2,7 @@ import React from 'react';
 import { X, Save, Settings } from 'lucide-react';
 import Select from 'react-select';
 import { customSelectStyles, inputStyle } from '../../../utils/pneusUtils';
+import { MAX, PADRAO, DICA, SULCO_MAX, VIDA_UTIL_MAX, mascaraDOT } from '../../../utils/campos';
 
 export default function ModalEdicaoPneu({
     modalEdicao,
@@ -23,10 +24,10 @@ export default function ModalEdicaoPneu({
                     <button onClick={() => setModalEdicao(false)} className="btn-close-modal"><X /></button>
                 </div>
                 <form onSubmit={salvarEdicao} style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                    <label>DOT</label><input value={pneuEditando.dot || ''} onChange={e => setPneuEditando({ ...pneuEditando, dot: e.target.value })} style={inputStyle} />
-                    <label>Fogo</label><input value={pneuEditando.fogo || ''} onChange={e => setPneuEditando({ ...pneuEditando, fogo: e.target.value })} style={inputStyle} />
+                    <label>DOT</label><input inputMode="numeric" pattern={PADRAO.DOT} title={DICA.DOT} value={pneuEditando.dot || ''} onChange={e => setPneuEditando({ ...pneuEditando, dot: mascaraDOT(e.target.value) })} style={inputStyle} />
+                    <label>Fogo</label><input maxLength={MAX.CURTO} value={pneuEditando.fogo || ''} onChange={e => setPneuEditando({ ...pneuEditando, fogo: e.target.value })} style={inputStyle} />
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-                        <div><label>Marca</label><input value={pneuEditando.marca || ''} onChange={e => setPneuEditando({ ...pneuEditando, marca: e.target.value })} style={inputStyle} /></div>
+                        <div><label>Marca</label><input maxLength={MAX.CURTO} value={pneuEditando.marca || ''} onChange={e => setPneuEditando({ ...pneuEditando, marca: e.target.value })} style={inputStyle} /></div>
                         <div style={{ position: 'relative', zIndex: 100 }}>
                             <label>Medida</label>
                             <div style={{ display: 'flex', gap: 5, marginTop: 5 }}>
@@ -53,20 +54,20 @@ export default function ModalEdicaoPneu({
                         </div>
                     </div>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-                        <div><label>Sulco Novo</label><input type="number" step="0.1" value={pneuEditando.sulco_novo} onChange={e => setPneuEditando({ ...pneuEditando, sulco_novo: e.target.value })} style={inputStyle} /></div>
-                        <div><label>Sulco Atual</label><input type="number" step="0.1" value={pneuEditando.sulco_atual} onChange={e => setPneuEditando({ ...pneuEditando, sulco_atual: e.target.value })} style={inputStyle} /></div>
+                        <div><label>Sulco Novo</label><input type="number" min="0" max={SULCO_MAX} step="0.1" value={pneuEditando.sulco_novo} onChange={e => setPneuEditando({ ...pneuEditando, sulco_novo: e.target.value })} style={inputStyle} /></div>
+                        <div><label>Sulco Atual</label><input type="number" min="0" max={Math.min(SULCO_MAX, Number(pneuEditando.sulco_novo) || SULCO_MAX)} step="0.1" value={pneuEditando.sulco_atual} onChange={e => setPneuEditando({ ...pneuEditando, sulco_atual: e.target.value })} style={inputStyle} /></div>
                     </div>
 
                     <div style={{ background: '#2d3748', padding: 10, borderRadius: 5, border: '1px solid #4a5568' }}>
                         <label style={{ color: '#8B5CF6', fontWeight: 'bold' }}>Vida Útil Esperada (Km)</label>
-                        <input type="number" value={pneuEditando.vida_util_km || ''} placeholder="Ex: 40000" onChange={e => setPneuEditando({ ...pneuEditando, vida_util_km: e.target.value })} style={inputStyle} />
+                        <input type="number" min="1" max={VIDA_UTIL_MAX} step="1" value={pneuEditando.vida_util_km || ''} placeholder="Ex: 40000" onChange={e => setPneuEditando({ ...pneuEditando, vida_util_km: e.target.value })} style={inputStyle} />
                         <span style={{ fontSize: '0.75rem', color: '#a0aec0' }}>Preencha este campo para habilitar o status Verde/Amarelo/Vermelho na tabela.</span>
                     </div>
 
                     <label>Status Físico</label>
-                    <select value={pneuEditando.status} onChange={e => setPneuEditando({ ...pneuEditando, status: e.target.value })} style={inputStyle}>
+                    <select value={pneuEditando.status} disabled={pneuEditando.status_original === 'EM_USO'} title={pneuEditando.status_original === 'EM_USO' ? 'Pneu montado: use a desmontagem para mudar o status.' : undefined} onChange={e => setPneuEditando({ ...pneuEditando, status: e.target.value })} style={inputStyle}>
                         <option value="ESTOQUE">Estoque</option>
-                        <option value="EM_USO">Em Uso</option>
+                        <option value="EM_USO" disabled={pneuEditando.status_original !== 'EM_USO'}>Em Uso</option>
                         <option value="MANUTENCAO">Manutenção</option>
                         <option value="SUCATA">Sucata</option>
                     </select>

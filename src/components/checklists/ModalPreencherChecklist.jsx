@@ -2,6 +2,7 @@ import React from 'react';
 import { X, Camera, Save, CheckCircle } from 'lucide-react';
 import Select from 'react-select';
 import { customSelectStyles } from '../../utils/checklistHelpers.jsx';
+import { MAX, limitesDataEvento } from '../../utils/campos';
 
 export default function ModalPreencherChecklist({
     isOpen, setShowModalChecklist, isReadOnly,
@@ -31,7 +32,8 @@ export default function ModalPreencherChecklist({
                                 <input 
                                     type="date" 
                                     disabled={isReadOnly} 
-                                    value={formData.data_verificacao} 
+                                    {...limitesDataEvento()}
+                                    value={formData.data_verificacao}
                                     onChange={e => setFormData({ ...formData, data_verificacao: e.target.value })} 
                                     required 
                                     style={{ width: '100%', padding: '5px', borderRadius: 4, border: '1px solid #444', background: '#1a202c', color: 'white', fontSize: '0.85rem' }} 
@@ -101,6 +103,7 @@ export default function ModalPreencherChecklist({
                                                 type="text"
                                                 disabled={isReadOnly}
                                                 placeholder="Obs..."
+                                                maxLength={MAX.MEDIO}
                                                 value={dados.observacao}
                                                 onChange={e => handleRespostaChange(chave, 'observacao', e.target.value)}
                                                 style={{ width: '100%', padding: 8, borderRadius: 4, border: '1px solid #444', background: '#1a202c', color: 'white', boxSizing: 'border-box' }}

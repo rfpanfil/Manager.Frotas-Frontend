@@ -1,4 +1,5 @@
 import { Map, X, Clock, MapPin, ArrowRight } from 'lucide-react';
+import { KM_MAX, limitesDataHoraEvento, limitesDataHoraPrazo } from '../../utils/campos';
 import AddressInput from './AddressInput';
 
 export default function ModalNovaRota({
@@ -66,15 +67,15 @@ export default function ModalNovaRota({
                                     <Clock size={12} /> AGORA
                                 </button>
                             </div>
-                            <input type="datetime-local" value={form.data_inicio} onChange={e => setForm({ ...form, data_inicio: e.target.value })} required />
+                            <input type="datetime-local" {...limitesDataHoraEvento()} value={form.data_inicio} onChange={e => setForm({ ...form, data_inicio: e.target.value })} required />
                         </div>
                         <div className="input-group">
                             <label>KM Saída</label>
-                            <input type="number" value={form.km_inicial} onChange={e => setForm({ ...form, km_inicial: e.target.value })} required />
+                            <input type="number" min="0" max={KM_MAX} step="1" value={form.km_inicial} onChange={e => setForm({ ...form, km_inicial: e.target.value })} required />
                         </div>
                         <div className="input-group">
                             <label>Prev. Chegada</label>
-                            <input type="datetime-local" value={form.previsao_retorno} onChange={e => setForm({ ...form, previsao_retorno: e.target.value })} />
+                            <input type="datetime-local" {...limitesDataHoraPrazo()} min={form.data_inicio || limitesDataHoraPrazo().min} value={form.previsao_retorno} onChange={e => setForm({ ...form, previsao_retorno: e.target.value })} />
                         </div>
                     </div>
 

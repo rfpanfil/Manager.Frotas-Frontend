@@ -1,5 +1,6 @@
 import React from 'react';
 import { Save, Plus } from 'lucide-react';
+import { MAX, QTD_ITEM_CHECKLIST_MAX } from '../../utils/campos';
 
 export default function FormNovoItemChecklist({ formItem, setFormItem, handleSaveItem, editingItem }) {
     return (
@@ -20,6 +21,7 @@ export default function FormNovoItemChecklist({ formItem, setFormItem, handleSav
                 <label style={{ fontSize: '0.8rem', color: '#a0aec0' }}>Nome do Item</label>
                 <input
                     required
+                    maxLength={MAX.NOME}
                     value={formItem.nome_item}
                     onChange={(e) => setFormItem({ ...formItem, nome_item: e.target.value })}
                     style={{ width: '100%', padding: 8, borderRadius: 4, border: 'none' }}
@@ -47,6 +49,8 @@ export default function FormNovoItemChecklist({ formItem, setFormItem, handleSav
                 <input
                     type="number"
                     min="1"
+                    max={QTD_ITEM_CHECKLIST_MAX}
+                    step="1"
                     required
                     value={formItem.quantidade_padrao}
                     onChange={(e) => setFormItem({ ...formItem, quantidade_padrao: e.target.value })}

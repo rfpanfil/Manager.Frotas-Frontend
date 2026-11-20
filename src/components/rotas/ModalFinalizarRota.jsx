@@ -1,4 +1,5 @@
 import { AlertTriangle } from 'lucide-react';
+import { MAX, KM_MAX, limitesDataHoraEvento } from '../../utils/campos';
 
 export default function ModalFinalizarRota({
     modalFinalizar,
@@ -21,11 +22,11 @@ export default function ModalFinalizarRota({
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
                     <div className="input-group">
                         <label>KM Final (Painel)</label>
-                        <input type="number" onChange={e => setDadosFinalizacao({ ...dadosFinalizacao, km_final: e.target.value })} autoFocus />
+                        <input type="number" min={(Number(rotaSelecionada?.km_inicial) || 0) + 1} max={KM_MAX} step="1" onChange={e => setDadosFinalizacao({ ...dadosFinalizacao, km_final: e.target.value })} autoFocus />
                     </div>
                     <div className="input-group">
                         <label>Data Chegada</label>
-                        <input type="datetime-local" value={dadosFinalizacao.data_retorno} onChange={e => setDadosFinalizacao({ ...dadosFinalizacao, data_retorno: e.target.value })} />
+                        <input type="datetime-local" {...limitesDataHoraEvento()} value={dadosFinalizacao.data_retorno} onChange={e => setDadosFinalizacao({ ...dadosFinalizacao, data_retorno: e.target.value })} />
                     </div>
                 </div>
 
@@ -60,7 +61,7 @@ export default function ModalFinalizarRota({
                 {dadosFinalizacao.retorno_realizado === 'Outro' && (
                     <div className="input-group">
                         <label>Onde parou?</label>
-                        <input placeholder="Ex: Oficina Mecânica" onChange={e => setDadosFinalizacao({ ...dadosFinalizacao, local_retorno_alternativo: e.target.value })} />
+                        <input maxLength={MAX.MEDIO} placeholder="Ex: Oficina Mecânica" onChange={e => setDadosFinalizacao({ ...dadosFinalizacao, local_retorno_alternativo: e.target.value })} />
                     </div>
                 )}
 

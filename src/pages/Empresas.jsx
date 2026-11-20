@@ -1,7 +1,8 @@
 // Arquivo: frontend/src/pages/Empresas.jsx
 import React, { useState, useEffect } from 'react';
 import { Building, Plus, X, Edit, Trash2 } from 'lucide-react';
-import api from '../services/api';
+import api, { mensagemDeErro } from '../services/api';
+import { MAX, PADRAO, DICA, mascaraCNPJ } from '../utils/campos';
 import { SAAS_CONFIG, TODOS_MODULOS } from '../config/saas';
 import toast from 'react-hot-toast';
 
@@ -70,7 +71,7 @@ export default function Empresas() {
             window.location.reload();
         } catch (error) {
             console.error("Erro ao salvar empresa:", error);
-            toast.error(error.response?.data?.detail || "Erro ao salvar empresa.");
+            toast.error(mensagemDeErro(error, "Erro ao salvar empresa."));
         }
     };
 
@@ -82,7 +83,7 @@ export default function Empresas() {
             toast.success("Empresa excluída com sucesso.");
             carregarEmpresas();
         } catch (error) {
-            toast.error(error.response?.data?.detail || "Erro ao excluir empresa.");
+            toast.error(mensagemDeErro(error, "Erro ao excluir empresa."));
         }
     };
 
@@ -166,6 +167,7 @@ export default function Empresas() {
                                 <label>Nome Fantasia *</label>
                                 <input
                                     type="text"
+                                    maxLength={MAX.NOME}
                                     value={formData.nome_fantasia}
                                     onChange={e => setFormData({ ...formData, nome_fantasia: e.target.value })}
                                     placeholder="Ex: Transportadora Expresso..."
@@ -178,9 +180,12 @@ export default function Empresas() {
                                 <label>CNPJ</label>
                                 <input
                                     type="text"
-                                    value={formData.cnpj}
-                                    onChange={e => setFormData({ ...formData, cnpj: e.target.value })}
-                                    placeholder="Opcional"
+                                    inputMode="numeric"
+                                    pattern={PADRAO.CNPJ}
+                                    title={DICA.CNPJ}
+                                    value={formData.cnpj || ''}
+                                    onChange={e => setFormData({ ...formData, cnpj: mascaraCNPJ(e.target.value) })}
+                                    placeholder="00.000.000/0000-00 (opcional)"
                                     style={{ width: '100%', boxSizing: 'border-box' }}
                                 />
                             </div>

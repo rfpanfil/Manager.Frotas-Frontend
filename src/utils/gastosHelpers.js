@@ -1,3 +1,5 @@
+import { MAX, LITROS_MAX } from './campos';
+
 export function validarEPrepararGasto(form, anexosExistentes, arquivos, veiculos, linkQrProtegido) {
     // VALIDAÇÕES
     if (form.tipo_gasto === 'Combustível' && form.veiculo_id) {
@@ -21,6 +23,12 @@ export function validarEPrepararGasto(form, anexosExistentes, arquivos, veiculos
             if (!form.centro_custo_id) return { isValid: false, error: "Selecione Centro de Custo." };
         }
     }
+
+    if (form.tipo_gasto === 'Combustível' && form.litros && parseFloat(String(form.litros).replace(',', '.')) > LITROS_MAX) {
+        return { isValid: false, error: `Litros acima do limite de ${LITROS_MAX} por lançamento.` };
+    }
+    const tamanhoDescricao = (form.descricao || '').length + (linkQrProtegido ? linkQrProtegido.length + 3 : 0);
+    if (tamanhoDescricao > MAX.LONGO) return { isValid: false, error: `A descrição pode ter no máximo ${MAX.LONGO} caracteres.` };
 
     // PREPARAÇÃO DO FORMDATA
     const formData = new FormData();

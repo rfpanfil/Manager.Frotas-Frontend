@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '../../contexts/AuthContext';
 import api, { mensagemDeErro } from '../../services/api';
+import { MAX } from '../../utils/campos';
 import toast from 'react-hot-toast';
 
 import FiltrosSolicitacoes from '../../components/compras/FiltrosSolicitacoes';
@@ -132,9 +133,7 @@ export default function TabSolicitacoes({ onCriarOrcamento }) {
             setModalAberto(false);
             queryClient.invalidateQueries({ queryKey: ['scs'] });
         } catch (error) {
-            const det = error.response?.data?.detail;
-            const msgErro = typeof det === 'object' ? JSON.stringify(det) : (det || error.message);
-            toast.error("Erro: " + msgErro);
+            toast.error("Erro: " + mensagemDeErro(error, error.message));
         }
     }
 
@@ -154,17 +153,18 @@ export default function TabSolicitacoes({ onCriarOrcamento }) {
             setModalNovoItemEstoque(false);
             setFormNovoItem({ nome: '', codigo_referencia: '', categoria: '', unidade_medida: 'UN', tipo_controle: 'QUANTIDADE', estoque_minimo: 0, observacoes: '' });
             setItemAtual({ ...itemAtual, classificacao: 'PRODUTO', estoque_item_id: res.data.id });
-        } catch (error) { toast.error("Erro ao criar item: " + (error.response?.data?.detail || error.message)); }
+        } catch (error) { toast.error("Erro ao criar item: " + mensagemDeErro(error, error.message)); }
     }
 
     async function handleCriarNovoServico() {
-        const nome = prompt("Descreva o novo Serviço Padrão:");
+        const nome = (prompt("Descreva o novo Serviço Padrão:") || '').trim();
+        if (nome.length > MAX.NOME) return toast.error(`O nome do serviço pode ter no máximo ${MAX.NOME} caracteres.`);
         if (nome) {
             try {
                 const res = await api.post('/compras/servicos', { nome });
                 queryClient.invalidateQueries({ queryKey: ['servicosPadroes'] });
                 setItemAtual({ ...itemAtual, classificacao: 'SERVICO', nome_novo_item: res.data.nome });
-            } catch (e) { toast.error("Erro ao criar serviço. Talvez já exista."); }
+            } catch (e) { toast.error(mensagemDeErro(e, "Erro ao criar serviço. Talvez já exista.")); }
         }
     }
 

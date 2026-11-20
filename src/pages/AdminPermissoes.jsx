@@ -2,7 +2,7 @@ import { useAuth } from '../contexts/AuthContext';
 import usePersistedTab from '../hooks/usePersistedTab';
 import React, { useState, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import api from '../services/api';
+import api, { mensagemDeErro } from '../services/api';
 import { Shield, PlusCircle, Pencil, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import ModalGerenciarCargos from '../components/cargos/ModalGerenciarCargos';
@@ -48,7 +48,7 @@ export default function AdminPermissoes() {
         try {
             await api.post(`/permissoes/cargo/${cargoId}/toggle`, { permissao_id: permId, ativo: !temPermissao });
         } catch (error) {
-            toast.error("Erro ao salvar permissão.");
+            toast.error(mensagemDeErro(error, "Erro ao salvar permissão."));
             queryClient.invalidateQueries({ queryKey: ['permissoesMatriz'] });
         }
     }

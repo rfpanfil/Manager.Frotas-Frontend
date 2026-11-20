@@ -300,13 +300,13 @@ export default function ChecklistMensal() {
             setEditingItem(null);
             setFormItem({ nome_item: '', categoria: 'Geral', quantidade_padrao: 1, ativo: true });
             queryClient.invalidateQueries({ queryKey: ['checklistsDefinicoes'] });
-        } catch (error) { toast.error("Erro ao salvar item"); }
+        } catch (error) { toast.error(mensagemDeErro(error, "Erro ao salvar item")); }
     }
 
     async function handleDeleteItem(id) {
         if (!confirm("Remover este item?")) return;
         try { await api.delete(`/checklists/definicoes/${id}`); queryClient.invalidateQueries({ queryKey: ['checklistsDefinicoes'] }); }
-        catch (error) { toast.error("Erro ao excluir item"); }
+        catch (error) { toast.error(mensagemDeErro(error, "Erro ao excluir item")); }
     }
 
     function startEdit(item) {

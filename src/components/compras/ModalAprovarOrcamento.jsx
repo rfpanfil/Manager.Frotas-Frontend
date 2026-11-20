@@ -1,4 +1,5 @@
 import { X, CheckCircle } from 'lucide-react';
+import { limitesDataPrazo } from '../../utils/campos';
 
 export default function ModalAprovarOrcamento({
     modalAprovacao,
@@ -44,8 +45,8 @@ export default function ModalAprovarOrcamento({
                         <h4 style={{ margin: '0 0 10px 0', color: '#8B5CF6' }}>Dados de Faturamento e Negociação</h4>
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10 }}>
                             <div><label>Centro Custo (Base)*</label><select required value={formAprovacao.centro_custo_id} onChange={e => setFormAprovacao({ ...formAprovacao, centro_custo_id: e.target.value })} style={inputStyle}><option value="">Selecione...</option>{bases.map(b => <option key={b.id} value={b.id}>{b.nome}</option>)}</select></div>
-                            <div><label>Prazo Pagamento</label><input type="date" value={formAprovacao.prazo_pagamento} onChange={e => setFormAprovacao({ ...formAprovacao, prazo_pagamento: e.target.value })} style={inputStyle} /></div>
-                            <div><label>Desconto Extra na OC</label><input type="number" step="0.01" value={formAprovacao.desconto} onChange={e => setFormAprovacao({ ...formAprovacao, desconto: e.target.value })} style={inputStyle} placeholder="0.00" /></div>
+                            <div><label>Prazo Pagamento</label><input type="date" {...limitesDataPrazo()} value={formAprovacao.prazo_pagamento} onChange={e => setFormAprovacao({ ...formAprovacao, prazo_pagamento: e.target.value })} style={inputStyle} /></div>
+                            <div><label>Desconto Extra na OC</label><input type="number" min="0" step="0.01" value={formAprovacao.desconto} onChange={e => setFormAprovacao({ ...formAprovacao, desconto: e.target.value })} style={inputStyle} placeholder="0.00" /></div>
                         </div>
                     </div>
 

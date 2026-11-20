@@ -1,7 +1,8 @@
 import useCan from '../../hooks/useCan';
 import React, { useState, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import api from '../../services/api';
+import api, { mensagemDeErro } from '../../services/api';
+import { MAX, PADRAO, DICA, KM_MAX, limitesDataPrazo, mascaraPlaca, mascaraRenavam, mascaraChassi } from '../../utils/campos';
 import { useAuth } from '../../contexts/AuthContext';
 import { PlusCircle, Car, Edit, Trash2, XCircle, FileText, X, Search, Filter } from 'lucide-react';
 import jsPDF from 'jspdf';
@@ -110,14 +111,14 @@ export default function Veiculos() {
     async function handleSelectChange(e, endpoint, fieldName) {
         const valor = e.target.value;
         if (valor === 'ADD_NEW') {
-            const novoNome = prompt(`Digite o nome para o novo ${fieldName}:`);
+            const novoNome = (prompt(`Digite o nome para o novo ${fieldName}:`) || '').trim();
             if (novoNome) {
                 try {
                     await api.post(endpoint, { nome: novoNome });
                     queryClient.invalidateQueries({ queryKey: fieldName === 'tipo' ? ['tiposVeiculo'] : ['marcasVeiculo'] });
                     setForm(prev => ({ ...prev, [fieldName]: novoNome }));
                 } catch (error) {
-                    toast.error("Erro ao cadastrar: " + (error.response?.data?.detail || error.message));
+                    toast.error("Erro ao cadastrar: " + mensagemDeErro(error, error.message));
                 }
             }
         } else {
@@ -170,12 +171,12 @@ export default function Veiculos() {
             setEditandoId(null);
             setForm(initialForm);
             queryClient.invalidateQueries({ queryKey: ['veiculosLista'] });
-        } catch (error) { toast.error("Erro ao salvar."); }
+        } catch (error) { toast.error(mensagemDeErro(error, "Erro ao salvar.")); }
     }
 
     async function handleDelete(id) {
         if (!confirm("Excluir?")) return;
-        try { await api.delete(`/veiculos/${id}`); queryClient.invalidateQueries({ queryKey: ['veiculosLista'] }); } catch (error) { toast.error(error.response?.data?.detail || "Erro ao excluir o veículo."); }
+        try { await api.delete(`/veiculos/${id}`); queryClient.invalidateQueries({ queryKey: ['veiculosLista'] }); } catch (error) { toast.error(mensagemDeErro(error, "Erro ao excluir o veículo.")); }
     }
 
     async function abrirModal(v = null) {
@@ -310,7 +311,7 @@ export default function Veiculos() {
 
                                 <div className="input-group">
                                     <label>Tipo Veículo</label>
-                                    <select name="tipo" value={form.tipo} onChange={(e) => handleSelectChange(e, '/opcoes/tipos-veiculo', 'tipo')}>
+                                    <select name="tipo" required value={form.tipo || ''} onChange={(e) => handleSelectChange(e, '/opcoes/tipos-veiculo', 'tipo')}>
                                         <option value="">Selecione...</option>
                                         {tiposVeiculo.map(t => <option key={t.id} value={t.nome}>{t.nome}</option>)}
                                         {can('veiculos.editar') && <option value="ADD_NEW" style={{ fontWeight: 'bold', color: '#8B5CF6' }}>+ Cadastrar Novo Tipo...</option>}
@@ -332,7 +333,7 @@ export default function Veiculos() {
 
                                 <div className="input-group">
                                     <label>Marca</label>
-                                    <select name="marca" value={form.marca} onChange={(e) => handleSelectChange(e, '/opcoes/marcas-veiculo', 'marca')}>
+                                    <select name="marca" required value={form.marca || ''} onChange={(e) => handleSelectChange(e, '/opcoes/marcas-veiculo', 'marca')}>
                                         <option value="">Selecione...</option>
                                         {marcasVeiculo.map(m => <option key={m.id} value={m.nome}>{m.nome}</option>)}
                                         {can('veiculos.editar') && <option value="ADD_NEW" style={{ fontWeight: 'bold', color: '#8B5CF6' }}>+ Cadastrar Nova Marca...</option>}
@@ -341,16 +342,16 @@ export default function Veiculos() {
 
                                 <div className="input-group">
                                     <label>Modelo</label>
-                                    <input name="modelo" value={form.modelo} onChange={handleChange} required />
+                                    <input name="modelo" maxLength={MAX.NOME} value={form.modelo} onChange={handleChange} required />
                                 </div>
                             </div>
 
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '15px' }}>
-                                <div className="input-group"><label>Placa</label><input name="placa" value={form.placa} onChange={handleChange} required /></div>
-                                <div className="input-group"><label>KM Atual (Hodômetro)</label><input type="number" name="km_atual" value={form.km_atual} onChange={handleChange} placeholder="Ex: 0 ou 50000" required /></div>
-                                <div className="input-group"><label>Ano</label><input type="number" name="ano" value={form.ano} onChange={handleChange} /></div>
-                                <div className="input-group"><label>Cor</label><input name="cor" value={form.cor} onChange={handleChange} /></div>
-                                <div className="input-group"><label>Renavam</label><input name="renavam" value={form.renavam} onChange={handleChange} /></div>
+                                <div className="input-group"><label>Placa</label><input name="placa" pattern={PADRAO.PLACA} title={DICA.PLACA} placeholder="AAA9A99" value={form.placa || ''} onChange={e => setForm({ ...form, placa: mascaraPlaca(e.target.value) })} required /></div>
+                                <div className="input-group"><label>KM Atual (Hodômetro)</label><input type="number" name="km_atual" min="0" max={KM_MAX} step="1" value={form.km_atual} onChange={handleChange} placeholder="Ex: 0 ou 50000" required /></div>
+                                <div className="input-group"><label>Ano</label><input type="number" name="ano" min="1950" max={new Date().getFullYear() + 1} step="1" value={form.ano || ''} onChange={handleChange} /></div>
+                                <div className="input-group"><label>Cor</label><input name="cor" maxLength={MAX.CURTO} value={form.cor || ''} onChange={handleChange} /></div>
+                                <div className="input-group"><label>Renavam</label><input name="renavam" inputMode="numeric" pattern={PADRAO.RENAVAM} title={DICA.RENAVAM} value={form.renavam || ''} onChange={e => setForm({ ...form, renavam: mascaraRenavam(e.target.value) })} /></div>
                                 <div className="input-group">
                                     <label>Situação do Veículo</label>
                                     <select name="status" value={form.status} onChange={handleChange} style={{ width: '100%', padding: '10px', borderRadius: '5px', background: '#2d3748', color: 'white', border: '1px solid #4a5568' }}>
@@ -362,20 +363,20 @@ export default function Veiculos() {
                             </div>
 
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '15px' }}>
-                                <div className="input-group"><label>Chassi</label><input name="chassi" value={form.chassi} onChange={handleChange} /></div>
-                                <div className="input-group"><label>Modelo Pneu</label><input name="modelo_pneu" value={form.modelo_pneu} onChange={handleChange} /></div>
-                                <div className="input-group"><label>Rastreador</label><input name="rastreador" value={form.rastreador} onChange={handleChange} /></div>
+                                <div className="input-group"><label>Chassi</label><input name="chassi" pattern={PADRAO.CHASSI} title={DICA.CHASSI} value={form.chassi || ''} onChange={e => setForm({ ...form, chassi: mascaraChassi(e.target.value) })} /></div>
+                                <div className="input-group"><label>Modelo Pneu</label><input name="modelo_pneu" maxLength={MAX.NOME} value={form.modelo_pneu || ''} onChange={handleChange} /></div>
+                                <div className="input-group"><label>Rastreador</label><input name="rastreador" maxLength={MAX.NOME} value={form.rastreador || ''} onChange={handleChange} /></div>
                             </div>
 
                             <hr style={{ borderColor: '#4a5568' }} />
 
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '15px' }}>
-                                <div className="input-group"><label>Seguradora</label><input name="seguradora" value={form.seguradora} onChange={handleChange} /></div>
-                                <div className="input-group"><label>Apólice</label><input name="apolice" value={form.apolice} onChange={handleChange} /></div>
-                                <div className="input-group"><label>Vencimento Seguro</label><input type="date" name="vencimento_seguro" value={form.vencimento_seguro} onChange={handleChange} /></div>
+                                <div className="input-group"><label>Seguradora</label><input name="seguradora" maxLength={MAX.NOME} value={form.seguradora || ''} onChange={handleChange} /></div>
+                                <div className="input-group"><label>Apólice</label><input name="apolice" maxLength={MAX.CURTO} value={form.apolice || ''} onChange={handleChange} /></div>
+                                <div className="input-group"><label>Vencimento Seguro</label><input type="date" name="vencimento_seguro" {...limitesDataPrazo()} value={form.vencimento_seguro || ''} onChange={handleChange} /></div>
                             </div>
 
-                            <div className="input-group"><label>Observação</label><input name="observacao" value={form.observacao} onChange={handleChange} /></div>
+                            <div className="input-group"><label>Observação</label><input name="observacao" maxLength={MAX.LONGO} value={form.observacao || ''} onChange={handleChange} /></div>
 
                             <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', marginTop: '10px' }}>
                                 <button type="button" onClick={() => setModalAberto(false)} className="btn-add" style={{ backgroundColor: '#e53e3e', color: 'white' }}>Cancelar</button>

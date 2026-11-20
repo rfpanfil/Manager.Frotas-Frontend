@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import api, { abrirArquivo } from '../../services/api';
+import api, { abrirArquivo, mensagemDeErro } from '../../services/api';
+import { MAX, PADRAO, DICA, CATEGORIAS_CNH, limitesDataPrazo, mascaraCPF } from '../../utils/campos';
 import { useAuth } from '../../contexts/AuthContext';
 import useCan from '../../hooks/useCan';
 import { PlusCircle, Users, Edit, Trash2, XCircle, FileText, X, Search, Filter, AlertTriangle, CheckCircle, Clock, Eye, UploadCloud } from 'lucide-react';
@@ -224,14 +225,14 @@ export default function TabEquipe() {
             fecharModal();
             queryClient.invalidateQueries({ queryKey: ['colaboradores'] });
         } catch (error) {
-            toast.error("Erro ao salvar: " + (error.response?.data?.detail || error.message));
+            toast.error("Erro ao salvar: " + mensagemDeErro(error, error.message));
         }
     }
 
     async function handleDelete(id) {
         if (confirm("Tem certeza que deseja excluir este colaborador?")) {
             try { await api.delete(`/colaboradores/${id}`); queryClient.invalidateQueries({ queryKey: ['colaboradores'] }); }
-            catch (error) { toast.error(error.response?.data?.detail || "Erro ao excluir."); }
+            catch (error) { toast.error(mensagemDeErro(error, "Erro ao excluir.")); }
         }
     }
 
@@ -499,7 +500,7 @@ export default function TabEquipe() {
                         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
                             <div className="input-group">
                                 <label>Nome Completo</label>
-                                <input name="nome" value={form.nome} onChange={handleChange} required placeholder="Ex: João da Silva" />
+                                <input name="nome" maxLength={MAX.NOME} value={form.nome} onChange={handleChange} required placeholder="Ex: João da Silva" />
                             </div>
 
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
@@ -519,7 +520,7 @@ export default function TabEquipe() {
                                         )}
                                     </select>
                                 </div>
-                                <div className="input-group"><label>CPF</label><input name="cpf" value={form.cpf} onChange={handleChange} required placeholder="000.000.000-00" /></div>
+                                <div className="input-group"><label>CPF</label><input name="cpf" inputMode="numeric" pattern={PADRAO.CPF} title={DICA.CPF} value={form.cpf || ''} onChange={e => setForm({ ...form, cpf: mascaraCPF(e.target.value) })} required placeholder="000.000.000-00" /></div>
 
                                 <div className="input-group">
                                     <label>Base Alocada</label>
@@ -538,11 +539,11 @@ export default function TabEquipe() {
                                     </select>
                                 </div>
 
-                                <div className="input-group"><label>Categoria CNH (Opcional)</label><select name="tipo_cnh" value={form.tipo_cnh || ""} onChange={handleChange}><option value="">Nenhuma / N/A</option><option>A</option><option>B</option><option>C</option><option>D</option><option>E</option><option>AB</option><option>AD</option><option>AE</option></select></div>
+                                <div className="input-group"><label>Categoria CNH (Opcional)</label><select name="tipo_cnh" value={form.tipo_cnh || ""} onChange={handleChange}><option value="">Nenhuma / N/A</option>{CATEGORIAS_CNH.map(c => <option key={c} value={c}>{c}</option>)}</select></div>
                             </div>
 
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
-                                <div className="input-group"><label>Vencimento CNH</label><input type="date" name="vencimento_cnh" value={form.vencimento_cnh} onChange={handleChange} /></div>
+                                <div className="input-group"><label>Vencimento CNH</label><input type="date" name="vencimento_cnh" {...limitesDataPrazo()} value={form.vencimento_cnh || ''} onChange={handleChange} /></div>
 
                                 {/* Campo de Upload */}
                                 <div className="input-group" style={{ marginTop: '0px', border: '1px dashed #4a5568', padding: '10px', borderRadius: '5px' }}>

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Package, X, AlertTriangle, Settings } from 'lucide-react';
 import { inputStyle } from './estoqueConstants';
+import { MAX, PADRAO, DICA, SULCO_MAX, mascaraDOT } from '../../utils/campos';
 
 /**
  * Modal de criação/edição de item de estoque (Molde) — formulário de 2 passos.
@@ -31,6 +32,7 @@ export default function ModalCadastroMolde({
                                 <label>Código de Referência</label>
                                 <input
                                     required
+                                    maxLength={MAX.CURTO}
                                     value={form.codigo_referencia}
                                     onChange={e => setForm({ ...form, codigo_referencia: e.target.value })}
                                     disabled={!form.id}
@@ -63,9 +65,9 @@ export default function ModalCadastroMolde({
                         </div>
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 15, marginBottom: 15 }}>
                             {form.categoria === 'PNEUS' ? (
-                                <div><label>Medida do Pneu</label><input required value={form.medida || ''} placeholder="Ex: 295/80" onChange={e => setForm({ ...form, medida: e.target.value })} style={inputStyle} /></div>
+                                <div><label>Medida do Pneu</label><input required maxLength={MAX.CURTO} value={form.medida || ''} placeholder="Ex: 295/80" onChange={e => setForm({ ...form, medida: e.target.value })} style={inputStyle} /></div>
                             ) : (
-                                <div><label>Nome do Item</label><input required value={form.nome} onChange={e => setForm({ ...form, nome: e.target.value })} style={inputStyle} /></div>
+                                <div><label>Nome do Item</label><input required maxLength={MAX.NOME} value={form.nome} onChange={e => setForm({ ...form, nome: e.target.value })} style={inputStyle} /></div>
                             )}
                             <div>
                                 <label>Unidade de Medida</label>
@@ -78,9 +80,9 @@ export default function ModalCadastroMolde({
                                     <option value="NOVA" style={{ fontWeight: 'bold', color: '#8B5CF6' }}>➕ Criar Nova Unidade</option>
                                 </select>
                             </div>
-                            <div><label>Qtd Mínima (Opcional)</label><input type="number" step="0.001" value={form.estoque_minimo} onChange={e => setForm({ ...form, estoque_minimo: e.target.value })} style={inputStyle} /></div>
+                            <div><label>Qtd Mínima (Opcional)</label><input type="number" min="0" step="0.001" value={form.estoque_minimo} onChange={e => setForm({ ...form, estoque_minimo: e.target.value })} style={inputStyle} /></div>
                         </div>
-                        <div><label>Observações Gerais</label><textarea rows="2" value={form.observacoes} onChange={e => setForm({ ...form, observacoes: e.target.value })} style={{ ...inputStyle, fontFamily: 'inherit' }} /></div>
+                        <div><label>Observações Gerais</label><textarea rows="2" maxLength={MAX.LONGO} value={form.observacoes} onChange={e => setForm({ ...form, observacoes: e.target.value })} style={{ ...inputStyle, fontFamily: 'inherit' }} /></div>
                     </div>
 
                     {/* --- PASSO 2: DEFINIÇÃO DO CONTROLE --- */}
@@ -111,8 +113,8 @@ export default function ModalCadastroMolde({
                         ) : (
                             form.tipo_controle === 'QUANTIDADE' ? (
                                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 15 }}>
-                                    <div><label>Qtd Inicial (Opcional)</label><input type="number" step="0.001" placeholder="0" value={form.quantidade_inicial} onChange={e => setForm({ ...form, quantidade_inicial: e.target.value })} style={inputStyle} /></div>
-                                    <div><label>Valor Unitário (R$) (Opcional)</label><input placeholder="0,00" value={form.valor_aquisicao} onChange={e => setForm({ ...form, valor_aquisicao: e.target.value })} style={inputStyle} /></div>
+                                    <div><label>Qtd Inicial (Opcional)</label><input type="number" min="0" step="0.001" placeholder="0" value={form.quantidade_inicial} onChange={e => setForm({ ...form, quantidade_inicial: e.target.value })} style={inputStyle} /></div>
+                                    <div><label>Valor Unitário (R$) (Opcional)</label><input inputMode="decimal" pattern={PADRAO.VALOR} title={DICA.VALOR} placeholder="0,00" value={form.valor_aquisicao} onChange={e => setForm({ ...form, valor_aquisicao: e.target.value })} style={inputStyle} /></div>
                                 </div>
                             ) : (
                                 <div style={{ background: 'rgba(246, 173, 85, 0.1)', padding: 15, borderRadius: 5, border: '1px dashed #f6ad55' }}>
@@ -120,25 +122,25 @@ export default function ModalCadastroMolde({
                                     <p style={{ color: '#a0aec0', fontSize: '0.8rem', marginBottom: 15 }}>Preencha abaixo se quiser dar entrada em itens físicos junto com a criação deste modelo.</p>
 
                                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 15 }}>
-                                        <div><label>Quantidade a Adicionar (Opcional)</label><input type="number" placeholder="Ex: 1" value={form.quantidade_inicial} onChange={e => setForm({ ...form, quantidade_inicial: e.target.value })} style={inputStyle} /></div>
-                                        <div><label>Valor Unitário (R$) (Opcional)</label><input type="number" step="0.0001" placeholder="0.00" value={form.valor_aquisicao} onChange={e => setForm({ ...form, valor_aquisicao: e.target.value })} style={inputStyle} /></div>
+                                        <div><label>Quantidade a Adicionar (Opcional)</label><input type="number" min="0" step="1" placeholder="Ex: 1" value={form.quantidade_inicial} onChange={e => setForm({ ...form, quantidade_inicial: e.target.value })} style={inputStyle} /></div>
+                                        <div><label>Valor Unitário (R$) (Opcional)</label><input type="number" min="0" step="0.0001" placeholder="0.00" value={form.valor_aquisicao} onChange={e => setForm({ ...form, valor_aquisicao: e.target.value })} style={inputStyle} /></div>
                                     </div>
 
                                     {form.categoria === 'PNEUS' ? (
                                         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-                                                <div><label>DOT (Opcional)</label><input value={form.dot || ''} onChange={e => setForm({ ...form, dot: e.target.value })} style={inputStyle} /></div>
-                                                <div><label>Nº de Fogo (Opcional)</label><input value={form.fogo || ''} onChange={e => setForm({ ...form, fogo: e.target.value })} style={inputStyle} /></div>
+                                                <div><label>DOT (Opcional)</label><input inputMode="numeric" pattern={PADRAO.DOT} title={DICA.DOT} value={form.dot || ''} onChange={e => setForm({ ...form, dot: mascaraDOT(e.target.value) })} style={inputStyle} /></div>
+                                                <div><label>Nº de Fogo (Opcional)</label><input maxLength={MAX.CURTO} value={form.fogo || ''} onChange={e => setForm({ ...form, fogo: e.target.value })} style={inputStyle} /></div>
                                             </div>
                                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-                                                <div><label>Marca (Opcional)</label><input value={form.marca || ''} onChange={e => setForm({ ...form, marca: e.target.value })} style={inputStyle} /></div>
-                                                <div><label>Sulco Novo (Opcional)</label><input type="number" value={form.sulco_novo || ''} onChange={e => setForm({ ...form, sulco_novo: e.target.value })} style={inputStyle} /></div>
+                                                <div><label>Marca (Opcional)</label><input maxLength={MAX.CURTO} value={form.marca || ''} onChange={e => setForm({ ...form, marca: e.target.value })} style={inputStyle} /></div>
+                                                <div><label>Sulco Novo (Opcional)</label><input type="number" min="0" max={SULCO_MAX} step="0.1" value={form.sulco_novo || ''} onChange={e => setForm({ ...form, sulco_novo: e.target.value })} style={inputStyle} /></div>
                                             </div>
                                         </div>
                                     ) : (
                                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-                                            <div><label>Número Serial (Opcional)</label><input value={form.serial || ''} onChange={e => setForm({ ...form, serial: e.target.value })} style={inputStyle} /></div>
-                                            <div><label>Nº Patrimônio (Opcional)</label><input value={form.patrimonio || ''} onChange={e => setForm({ ...form, patrimonio: e.target.value })} style={inputStyle} /></div>
+                                            <div><label>Número Serial (Opcional)</label><input maxLength={MAX.CURTO} value={form.serial || ''} onChange={e => setForm({ ...form, serial: e.target.value })} style={inputStyle} /></div>
+                                            <div><label>Nº Patrimônio (Opcional)</label><input maxLength={MAX.CURTO} value={form.patrimonio || ''} onChange={e => setForm({ ...form, patrimonio: e.target.value })} style={inputStyle} /></div>
                                         </div>
                                     )}
                                 </div>

@@ -1,4 +1,5 @@
 import { X, CheckSquare } from 'lucide-react';
+import { MAX, PADRAO, DICA, SULCO_MAX, mascaraDOT } from '../../utils/campos';
 
 export default function ModalReceberOC({
     modalBaixa,
@@ -27,11 +28,11 @@ export default function ModalReceberOC({
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
                         <div style={{ background: '#2d3748', padding: 15, borderRadius: 5 }}>
                             <label style={{ color: '#8B5CF6', fontWeight: 'bold' }}>Número da Nota Fiscal (NF)*</label>
-                            <input required placeholder="Ex: 123456" value={dadosBaixa.numero_nf} onChange={e => setDadosBaixa({ ...dadosBaixa, numero_nf: e.target.value })} style={{ ...inputStyle, marginTop: 5, fontSize: '1.2rem' }} />
+                            <input required maxLength={MAX.CURTO} placeholder="Ex: 123456" value={dadosBaixa.numero_nf} onChange={e => setDadosBaixa({ ...dadosBaixa, numero_nf: e.target.value })} style={{ ...inputStyle, marginTop: 5, fontSize: '1.2rem' }} />
                         </div>
                         <div style={{ background: '#2d3748', padding: 15, borderRadius: 5 }}>
                             <label style={{ color: '#a0aec0', fontWeight: 'bold' }}>Observação do Lote (Opcional)</label>
-                            <textarea rows="2" placeholder="Ex: Entregue pela Tnt..." value={dadosBaixa.observacao} onChange={e => setDadosBaixa({ ...dadosBaixa, observacao: e.target.value })} style={{ ...inputStyle, marginTop: 5 }} />
+                            <textarea rows="2" maxLength={MAX.LONGO} placeholder="Ex: Entregue pela Tnt..." value={dadosBaixa.observacao} onChange={e => setDadosBaixa({ ...dadosBaixa, observacao: e.target.value })} style={{ ...inputStyle, marginTop: 5 }} />
                         </div>
                     </div>
 
@@ -75,16 +76,16 @@ export default function ModalReceberOC({
 
                                                 {catFixa === 'PNEUS' ? (
                                                     <>
-                                                        <input required placeholder="DOT (Obrigatório)*" value={d.dot} onChange={e => atualizarDetalheBaixa(indexGeral, 'dot', e.target.value)} style={inputStyle} />
-                                                        <input placeholder="Fogo (Opcional)" value={d.fogo} onChange={e => atualizarDetalheBaixa(indexGeral, 'fogo', e.target.value)} style={inputStyle} />
-                                                        <input placeholder="Marca (Opcional)" value={d.marca} onChange={e => atualizarDetalheBaixa(indexGeral, 'marca', e.target.value)} style={inputStyle} />
-                                                        <input required placeholder="Medida*" value={d.medida} onChange={e => atualizarDetalheBaixa(indexGeral, 'medida', e.target.value)} style={inputStyle} />
-                                                        <input type="number" step="0.1" placeholder="Sulco (mm) (Opc)" value={d.sulco_novo} onChange={e => atualizarDetalheBaixa(indexGeral, 'sulco_novo', e.target.value)} style={inputStyle} />
+                                                        <input required inputMode="numeric" pattern={PADRAO.DOT} title={DICA.DOT} placeholder="DOT (Obrigatório)*" value={d.dot} onChange={e => atualizarDetalheBaixa(indexGeral, 'dot', mascaraDOT(e.target.value))} style={inputStyle} />
+                                                        <input maxLength={MAX.CURTO} placeholder="Fogo (Opcional)" value={d.fogo} onChange={e => atualizarDetalheBaixa(indexGeral, 'fogo', e.target.value)} style={inputStyle} />
+                                                        <input maxLength={MAX.CURTO} placeholder="Marca (Opcional)" value={d.marca} onChange={e => atualizarDetalheBaixa(indexGeral, 'marca', e.target.value)} style={inputStyle} />
+                                                        <input required maxLength={MAX.CURTO} placeholder="Medida*" value={d.medida} onChange={e => atualizarDetalheBaixa(indexGeral, 'medida', e.target.value)} style={inputStyle} />
+                                                        <input type="number" min="0" max={SULCO_MAX} step="0.1" placeholder="Sulco (mm) (Opc)" value={d.sulco_novo} onChange={e => atualizarDetalheBaixa(indexGeral, 'sulco_novo', e.target.value)} style={inputStyle} />
                                                     </>
                                                 ) : (
                                                     <>
-                                                        <input required placeholder="Nº de Série (Obrigatório)*" value={d.serial} onChange={e => atualizarDetalheBaixa(indexGeral, 'serial', e.target.value)} style={inputStyle} />
-                                                        <input placeholder="Nº Patrimônio (Opcional)" value={d.patrimonio} onChange={e => atualizarDetalheBaixa(indexGeral, 'patrimonio', e.target.value)} style={inputStyle} />
+                                                        <input required maxLength={MAX.CURTO} placeholder="Nº de Série (Obrigatório)*" value={d.serial} onChange={e => atualizarDetalheBaixa(indexGeral, 'serial', e.target.value)} style={inputStyle} />
+                                                        <input maxLength={MAX.CURTO} placeholder="Nº Patrimônio (Opcional)" value={d.patrimonio} onChange={e => atualizarDetalheBaixa(indexGeral, 'patrimonio', e.target.value)} style={inputStyle} />
                                                     </>
                                                 )}
                                             </div>

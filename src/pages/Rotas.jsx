@@ -2,7 +2,7 @@ import usePersistedTab from '../hooks/usePersistedTab';
 import useCan from '../hooks/useCan';
 import { useState, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import api from '../services/api';
+import api, { mensagemDeErro } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 import { Map, FileText, Search, PlusCircle } from 'lucide-react';
 import jsPDF from 'jspdf';
@@ -177,6 +177,10 @@ export default function Rotas() {
             return toast.error("Preencha Veículo, Colaborador, Origem e o Destino Final.");
         }
 
+        if (form.previsao_retorno && form.data_inicio && form.previsao_retorno < form.data_inicio) {
+            return toast.error("A previsão de retorno não pode ser antes do início da rota.");
+        }
+
         // Monta a string única de destinos
         const todosDestinos = [...paradasIntermediarias, destinoFinal].filter(d => d.trim() !== '');
         const stringDestino = todosDestinos.join(' ➝ ');
@@ -205,8 +209,7 @@ export default function Rotas() {
             queryClient.invalidateQueries({ queryKey: ['rotas'] }); queryClient.invalidateQueries({ queryKey: ['dashboardFrota'] });
         } catch (error) {
             console.error(error);
-            const msg = error.response?.data?.detail || "Erro ao salvar.";
-            toast.error("Erro: " + msg);
+            toast.error("Erro: " + mensagemDeErro(error, "Erro ao salvar."));
         }
     }
 
@@ -229,6 +232,7 @@ export default function Rotas() {
 
     async function confirmarFinalizacao() {
         if (!dadosFinalizacao.km_final || !dadosFinalizacao.data_retorno) return toast.error("Preencha KM e Data.");
+        if (!/^\d+$/.test(String(dadosFinalizacao.km_final).trim())) return toast.error("KM final inválido: use um número inteiro.");
         if (parseFloat(dadosFinalizacao.km_final) <= rotaSelecionada.km_inicial) return toast("KM Final deve ser maior que o Inicial.");
 
         try {
@@ -251,13 +255,13 @@ export default function Rotas() {
             setModalFinalizar(null);
             setRotaSelecionada(null);
             queryClient.invalidateQueries({ queryKey: ['rotas'] }); queryClient.invalidateQueries({ queryKey: ['dashboardFrota'] });
-        } catch (error) { toast.error("Erro: " + error.response?.data?.detail); }
+        } catch (error) { toast.error("Erro: " + mensagemDeErro(error, "Não foi possível finalizar a rota.")); }
     }
 
     async function handleDelete(id) {
         if (window.confirm("Excluir?")) {
             try { await api.delete(`/rotas/${id}`); queryClient.invalidateQueries({ queryKey: ['rotas'] }); queryClient.invalidateQueries({ queryKey: ['dashboardFrota'] }); }
-            catch (error) { toast.error(error.response?.data?.detail || "Erro ao excluir a rota."); }
+            catch (error) { toast.error(mensagemDeErro(error, "Erro ao excluir a rota.")); }
         }
     }
 

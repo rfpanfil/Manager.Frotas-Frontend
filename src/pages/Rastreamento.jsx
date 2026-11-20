@@ -1,7 +1,7 @@
 import usePersistedTab from '../hooks/usePersistedTab';
 import { useState, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import api from '../services/api';
+import api, { mensagemDeErro } from '../services/api';
 import { MapContainer, TileLayer, Polyline, Marker, Popup, useMap } from 'react-leaflet';
 import { Search, MapPin, Calendar, FileText, X } from 'lucide-react'; // Adicionei FileText e X
 import Select from 'react-select';
@@ -93,7 +93,7 @@ export default function Rastreamento() {
             }
         } catch (error) {
             console.error(error);
-            toast.error("Erro ao buscar histórico.");
+            toast.error(mensagemDeErro(error, "Erro ao buscar histórico."));
         } finally {
             setLoading(false);
         }

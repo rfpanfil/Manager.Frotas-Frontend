@@ -2,6 +2,7 @@ import useCan from '../../hooks/useCan';
 import React from 'react';
 import { X, Edit, Trash2 } from 'lucide-react';
 import { inputStyle } from './estoqueConstants';
+import { MAX } from '../../utils/campos';
 
 /**
  * Modal para CRUD de Categorias de Estoque.
@@ -24,7 +25,7 @@ export default function ModalGerenciarCategorias({
                     <div style={{ display: 'flex', gap: 10 }}>
                         <div style={{ flex: 2 }}>
                             <label>Nome da Categoria</label>
-                            <input required value={formCategoria.nome} onChange={e => setFormCategoria({ ...formCategoria, nome: e.target.value })} placeholder="Ex: FILTROS" style={inputStyle} />
+                            <input required maxLength={MAX.CURTO} value={formCategoria.nome} onChange={e => setFormCategoria({ ...formCategoria, nome: e.target.value })} placeholder="Ex: FILTROS" style={inputStyle} />
                         </div>
                         <div style={{ flex: 1 }}>
                             <label>Tipo de Controle</label>

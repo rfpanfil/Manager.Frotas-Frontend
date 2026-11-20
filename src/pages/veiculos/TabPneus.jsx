@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import api from '../../services/api';
+import api, { mensagemDeErro } from '../../services/api';
+import { KM_MAX } from '../../utils/campos';
 import { useAuth } from '../../contexts/AuthContext';
 import toast from 'react-hot-toast';
 
@@ -64,7 +65,7 @@ export default function TabPneus() {
             const res = await api.post('/pneus/medidas', { nome: nomeInserido });
             setMedidas([...medidas, res.data]);
             return res.data;
-        } catch (error) { toast.error("Erro ao criar medida: " + (error.response?.data?.detail || "Já existe")); }
+        } catch (error) { toast.error("Erro ao criar medida: " + mensagemDeErro(error, "Já existe")); }
     }
 
     async function handleSalvarMedida(e) {
@@ -77,7 +78,7 @@ export default function TabPneus() {
             }
             setMedidaForm({ id: null, nome: '' });
             queryClient.invalidateQueries({ queryKey: ['pneus'] }); queryClient.invalidateQueries({ queryKey: ['veiculosResumo'] }); queryClient.invalidateQueries({ queryKey: ['pneusResumo'] }); queryClient.invalidateQueries({ queryKey: ['pneusMedidas'] });
-        } catch (error) { toast.error("Erro: " + (error.response?.data?.detail || "Já existe")); }
+        } catch (error) { toast.error("Erro: " + mensagemDeErro(error, "Já existe")); }
     }
 
     async function handleExcluirMedida(id) {
@@ -85,7 +86,7 @@ export default function TabPneus() {
         try {
             await api.delete(`/pneus/medidas/${id}`);
             queryClient.invalidateQueries({ queryKey: ['pneus'] }); queryClient.invalidateQueries({ queryKey: ['veiculosResumo'] }); queryClient.invalidateQueries({ queryKey: ['pneusResumo'] }); queryClient.invalidateQueries({ queryKey: ['pneusMedidas'] });
-        } catch (error) { toast.error("Erro: " + (error.response?.data?.detail || "Em uso")); }
+        } catch (error) { toast.error("Erro: " + mensagemDeErro(error, "Em uso")); }
     }
 
     const veiculosProcessados = veiculos.map(v => {
@@ -119,7 +120,7 @@ export default function TabPneus() {
         try {
             await api.post(`/pneus/movimentar`, { pneu_id: pneu.id, tipo_evento: 'DESMONTAGEM', observacao: 'Desmontagem via painel visual' });
             queryClient.invalidateQueries({ queryKey: ['pneus'] }); queryClient.invalidateQueries({ queryKey: ['veiculosResumo'] }); queryClient.invalidateQueries({ queryKey: ['pneusResumo'] }); queryClient.invalidateQueries({ queryKey: ['pneusMedidas'] });
-        } catch (error) { toast.error("Erro ao desmontar."); }
+        } catch (error) { toast.error(mensagemDeErro(error, "Erro ao desmontar.")); }
     }
 
     async function handleMontarEstoque(pneuId) {
@@ -129,27 +130,30 @@ export default function TabPneus() {
         if (!km) {
             km = prompt("Você não preencheu o KM da montagem geral. Digite o KM de montagem agora:", veiculoMontagem.km_atual || '');
             if (!km) return;
+            km = String(km).trim();
             setKmMontagemGlobal(km);
         }
 
+        if (!/^\d+$/.test(String(km)) || Number(km) > KM_MAX) return toast.error("KM inválido: use um número inteiro, sem pontos ou vírgulas.");
+
         try {
-            await api.post(`/pneus/movimentar`, { pneu_id: pneuId, veiculo_id: veiculoMontagem.id, posicao: posicaoAlvo, tipo_evento: 'MONTAGEM', km_veiculo: parseFloat(km) });
+            await api.post(`/pneus/movimentar`, { pneu_id: pneuId, veiculo_id: veiculoMontagem.id, posicao: posicaoAlvo, tipo_evento: 'MONTAGEM', km_veiculo: Number(km) });
             setPopoverAberto(false);
             queryClient.invalidateQueries({ queryKey: ['pneus'] }); queryClient.invalidateQueries({ queryKey: ['veiculosResumo'] }); queryClient.invalidateQueries({ queryKey: ['pneusResumo'] }); queryClient.invalidateQueries({ queryKey: ['pneusMedidas'] });
-        } catch (error) { toast.error("Erro ao montar."); }
+        } catch (error) { toast.error(mensagemDeErro(error, "Erro ao montar.")); }
     }
 
     async function handleMontagemExpressa(e) {
         e.preventDefault();
         if (!kmMontagemGlobal) return toast("Por favor, feche este modal e insira o KM do veículo na tela de Montagem Geral antes de continuar.");
         try {
-            const payload = { ...formExpresso, veiculo_id: veiculoMontagem.id, posicao: posicaoAlvo, km_montagem: Number(kmMontagemGlobal) };
+            const payload = { ...formExpresso, sulco_novo: formExpresso.sulco_novo === '' ? null : Number(formExpresso.sulco_novo), veiculo_id: veiculoMontagem.id, posicao: posicaoAlvo, km_montagem: Number(kmMontagemGlobal) };
             await api.post(`/pneus/montagem-expressa`, payload);
             toast.success("Pneu cadastrado e montado com sucesso!");
             setModalExpresso(false);
             setPopoverAberto(false);
             queryClient.invalidateQueries({ queryKey: ['pneus'] }); queryClient.invalidateQueries({ queryKey: ['veiculosResumo'] }); queryClient.invalidateQueries({ queryKey: ['pneusResumo'] }); queryClient.invalidateQueries({ queryKey: ['pneusMedidas'] });
-        } catch (error) { toast.error("Erro na montagem expressa: " + (error.response?.data?.detail || error.message)); }
+        } catch (error) { toast.error("Erro na montagem expressa: " + mensagemDeErro(error, error.message)); }
     }
 
     async function abrirHistorico(pneuId) {
@@ -162,7 +166,7 @@ export default function TabPneus() {
 
     function abrirModalEdicao(pneu) {
         setPneuEditando({
-            ...pneu, medida: pneu.medida || '', sulco_novo: pneu.sulco_novo || 0,
+            ...pneu, status_original: pneu.status, medida: pneu.medida || '', sulco_novo: pneu.sulco_novo || 0,
             sulco_atual: pneu.sulco_atual || 0, vida_util_km: pneu.vida_util_km || ''
         });
         setModalEdicao(true);
@@ -181,7 +185,7 @@ export default function TabPneus() {
             toast.success("Pneu atualizado com sucesso!");
             setModalEdicao(false);
             queryClient.invalidateQueries({ queryKey: ['pneus'] }); queryClient.invalidateQueries({ queryKey: ['veiculosResumo'] }); queryClient.invalidateQueries({ queryKey: ['pneusResumo'] }); queryClient.invalidateQueries({ queryKey: ['pneusMedidas'] });
-        } catch (error) { toast.error("Erro ao salvar: " + (error.response?.data?.detail || error.message)); }
+        } catch (error) { toast.error("Erro ao salvar: " + mensagemDeErro(error, error.message)); }
     }
 
     async function excluirPneu(id) {
@@ -190,7 +194,7 @@ export default function TabPneus() {
             await api.delete(`/pneus/${id}`);
             toast.success("Pneu excluído.");
             queryClient.invalidateQueries({ queryKey: ['pneus'] }); queryClient.invalidateQueries({ queryKey: ['veiculosResumo'] }); queryClient.invalidateQueries({ queryKey: ['pneusResumo'] }); queryClient.invalidateQueries({ queryKey: ['pneusMedidas'] });
-        } catch (error) { toast.error("Erro ao excluir: " + (error.response?.data?.detail || error.message)); }
+        } catch (error) { toast.error("Erro ao excluir: " + mensagemDeErro(error, error.message)); }
     }
 
     const abrirMontagemExpressa = (tipo) => {

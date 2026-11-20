@@ -117,7 +117,6 @@ export default function Auditoria() {
                         <option value="500">500 Registros</option>
                         <option value="1000">1.000 Registros</option>
                         <option value="2000">2.000 Registros</option>
-                        <option value="999999">Mostrar Tudo</option>
                     </select>
 
                     {can('relatorios.baixar') && ( <button onClick={exportarCsv} className="btn-add" style={{ backgroundColor: '#3182ce', color: 'white', height: '40px' }} title="Baixar planilha (CSV, abre no Excel)">
@@ -137,6 +136,7 @@ export default function Auditoria() {
                     <Search size={18} color="#a0aec0" />
                     <input
                         placeholder="Buscar em dados ou usuário (Enter para buscar)..."
+                        maxLength={100}
                         value={filtros.busca}
                         onChange={e => setFiltros({ ...filtros, busca: e.target.value })}
                         style={{ background: 'transparent', border: 'none', color: 'white', padding: '10px', outline: 'none', width: '100%' }}
@@ -170,11 +170,11 @@ export default function Auditoria() {
                 <div className="filter-item" style={{ display: 'flex', gap: '5px', alignItems: 'flex-end' }}>
                     <div>
                         <label style={{ fontSize: '0.8rem', color: '#a0aec0', display: 'block', marginBottom: '3px' }}>Início</label>
-                        <input type="date" value={filtros.data_inicio} onChange={e => setFiltros({ ...filtros, data_inicio: e.target.value })} style={{ padding: '7px', background: '#2d3748', color: 'white', border: '1px solid #4a5568', borderRadius: '4px' }} />
+                        <input type="date" min="2000-01-01" max={filtros.data_fim || undefined} value={filtros.data_inicio} onChange={e => setFiltros({ ...filtros, data_inicio: e.target.value })} style={{ padding: '7px', background: '#2d3748', color: 'white', border: '1px solid #4a5568', borderRadius: '4px' }} />
                     </div>
                     <div>
                         <label style={{ fontSize: '0.8rem', color: '#a0aec0', display: 'block', marginBottom: '3px' }}>Fim</label>
-                        <input type="date" value={filtros.data_fim} onChange={e => setFiltros({ ...filtros, data_fim: e.target.value })} style={{ padding: '7px', background: '#2d3748', color: 'white', border: '1px solid #4a5568', borderRadius: '4px' }} />
+                        <input type="date" min={filtros.data_inicio || '2000-01-01'} value={filtros.data_fim} onChange={e => setFiltros({ ...filtros, data_fim: e.target.value })} style={{ padding: '7px', background: '#2d3748', color: 'white', border: '1px solid #4a5568', borderRadius: '4px' }} />
                     </div>
                 </div>
             </div>

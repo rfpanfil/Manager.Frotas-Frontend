@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Save } from 'lucide-react';
-import api from '../../services/api';
+import api, { mensagemDeErro } from '../../services/api';
+import { MAX } from '../../utils/campos';
 import toast from 'react-hot-toast';
 
 export default function ModalEditarBase({ isOpen, onClose, base, onSuccess }) {
@@ -33,7 +34,7 @@ export default function ModalEditarBase({ isOpen, onClose, base, onSuccess }) {
             onClose();   // Fecha o modal
         } catch (error) {
             console.error(error);
-            const msg = error.response?.data?.detail || "Erro ao editar a base.";
+            const msg = mensagemDeErro(error, "Erro ao editar a base.");
             toast.error(msg);
         } finally {
             setIsSaving(false);
@@ -93,6 +94,7 @@ export default function ModalEditarBase({ isOpen, onClose, base, onSuccess }) {
                         <input 
                             type="text" 
                             value={nome} 
+                            maxLength={MAX.NOME}
                             onChange={(e) => setNome(e.target.value)}
                             placeholder="Ex: Base Central"
                             disabled={isSaving}

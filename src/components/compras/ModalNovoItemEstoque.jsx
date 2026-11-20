@@ -1,5 +1,6 @@
 import { X } from 'lucide-react';
 import CreatableSelect from 'react-select/creatable';
+import { MAX } from '../../utils/campos';
 
 const customSelectStyles = {
     control: (base, state) => ({ ...base, backgroundColor: '#2d3748', borderColor: '#4a5568', color: 'white', minHeight: '40px', boxShadow: state.isFocused ? '0 0 0 1px #8B5CF6' : 'none', '&:hover': { borderColor: '#8B5CF6' } }),
@@ -33,12 +34,12 @@ export default function ModalNovoItemEstoque({
                 </div>
                 <form onSubmit={handleCriarNovoItemEstoque} style={{ display: 'flex', flexDirection: 'column', gap: 15 }}>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-                        <div><label>Nome do Item / Modelo <span style={{ color: '#e53e3e' }}>*</span></label><input required value={formNovoItem.nome} onChange={e => setFormNovoItem({ ...formNovoItem, nome: e.target.value })} style={inputStyle} /></div>
+                        <div><label>Nome do Item / Modelo <span style={{ color: '#e53e3e' }}>*</span></label><input required maxLength={MAX.NOME} value={formNovoItem.nome} onChange={e => setFormNovoItem({ ...formNovoItem, nome: e.target.value })} style={inputStyle} /></div>
                         <div>
                             <label>Cód. Referência (SKU) <span style={{ color: '#e53e3e' }}>*</span></label>
                             <div style={{ display: 'flex', marginTop: '5px' }}>
                                 <span style={{ padding: '10px 12px', background: '#4a5568', color: '#a0aec0', borderRadius: '5px 0 0 5px', border: '1px solid #4a5568', borderRight: 'none', fontWeight: 'bold', fontSize: '0.9rem', userSelect: 'none' }}>ID</span>
-                                <input required placeholder="123" value={formNovoItem.codigo_referencia.replace(/^ID/i, '')} onChange={e => setFormNovoItem({ ...formNovoItem, codigo_referencia: 'ID' + e.target.value.replace(/^ID/i, '') })} style={{ ...inputStyle, borderRadius: '0 5px 5px 0', flex: 1, marginTop: 0, borderColor: (formNovoItem.codigo_referencia && itensEstoque.some(i => (i.codigo_referencia || '').toLowerCase() === formNovoItem.codigo_referencia.toLowerCase())) ? '#e53e3e' : '#4a5568' }} />
+                                <input required maxLength={MAX.CURTO - 2} placeholder="123" value={formNovoItem.codigo_referencia.replace(/^ID/i, '')} onChange={e => setFormNovoItem({ ...formNovoItem, codigo_referencia: 'ID' + e.target.value.replace(/^ID/i, '') })} style={{ ...inputStyle, borderRadius: '0 5px 5px 0', flex: 1, marginTop: 0, borderColor: (formNovoItem.codigo_referencia && itensEstoque.some(i => (i.codigo_referencia || '').toLowerCase() === formNovoItem.codigo_referencia.toLowerCase())) ? '#e53e3e' : '#4a5568' }} />
                             </div>
                             {formNovoItem.codigo_referencia && itensEstoque.some(i => (i.codigo_referencia || '').toLowerCase() === formNovoItem.codigo_referencia.toLowerCase()) && (
                                 <span style={{ color: '#e53e3e', fontSize: '0.75rem', marginTop: '4px', display: 'block', fontWeight: 'bold' }}>Este código já está em uso no estoque!</span>
@@ -65,10 +66,10 @@ export default function ModalNovoItemEstoque({
                                 <option value="SERIALIZADO">Serializado (Único)</option>
                             </select>
                         </div>
-                        <div><label>Estoque Mínimo de Alerta</label><input type="number" step="0.001" placeholder="0" value={formNovoItem.estoque_minimo} onChange={e => setFormNovoItem({ ...formNovoItem, estoque_minimo: e.target.value })} style={inputStyle} /></div>
+                        <div><label>Estoque Mínimo de Alerta</label><input type="number" min="0" step="0.001" placeholder="0" value={formNovoItem.estoque_minimo} onChange={e => setFormNovoItem({ ...formNovoItem, estoque_minimo: e.target.value })} style={inputStyle} /></div>
                     </div>
 
-                    <div><label>Observações / Link</label><textarea rows="2" value={formNovoItem.observacoes} onChange={e => setFormNovoItem({ ...formNovoItem, observacoes: e.target.value })} style={inputStyle} /></div>
+                    <div><label>Observações / Link</label><textarea rows="2" maxLength={MAX.LONGO} value={formNovoItem.observacoes} onChange={e => setFormNovoItem({ ...formNovoItem, observacoes: e.target.value })} style={inputStyle} /></div>
 
                     <button type="submit" className="btn-add" style={{ background: '#3182ce', color: 'white', marginTop: 10 }}>Gravar e Selecionar</button>
                 </form>

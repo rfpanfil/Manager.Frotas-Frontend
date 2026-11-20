@@ -18,7 +18,7 @@ export default function Login() {
       navigate('/');
     } catch (err) {
       const detalhe = err.response?.data?.detail;
-      setError(err.response?.status === 429 && typeof detalhe === 'string'
+      setError([422, 429].includes(err.response?.status) && typeof detalhe === 'string'
         ? detalhe
         : 'Credenciais inválidas. Verifique login e senha.');
     }
@@ -67,6 +67,8 @@ export default function Login() {
               type="text"
               value={identifier}
               onChange={(e) => setIdentifier(e.target.value)}
+              maxLength={150}
+              autoComplete="username"
               placeholder="Digite seu login"
               style={{
                 width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #2d3748',
@@ -82,6 +84,8 @@ export default function Login() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              maxLength={1024}
+              autoComplete="current-password"
               placeholder="Digite sua senha"
               style={{
                 width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #2d3748',

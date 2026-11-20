@@ -2,6 +2,7 @@ import React from 'react';
 import { X } from 'lucide-react';
 import Select from 'react-select';
 import { customSelectStyles } from '../../../utils/pneusUtils';
+import { KM_MAX } from '../../../utils/campos';
 import CarroEixosVisual from './CarroEixosVisual';
 
 export default function ModalMontagemGeral({
@@ -46,6 +47,9 @@ export default function ModalMontagemGeral({
                             <label style={{ color: '#8B5CF6', fontWeight: 'bold', display: 'block', marginBottom: 5 }}>KM do Veículo no Momento da Montagem (Histórico)</label>
                             <input
                                 type="number"
+                                min="0"
+                                max={KM_MAX}
+                                step="1"
                                 placeholder="Ex: 150000"
                                 value={kmMontagemGlobal}
                                 onChange={e => setKmMontagemGlobal(e.target.value)}

@@ -1,6 +1,7 @@
 import useCan from '../../hooks/useCan';
 import { X, QrCode, Info, Paperclip, Trash2 } from 'lucide-react';
 import Select from 'react-select';
+import { MAX, PADRAO, DICA, KM_MAX, limitesDataHoraEvento, mascaraDOT } from '../../utils/campos';
 
 const customSelectStyles = {
     control: (base, state) => ({
@@ -103,7 +104,7 @@ export default function ModalGastoForm({
                     </div>
 
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '15px' }}>
-                        <div className="input-group"><label>Data</label><input type="datetime-local" value={form.data} onChange={e => setForm({ ...form, data: e.target.value })} required /></div>
+                        <div className="input-group"><label>Data</label><input type="datetime-local" {...limitesDataHoraEvento()} value={form.data} onChange={e => setForm({ ...form, data: e.target.value })} required /></div>
 
                         <div className="input-group">
                             <label>Tipo de Gasto</label>
@@ -115,7 +116,7 @@ export default function ModalGastoForm({
                             {!podeCriarOpcao && <SemOpcoes lista={tiposGasto} />}
                         </div>
 
-                        <div className="input-group"><label>Valor (R$)</label><input type="text" value={form.valor} onChange={e => setForm({ ...form, valor: e.target.value })} required placeholder="0,00" /></div>
+                        <div className="input-group"><label>Valor (R$)</label><input type="text" inputMode="decimal" pattern={PADRAO.DECIMAL} title={DICA.DECIMAL} value={form.valor} onChange={e => setForm({ ...form, valor: e.target.value })} required placeholder="0,00" /></div>
                     </div>
 
                     {/* --- CAMPOS DINÂMICOS PARA COMBUSTÍVEL --- */}
@@ -142,11 +143,11 @@ export default function ModalGastoForm({
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
                                 <div className="input-group">
                                     <label style={{ color: '#f6ad55' }}>Litros</label>
-                                    <input type="text" value={form.litros} onChange={e => setForm({ ...form, litros: e.target.value })} placeholder="Ex: 50,5" required style={{ border: '1px solid #f6ad55' }} />
+                                    <input type="text" inputMode="decimal" pattern={PADRAO.DECIMAL} title={DICA.DECIMAL} value={form.litros} onChange={e => setForm({ ...form, litros: e.target.value })} placeholder="Ex: 50,5" required style={{ border: '1px solid #f6ad55' }} />
                                 </div>
                                 <div className="input-group">
                                     <label style={{ color: '#f6ad55' }}>Preço Litro (R$)</label>
-                                    <input type="text" value={form.preco_litro} onChange={e => setForm({ ...form, preco_litro: e.target.value })} placeholder="Ex: 5,89" required style={{ border: '1px solid #f6ad55' }} />
+                                    <input type="text" inputMode="decimal" pattern={PADRAO.DECIMAL} title={DICA.DECIMAL} value={form.preco_litro} onChange={e => setForm({ ...form, preco_litro: e.target.value })} placeholder="Ex: 5,89" required style={{ border: '1px solid #f6ad55' }} />
                                 </div>
                             </div>
 
@@ -154,6 +155,9 @@ export default function ModalGastoForm({
                                 <label style={{ color: '#f6ad55' }}>KM Atual (Odômetro)</label>
                                 <input
                                     type="text"
+                                    inputMode="numeric"
+                                    pattern={PADRAO.KM}
+                                    title={DICA.KM}
                                     value={form.km_registro}
                                     onChange={handleKmChange}
                                     placeholder="Ex: 123.456"
@@ -243,6 +247,9 @@ export default function ModalGastoForm({
                                         <label style={{ color: '#e53e3e' }}>KM da Troca</label>
                                         <input
                                             type="number"
+                                            min="0"
+                                            max={KM_MAX}
+                                            step="1"
                                             value={form.km_registro}
                                             onChange={e => {
                                                 const km = e.target.value;
@@ -260,8 +267,11 @@ export default function ModalGastoForm({
                                     <div className="input-group">
                                         <label style={{ color: '#e53e3e' }}>DOT</label>
                                         <input
+                                            inputMode="numeric"
+                                            pattern={PADRAO.DOT}
+                                            title={DICA.DOT}
                                             value={form.dot}
-                                            onChange={e => setForm({ ...form, dot: e.target.value })}
+                                            onChange={e => setForm({ ...form, dot: mascaraDOT(e.target.value) })}
                                             placeholder="Ex: 3524"
                                             required
                                         />
@@ -271,6 +281,9 @@ export default function ModalGastoForm({
                                         <label style={{ color: '#e53e3e' }}>Próxima Troca (40k)</label>
                                         <input
                                             type="number"
+                                            min={form.km_registro || 0}
+                                            max={KM_MAX}
+                                            step="1"
                                             value={form.proxima_troca_km}
                                             onChange={e => setForm({ ...form, proxima_troca_km: e.target.value })}
                                             required
@@ -318,6 +331,7 @@ export default function ModalGastoForm({
                         <label>Descrição / Observação</label>
                         <input
                             placeholder={linkQrProtegido ? "Adicione observações extras aqui..." : "Detalhes..."}
+                            maxLength={MAX.LONGO - (linkQrProtegido ? linkQrProtegido.length + 3 : 0)}
                             value={form.descricao}
                             onChange={e => setForm({ ...form, descricao: e.target.value })}
                         />
@@ -348,6 +362,7 @@ export default function ModalGastoForm({
                         <input
                             type="file"
                             multiple
+                            accept="image/*,application/pdf"
                             onChange={e => setArquivos(Array.from(e.target.files || []))}
                             style={{ marginTop: '10px', width: '100%' }}
                         />

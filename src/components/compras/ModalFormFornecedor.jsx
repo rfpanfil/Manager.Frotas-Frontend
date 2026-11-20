@@ -1,5 +1,6 @@
 import React from 'react';
 import { X } from 'lucide-react';
+import { MAX, PADRAO, DICA, mascaraCpfOuCnpj } from '../../utils/campos';
 
 export default function ModalFormFornecedor({
     modalAberto,
@@ -24,6 +25,7 @@ export default function ModalFormFornecedor({
                         <label>Razão Social / Nome</label>
                         <input 
                             required 
+                            maxLength={MAX.NOME}
                             value={form.razao_social}
                             onChange={e => setForm({ ...form, razao_social: e.target.value })} 
                             style={inputStyle} 
@@ -31,11 +33,14 @@ export default function ModalFormFornecedor({
                     </div>
                     
                     <div>
-                        <label>CNPJ ou CPF</label>
+                        <label>CNPJ ou CPF (opcional)</label>
                         <input 
-                            required 
-                            value={form.cnpj_cpf}
-                            onChange={e => setForm({ ...form, cnpj_cpf: e.target.value })} 
+                            inputMode="numeric"
+                            pattern={PADRAO.CPF_OU_CNPJ}
+                            title={DICA.CPF_OU_CNPJ}
+                            placeholder="000.000.000-00 ou 00.000.000/0000-00"
+                            value={form.cnpj_cpf || ''}
+                            onChange={e => setForm({ ...form, cnpj_cpf: mascaraCpfOuCnpj(e.target.value) })} 
                             style={inputStyle} 
                         />
                     </div>
@@ -68,6 +73,7 @@ export default function ModalFormFornecedor({
                     <div>
                         <label>Contato (Telefone / E-mail)</label>
                         <input 
+                            maxLength={MAX.MEDIO}
                             value={form.contato}
                             onChange={e => setForm({ ...form, contato: e.target.value })} 
                             style={inputStyle} 
@@ -77,6 +83,7 @@ export default function ModalFormFornecedor({
                     <div>
                         <label>Endereço Completo</label>
                         <input 
+                            maxLength={MAX.MEDIO}
                             value={form.endereco}
                             onChange={e => setForm({ ...form, endereco: e.target.value })} 
                             style={inputStyle} 
@@ -87,6 +94,7 @@ export default function ModalFormFornecedor({
                         <label>Observações</label>
                         <textarea 
                             rows="2" 
+                            maxLength={MAX.LONGO}
                             value={form.observacao}
                             onChange={e => setForm({ ...form, observacao: e.target.value })} 
                             style={inputStyle} 

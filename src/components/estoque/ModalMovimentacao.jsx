@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { AlertTriangle, Info } from 'lucide-react';
 import Select from 'react-select';
 import { customSelectStyles, inputStyle } from './estoqueConstants';
+import { MAX, PADRAO, DICA, SULCO_MAX, mascaraDOT } from '../../utils/campos';
 
 /**
  * Modal de Entrada/Saída de Estoque com campos condicionais.
@@ -69,7 +70,7 @@ export default function ModalMovimentacao({
                         <>
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
                                 <div><label>Quantidade</label><input type="number" min={itemSelecionado?.tipo_controle === 'SERIALIZADO' ? '1' : '0.001'} step={itemSelecionado?.tipo_controle === 'SERIALIZADO' ? '1' : '0.001'} required placeholder="Ex: 50" onChange={e => setFormMov({ ...formMov, quantidade: e.target.value })} style={inputStyle} /></div>
-                                <div><label>Valor Unitário (R$)</label><input type="number" step="0.0001" placeholder="R$ 0,00" onChange={e => setFormMov({ ...formMov, valor_aquisicao: e.target.value })} style={inputStyle} /></div>
+                                <div><label>Valor Unitário (R$)</label><input type="number" min="0" step="0.0001" placeholder="R$ 0,00" onChange={e => setFormMov({ ...formMov, valor_aquisicao: e.target.value })} style={inputStyle} /></div>
                             </div>
 
                             {/* CÁLCULO VISUAL DO TOTAL */}
@@ -77,7 +78,7 @@ export default function ModalMovimentacao({
                                 Custo Total: R$ {((formMov.quantidade || 0) * (formMov.valor_aquisicao || 0)).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                             </div>
 
-                            <div><label>Número da NF (Opcional)</label><input placeholder="Série e Número" onChange={e => setFormMov({ ...formMov, numero_nf: e.target.value })} style={inputStyle} /></div>
+                            <div><label>Número da NF (Opcional)</label><input maxLength={MAX.CURTO} placeholder="Série e Número" onChange={e => setFormMov({ ...formMov, numero_nf: e.target.value })} style={inputStyle} /></div>
 
                             {/* CAMPOS ESPECÍFICOS PARA SERIALIZADOS */}
                             {itemSelecionado?.tipo_controle === 'SERIALIZADO' && (
@@ -87,25 +88,25 @@ export default function ModalMovimentacao({
                                     {itemSelecionado?.categoria === 'PNEUS' ? (
                                         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-                                                <div><label>DOT (Obrigatório)</label><input required onChange={e => setFormMov({ ...formMov, dot: e.target.value })} style={inputStyle} /></div>
-                                                <div><label>Nº de Fogo (Opcional)</label><input onChange={e => setFormMov({ ...formMov, fogo: e.target.value })} style={{ ...inputStyle, borderColor: '#a0aec0' }} /></div>
+                                                <div><label>DOT (Obrigatório)</label><input required inputMode="numeric" pattern={PADRAO.DOT} title={DICA.DOT} value={formMov.dot || ''} onChange={e => setFormMov({ ...formMov, dot: mascaraDOT(e.target.value) })} style={inputStyle} /></div>
+                                                <div><label>Nº de Fogo (Opcional)</label><input maxLength={MAX.CURTO} onChange={e => setFormMov({ ...formMov, fogo: e.target.value })} style={{ ...inputStyle, borderColor: '#a0aec0' }} /></div>
                                             </div>
                                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10 }}>
-                                                <div><label>Marca (Opcional)</label><input placeholder="Ex: Michelin" onChange={e => setFormMov({ ...formMov, marca: e.target.value })} style={inputStyle} /></div>
-                                                <div><label>Medida</label><input required placeholder="Ex: 295/80" onChange={e => setFormMov({ ...formMov, medida: e.target.value })} style={inputStyle} /></div>
-                                                <div><label>Sulco Novo (Opcional)</label><input type="number" placeholder="Ex: 18.0" onChange={e => setFormMov({ ...formMov, sulco_novo: e.target.value })} style={inputStyle} /></div>
+                                                <div><label>Marca (Opcional)</label><input maxLength={MAX.CURTO} placeholder="Ex: Michelin" onChange={e => setFormMov({ ...formMov, marca: e.target.value })} style={inputStyle} /></div>
+                                                <div><label>Medida</label><input required maxLength={MAX.CURTO} placeholder="Ex: 295/80" onChange={e => setFormMov({ ...formMov, medida: e.target.value })} style={inputStyle} /></div>
+                                                <div><label>Sulco Novo (Opcional)</label><input type="number" min="0" max={SULCO_MAX} step="0.1" placeholder="Ex: 18.0" onChange={e => setFormMov({ ...formMov, sulco_novo: e.target.value })} style={inputStyle} /></div>
                                             </div>
                                         </div>
                                     ) : (
                                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
                                             <div>
                                                 <label>Número Serial</label>
-                                                <input required placeholder="S/N (Obrigatório)" value={formMov.serial || ''} onChange={e => setFormMov({ ...formMov, serial: e.target.value })} style={inputStyle} />
+                                                <input required maxLength={MAX.CURTO} placeholder="S/N (Obrigatório)" value={formMov.serial || ''} onChange={e => setFormMov({ ...formMov, serial: e.target.value })} style={inputStyle} />
                                                 {serialMovDuplicado && <span style={{ color: '#fc8181', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: 5, marginTop: 5 }}><AlertTriangle size={12} /> Serial já em uso!</span>}
                                             </div>
                                             <div>
                                                 <label>Nº Patrimônio</label>
-                                                <input placeholder="Opcional" value={formMov.patrimonio || ''} onChange={e => setFormMov({ ...formMov, patrimonio: e.target.value })} style={inputStyle} />
+                                                <input maxLength={MAX.CURTO} placeholder="Opcional" value={formMov.patrimonio || ''} onChange={e => setFormMov({ ...formMov, patrimonio: e.target.value })} style={inputStyle} />
                                                 {patriMovDuplicado && <span style={{ color: '#fc8181', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: 5, marginTop: 5 }}><AlertTriangle size={12} /> Patrimônio já em uso!</span>}
                                             </div>
                                             {erroMovimentacao && <div style={{ gridColumn: '1 / -1', color: '#fc8181', fontSize: '0.85rem' }}>{erroMovimentacao}</div>}
@@ -117,7 +118,7 @@ export default function ModalMovimentacao({
                     ) : (
                         <>
                             {/* SAÍDA */}
-                            <div><label>Qtd. a Retirar</label><input type="number" step="0.001" required placeholder="Ex: 2" onChange={e => setFormMov({ ...formMov, quantidade: e.target.value })} style={inputStyle} /></div>
+                            <div><label>Qtd. a Retirar</label><input type="number" min="0.001" step="0.001" required placeholder="Ex: 2" onChange={e => setFormMov({ ...formMov, quantidade: e.target.value })} style={inputStyle} /></div>
                             <div>
                                 <label>Centro de Custo / Base</label>
                                 <select required onChange={e => setFormMov({ ...formMov, base_id: e.target.value })} style={inputStyle}>
@@ -143,7 +144,7 @@ export default function ModalMovimentacao({
                             </div>
                         </>
                     )}
-                    <div><label>Observação (Obrigatória)</label><input required placeholder="Justificativa" onChange={e => setFormMov({ ...formMov, observacao: e.target.value })} style={inputStyle} /></div>
+                    <div><label>Observação (Obrigatória)</label><input required maxLength={MAX.LONGO} placeholder="Justificativa" onChange={e => setFormMov({ ...formMov, observacao: e.target.value })} style={inputStyle} /></div>
 
                     {/* AVISO DE GASTOS */}
                     {tipoMov === 'ENTRADA' && (

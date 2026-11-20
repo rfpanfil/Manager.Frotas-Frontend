@@ -2,6 +2,7 @@ import React from 'react';
 import Select from 'react-select';
 import { Save, Settings } from 'lucide-react';
 import { customSelectStyles, inputStyle } from '../../../utils/pneusUtils';
+import { MAX, PADRAO, DICA, SULCO_MAX, limitesDataEvento, mascaraDOT } from '../../../utils/campos';
 
 export default function ModalMontagemExpressa({
     modalExpresso,
@@ -21,14 +22,14 @@ export default function ModalMontagemExpressa({
                 <h3>Cadastrar e Montar Pneu {formExpresso.condicao}</h3>
                 <form onSubmit={handleMontagemExpressa} style={{ display: 'grid', gap: 10, marginTop: 15 }}>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 10 }}>
-                        <div><label>Data da Montagem*</label><input type="date" required value={formExpresso.data_montagem} onChange={e => setFormExpresso({ ...formExpresso, data_montagem: e.target.value })} style={inputStyle} /></div>
+                        <div><label>Data da Montagem*</label><input type="date" required {...limitesDataEvento()} value={formExpresso.data_montagem} onChange={e => setFormExpresso({ ...formExpresso, data_montagem: e.target.value })} style={inputStyle} /></div>
                     </div>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-                        <div><label>DOT*</label><input required value={formExpresso.dot} onChange={e => setFormExpresso({ ...formExpresso, dot: e.target.value })} style={inputStyle} /></div>
-                        <div><label>Fogo (Opcional)</label><input value={formExpresso.fogo} onChange={e => setFormExpresso({ ...formExpresso, fogo: e.target.value })} style={inputStyle} /></div>
+                        <div><label>DOT*</label><input required inputMode="numeric" pattern={PADRAO.DOT} title={DICA.DOT} value={formExpresso.dot} onChange={e => setFormExpresso({ ...formExpresso, dot: mascaraDOT(e.target.value) })} style={inputStyle} /></div>
+                        <div><label>Fogo (Opcional)</label><input maxLength={MAX.CURTO} value={formExpresso.fogo} onChange={e => setFormExpresso({ ...formExpresso, fogo: e.target.value })} style={inputStyle} /></div>
                     </div>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-                        <div><label>Marca (Opcional)</label><input value={formExpresso.marca} onChange={e => setFormExpresso({ ...formExpresso, marca: e.target.value })} style={inputStyle} /></div>
+                        <div><label>Marca (Opcional)</label><input maxLength={MAX.CURTO} value={formExpresso.marca} onChange={e => setFormExpresso({ ...formExpresso, marca: e.target.value })} style={inputStyle} /></div>
                         <div style={{ position: 'relative', zIndex: 100 }}>
                             <label>Medida*</label>
                             <div style={{ display: 'flex', gap: 5, marginTop: 5 }}>
@@ -40,7 +41,7 @@ export default function ModalMontagemExpressa({
                                         value={formExpresso.medida ? { value: formExpresso.medida, label: formExpresso.medida } : null}
                                         onChange={async (sel) => {
                                             if (sel?.value === 'NOVA') {
-                                                const nome = prompt("Digite a nova medida:");
+                                                const nome = (prompt("Digite a nova medida:") || '').trim().slice(0, MAX.CURTO);
                                                 if (nome) {
                                                     const criada = await handleNovaMedida(nome);
                                                     if (criada) setFormExpresso({ ...formExpresso, medida: criada.nome });
@@ -55,7 +56,7 @@ export default function ModalMontagemExpressa({
                             </div>
                         </div>
                     </div>
-                    <div><label>Sulco Novo (mm) (Opcional)</label><input type="number" value={formExpresso.sulco_novo} onChange={e => setFormExpresso({ ...formExpresso, sulco_novo: e.target.value })} style={inputStyle} /></div>
+                    <div><label>Sulco Novo (mm) (Opcional)</label><input type="number" min="0" max={SULCO_MAX} step="0.1" value={formExpresso.sulco_novo} onChange={e => setFormExpresso({ ...formExpresso, sulco_novo: e.target.value })} style={inputStyle} /></div>
                     <div style={{ background: 'rgba(255,255,255,0.05)', padding: 10, borderRadius: 5, fontSize: '0.85rem', color: '#a0aec0' }}>
                         A vida útil esperada configurada para este pneu será de <strong>{formExpresso.vida_util_km.toLocaleString()} km</strong>.
                     </div>

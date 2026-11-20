@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import useCan from '../../hooks/useCan';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import api, { mensagemDeErro } from '../../services/api';
+import { MAX, QTD_ITEM_CHECKLIST_MAX } from '../../utils/campos';
 import { useAuth } from '../../contexts/AuthContext';
 import { Settings, CheckCircle, AlertCircle, Camera, Eye, Trash2, X, Save, FileText, Clock, Plus, Shield, Edit } from 'lucide-react';
 import Select from 'react-select';
@@ -207,7 +208,7 @@ export default function TabChecklistColab() {
             else await api.post('/checklists-colab/definicoes', formItem);
             setEditingItem(null); setFormItem({ nome_item: '', categoria: 'EPI', quantidade_padrao: 1, ativo: true });
             const res = await api.get('/checklists-colab/definicoes'); queryClient.invalidateQueries({ queryKey: ['checklistsColabDefinicoes'] });
-        } catch (e) { toast.error("Erro"); }
+        } catch (e) { toast.error(mensagemDeErro(e, "Erro ao salvar o item.")); }
     }
     async function handleDeleteItem(id) {
         if (confirm("Excluir item?")) { await api.delete(`/checklists-colab/definicoes/${id}`); queryClient.invalidateQueries({ queryKey: ['checklistsColabDefinicoes'] }); }
@@ -219,7 +220,7 @@ export default function TabChecklistColab() {
             await api.post('/checklists-colab/config', formCargo);
             setFormCargo({ cargo_alvo: '', exige_foto: true });
             carregarTudo(); // Recarrega os configs e a dashboard
-        } catch (e) { toast.error("Erro"); }
+        } catch (e) { toast.error(mensagemDeErro(e, "Erro ao salvar a configuração.")); }
     }
     async function handleDeleteCargo(id) {
         if (confirm("Parar de exigir checklist para este cargo?")) {
@@ -331,7 +332,7 @@ export default function TabChecklistColab() {
                                                 </select>
 
                                                 {/* ÁREA OBSERVAÇÃO */}
-                                                <input className="chk-area-obs" disabled={isReadOnly} type="text" placeholder="Observações" value={dados.observacao} onChange={e => handleRespostaChange(chave, 'observacao', e.target.value)} style={{ width: '100%', padding: 8, borderRadius: 4, background: '#1a202c', border: '1px solid #444', color: 'white', boxSizing: 'border-box' }} />
+                                                <input className="chk-area-obs" disabled={isReadOnly} type="text" maxLength={MAX.MEDIO} placeholder="Observações" value={dados.observacao} onChange={e => handleRespostaChange(chave, 'observacao', e.target.value)} style={{ width: '100%', padding: 8, borderRadius: 4, background: '#1a202c', border: '1px solid #444', color: 'white', boxSizing: 'border-box' }} />
 
                                                 {/* ÁREA FOTO */}
                                                 <div className="chk-area-foto" style={{ display: 'flex', alignItems: 'center', gap: 10 , flexWrap: "wrap"}}>
@@ -452,6 +453,7 @@ export default function TabChecklistColab() {
                                     <label style={{ fontSize: '0.75rem', color: '#a0aec0', marginBottom: 2 }}>Nome do Item</label>
                                     <input
                                         required
+                                        maxLength={MAX.NOME}
                                         value={formItem.nome_item}
                                         onChange={e => setFormItem({ ...formItem, nome_item: e.target.value })}
                                         placeholder="Ex: Bota de Segurança"
@@ -466,9 +468,12 @@ export default function TabChecklistColab() {
                                         value={formItem.categoria}
                                         onChange={e => {
                                             if (e.target.value === 'ADD_NEW') {
-                                                const novaCategoria = prompt("Digite o nome da nova categoria:");
-                                                if (novaCategoria && novaCategoria.trim() !== '') {
-                                                    setFormItem({ ...formItem, categoria: novaCategoria.trim() });
+                                                const novaCategoria = (prompt("Digite o nome da nova categoria:") || '').trim();
+                                                if (novaCategoria.length > MAX.CURTO) {
+                                                    toast.error(`A categoria pode ter no máximo ${MAX.CURTO} caracteres.`);
+                                                    setFormItem({ ...formItem, categoria: '' });
+                                                } else if (novaCategoria) {
+                                                    setFormItem({ ...formItem, categoria: novaCategoria });
                                                 } else {
                                                     setFormItem({ ...formItem, categoria: '' });
                                                 }
@@ -491,6 +496,8 @@ export default function TabChecklistColab() {
                                     <input
                                         type="number"
                                         min="1"
+                                        max={QTD_ITEM_CHECKLIST_MAX}
+                                        step="1"
                                         required
                                         value={formItem.quantidade_padrao}
                                         onChange={e => setFormItem({ ...formItem, quantidade_padrao: e.target.value })}

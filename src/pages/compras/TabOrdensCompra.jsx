@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '../../contexts/AuthContext';
 import api, { mensagemDeErro } from '../../services/api';
+import { MAX } from '../../utils/campos';
 import toast from 'react-hot-toast';
 
 import FiltrosOrdensCompra from '../../components/compras/FiltrosOrdensCompra';
@@ -199,17 +200,18 @@ export default function TabOrdensCompra({ orcAprovado, clearOrcAprovado }) {
             queryClient.invalidateQueries({ queryKey: ['itensEstoque'] });
             setModalNovoItemEstoque(false);
             setItemAtual({ ...itemAtual, classificacao: 'PRODUTO', estoque_item_id: res.data.id });
-        } catch (e) { toast.error("Erro."); }
+        } catch (e) { toast.error(mensagemDeErro(e, "Erro ao criar item.")); }
     }
 
     async function handleCriarNovoServico() {
-        const nome = prompt("Descreva o novo Serviço Padrão:");
+        const nome = (prompt("Descreva o novo Serviço Padrão:") || '').trim();
+        if (nome.length > MAX.NOME) return toast.error(`O nome do serviço pode ter no máximo ${MAX.NOME} caracteres.`);
         if (nome) {
             try {
                 const res = await api.post('/compras/servicos', { nome });
                 queryClient.invalidateQueries({ queryKey: ['servicosPadroes'] });
                 setItemAtual({ ...itemAtual, classificacao: 'SERVICO', nome_novo_item: res.data.nome });
-            } catch (e) { toast.error("Erro ao criar serviço. Talvez já exista."); }
+            } catch (e) { toast.error(mensagemDeErro(e, "Erro ao criar serviço. Talvez já exista.")); }
         }
     }
 
@@ -245,7 +247,7 @@ export default function TabOrdensCompra({ orcAprovado, clearOrcAprovado }) {
             toast.success("Recebimento Concluído! O estoque e o financeiro foram atualizados.");
             setModalBaixa(false);
             queryClient.invalidateQueries({ queryKey: ['ocs'] });
-        } catch (error) { toast.error("Erro no recebimento: " + (error.response?.data?.detail || error.message)); }
+        } catch (error) { toast.error("Erro no recebimento: " + mensagemDeErro(error, error.message)); }
     }
 
     function atualizarDetalheBaixa(idxGeral, campo, valor) {

@@ -1,6 +1,7 @@
 import useCan from '../../hooks/useCan';
 import { X, FileText, Package, PlusCircle, ShoppingCart, Trash2, CheckCircle } from 'lucide-react';
 import Select from 'react-select';
+import { MAX, FORMAS_PAGAMENTO, KM_MAX, LITROS_MAX, limitesDataPrazo } from '../../utils/campos';
 
 const customSelectStyles = {
     control: (base, state) => ({ ...base, backgroundColor: '#2d3748', borderColor: '#4a5568', color: 'white', minHeight: '40px', boxShadow: state.isFocused ? '0 0 0 1px #8B5CF6' : 'none', '&:hover': { borderColor: '#8B5CF6' } }),
@@ -51,11 +52,11 @@ export default function ModalNovaOCManual({
                         <h3 style={{ marginTop: 0, color: '#8B5CF6', marginBottom: 15 }}><FileText size={20} style={{ display: 'inline', marginRight: 5 }} /> 1. Fornecedor e Prazos</h3>
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 15, marginBottom: 15 }}>
                             <div><label style={{ display: 'block', marginBottom: 5 }}>Fornecedor *</label><select required value={formCapa.fornecedor_id} onChange={e => setFormCapa({ ...formCapa, fornecedor_id: e.target.value })} style={inputStyle}><option value="">Selecione...</option>{fornecedores.map(f => <option key={f.id} value={f.id}>{f.razao_social}</option>)}</select></div>
-                            <div><label style={{ display: 'block', marginBottom: 5 }}>Condição de Pagamento</label><input placeholder="Boleto, Pix, etc" value={formCapa.tipo_pagamento} onChange={e => setFormCapa({ ...formCapa, tipo_pagamento: e.target.value })} style={inputStyle} /></div>
+                            <div><label style={{ display: 'block', marginBottom: 5 }}>Condição de Pagamento</label><select value={formCapa.tipo_pagamento || ''} onChange={e => setFormCapa({ ...formCapa, tipo_pagamento: e.target.value })} style={inputStyle}><option value="">Selecione...</option>{FORMAS_PAGAMENTO.map(f => <option key={f} value={f}>{f}</option>)}</select></div>
                         </div>
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 15 }}>
-                            <div><label style={{ display: 'block', marginBottom: 5 }}>Vencimento do Pagamento</label><input type="date" value={formCapa.prazo_pagamento} onChange={e => setFormCapa({ ...formCapa, prazo_pagamento: e.target.value })} style={inputStyle} /></div>
-                            <div><label style={{ display: 'block', marginBottom: 5 }}>Prazo de Entrega</label><input type="date" value={formCapa.prazo_entrega} onChange={e => setFormCapa({ ...formCapa, prazo_entrega: e.target.value })} style={inputStyle} /></div>
+                            <div><label style={{ display: 'block', marginBottom: 5 }}>Vencimento do Pagamento</label><input type="date" {...limitesDataPrazo()} value={formCapa.prazo_pagamento} onChange={e => setFormCapa({ ...formCapa, prazo_pagamento: e.target.value })} style={inputStyle} /></div>
+                            <div><label style={{ display: 'block', marginBottom: 5 }}>Prazo de Entrega</label><input type="date" {...limitesDataPrazo()} value={formCapa.prazo_entrega} onChange={e => setFormCapa({ ...formCapa, prazo_entrega: e.target.value })} style={inputStyle} /></div>
                         </div>
                     </div>
 
@@ -88,8 +89,8 @@ export default function ModalNovaOCManual({
                                     </>
                                 )}
                             </div>
-                            <div style={{ width: '100px' }}><label style={{ display: 'block', marginBottom: 5 }}>Qtd.</label><input type="number" min="0" step={opcoesEstoque.find(o => o.value === itemAtual.estoque_item_id)?.tipo_controle === 'SERIALIZADO' ? '1' : '0.001'} value={itemAtual.quantidade} onChange={e => setItemAtual({ ...itemAtual, quantidade: e.target.value })} style={inputStyle} placeholder="Ex: 4" /></div>
-                            <div style={{ width: '120px' }}><label style={{ display: 'block', marginBottom: 5 }}>V. Unit (R$)</label><input type="number" step="0.0001" value={itemAtual.valor_unitario} onChange={e => setItemAtual({ ...itemAtual, valor_unitario: e.target.value })} style={inputStyle} placeholder="0.00" /></div>
+                            <div style={{ width: '100px' }}><label style={{ display: 'block', marginBottom: 5 }}>Qtd.</label><input type="number" min={opcoesEstoque.find(o => o.value === itemAtual.estoque_item_id)?.tipo_controle === 'SERIALIZADO' ? '1' : '0.001'} step={opcoesEstoque.find(o => o.value === itemAtual.estoque_item_id)?.tipo_controle === 'SERIALIZADO' ? '1' : '0.001'} value={itemAtual.quantidade} onChange={e => setItemAtual({ ...itemAtual, quantidade: e.target.value })} style={inputStyle} placeholder="Ex: 4" /></div>
+                            <div style={{ width: '120px' }}><label style={{ display: 'block', marginBottom: 5 }}>V. Unit (R$)</label><input type="number" min="0" step="0.0001" value={itemAtual.valor_unitario} onChange={e => setItemAtual({ ...itemAtual, valor_unitario: e.target.value })} style={inputStyle} placeholder="0.00" /></div>
                             <div><button type="button" onClick={adicionarItemOC} style={{ height: '42px', padding: '0 20px', background: '#3182ce', color: 'white', border: 'none', borderRadius: 5, cursor: 'pointer', fontWeight: 'bold' }}><PlusCircle size={18} style={{ display: 'inline' }} /> Inserir</button></div>
                         </div>
                     </div>
@@ -131,8 +132,8 @@ export default function ModalNovaOCManual({
 
                                         {regrasManual.isCombustivel && (
                                             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 10 }}>
-                                                <div><label style={{ display: 'block', marginBottom: 5 }}>Litros Abastecidos *</label><input required type="number" step="0.001" value={formCapa.litros} onChange={e => setFormCapa({ ...formCapa, litros: e.target.value })} style={inputStyle} /></div>
-                                                <div><label style={{ display: 'block', marginBottom: 5 }}>KM Atual *</label><input required type="number" value={formCapa.km_atual} onChange={e => setFormCapa({ ...formCapa, km_atual: e.target.value })} style={inputStyle} /></div>
+                                                <div><label style={{ display: 'block', marginBottom: 5 }}>Litros Abastecidos *</label><input required type="number" min="0.001" max={LITROS_MAX} step="0.001" value={formCapa.litros} onChange={e => setFormCapa({ ...formCapa, litros: e.target.value })} style={inputStyle} /></div>
+                                                <div><label style={{ display: 'block', marginBottom: 5 }}>KM Atual *</label><input required type="number" min="0" max={KM_MAX} step="1" value={formCapa.km_atual} onChange={e => setFormCapa({ ...formCapa, km_atual: e.target.value })} style={inputStyle} /></div>
                                             </div>
                                         )}
                                     </div>
@@ -144,14 +145,14 @@ export default function ModalNovaOCManual({
                             <h4 style={{ margin: '0 0 10px 0', color: '#8B5CF6' }}>Dados de Faturamento e Negociação</h4>
                             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 15 }}>
                                 <div><label style={{ display: 'block', marginBottom: 5 }}>Centro Custo (Base)*</label><select required value={formCapa.centro_custo_id} onChange={e => setFormCapa({ ...formCapa, centro_custo_id: e.target.value })} style={inputStyle}><option value="">Selecione...</option>{bases.map(b => <option key={b.id} value={b.id}>{b.nome}</option>)}</select></div>
-                                <div><label style={{ display: 'block', marginBottom: 5 }}>Frete Total (R$)</label><input type="number" step="0.01" value={formCapa.frete} onChange={e => setFormCapa({ ...formCapa, frete: e.target.value })} style={inputStyle} placeholder="0.00" /></div>
-                                <div><label style={{ display: 'block', marginBottom: 5 }}>Desconto Geral (R$)</label><input type="number" step="0.01" value={formCapa.desconto} onChange={e => setFormCapa({ ...formCapa, desconto: e.target.value })} style={inputStyle} placeholder="0.00" /></div>
+                                <div><label style={{ display: 'block', marginBottom: 5 }}>Frete Total (R$)</label><input type="number" min="0" step="0.01" value={formCapa.frete} onChange={e => setFormCapa({ ...formCapa, frete: e.target.value })} style={inputStyle} placeholder="0.00" /></div>
+                                <div><label style={{ display: 'block', marginBottom: 5 }}>Desconto Geral (R$)</label><input type="number" min="0" step="0.01" value={formCapa.desconto} onChange={e => setFormCapa({ ...formCapa, desconto: e.target.value })} style={inputStyle} placeholder="0.00" /></div>
                             </div>
                         </div>
 
                         <div style={{ marginTop: 15 }}>
                             <label style={{ display: 'block', marginBottom: 5, color: '#63b3ed' }}>Observações / Detalhes Adicionais da OC</label>
-                            <textarea rows="2" value={formCapa.observacoes} onChange={e => setFormCapa({ ...formCapa, observacoes: e.target.value })} style={inputStyle} placeholder="Escreva aqui se houver mais detalhes..." />
+                            <textarea rows="2" maxLength={MAX.LONGO} value={formCapa.observacoes} onChange={e => setFormCapa({ ...formCapa, observacoes: e.target.value })} style={inputStyle} placeholder="Escreva aqui se houver mais detalhes..." />
                         </div>
                     </div>
 

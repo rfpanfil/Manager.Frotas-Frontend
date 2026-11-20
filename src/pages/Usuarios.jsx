@@ -3,7 +3,8 @@ import usePersistedTab from '../hooks/usePersistedTab';
 // Arquivo: frontend/src/pages/Usuarios.jsx
 import { useState, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import api from '../services/api';
+import api, { mensagemDeErro } from '../services/api';
+import { MAX, PADRAO, DICA, CATEGORIAS_CNH, limitesDataPrazo, mascaraCPF, mascaraTelefone } from '../utils/campos';
 import { useAuth } from '../contexts/AuthContext';
 import { Users, PlusCircle, Trash2, Edit, Shield, ShieldAlert, User, ChevronDown, ChevronRight, Briefcase, Truck } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -134,16 +135,14 @@ export default function Usuarios() {
       handleCancel();
       queryClient.invalidateQueries({ queryKey: ['usuarios'] });
     } catch (error) {
-      let msg = error.response?.data?.detail || error.message;
-      if (Array.isArray(msg)) msg = msg.map(d => d.msg).join('\n');
-      toast.error("Erro: " + msg);
+      toast.error("Erro: " + mensagemDeErro(error, error.message));
     }
   }
 
   async function handleDelete(id) {
     if (!window.confirm("Excluir usuário?")) return;
     try { await api.delete(`/usuarios/${id}`); queryClient.invalidateQueries({ queryKey: ['usuarios'] }); }
-    catch (error) { toast.error("Erro ao excluir."); }
+    catch (error) { toast.error(mensagemDeErro(error, "Erro ao excluir.")); }
   }
 
   function getCargoIcon(cargo) {
@@ -178,14 +177,14 @@ export default function Usuarios() {
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexWrap: 'wrap', gap: '15px' }}>
           {/* DADOS DE LOGIN */}
           <div style={{ width: '100%', display: 'flex', flexWrap: 'wrap', gap: '15px' }}>
-            <div className="input-group" style={{ flex: 1, minWidth: '200px' }}><label>Nome Completo</label><input name="nome" value={formData.nome} onChange={handleChange} required /></div>
-            <div className="input-group" style={{ flex: 1, minWidth: '150px' }}><label>Login</label><input name="login" value={formData.login} onChange={handleChange} required disabled={!!formData.id && !isAdmin} /></div>
-            <div className="input-group" style={{ flex: 1, minWidth: '150px' }}><label>Senha</label><input type="password" name="senha" value={formData.senha} onChange={handleChange} placeholder={formData.id ? "********" : "Obrigatória"} /></div>
+            <div className="input-group" style={{ flex: 1, minWidth: '200px' }}><label>Nome Completo</label><input name="nome" maxLength={MAX.NOME} value={formData.nome} onChange={handleChange} required /></div>
+            <div className="input-group" style={{ flex: 1, minWidth: '150px' }}><label>Login</label><input name="login" maxLength={MAX.NOME} autoComplete="username" value={formData.login} onChange={handleChange} required disabled={!!formData.id && !isAdmin} /></div>
+            <div className="input-group" style={{ flex: 1, minWidth: '150px' }}><label>Senha</label><input type="password" name="senha" autoComplete="new-password" required={!formData.id} pattern={PADRAO.SENHA} title={DICA.SENHA} maxLength={72} value={formData.senha} onChange={handleChange} placeholder={formData.id ? "********" : "Mín. 8, com letra e número"} /></div>
           </div>
 
           <div style={{ width: '100%', display: 'flex', flexWrap: 'wrap', gap: '15px' }}>
-            <div className="input-group" style={{ flex: 1, minWidth: '150px' }}><label>Celular</label><input name="celular" value={formData.celular} onChange={handleChange} placeholder="(00) 00000-0000" required /></div>
-            <div className="input-group" style={{ flex: 1, minWidth: '200px' }}><label>E-mail</label><input type="email" name="email" value={formData.email} onChange={handleChange} /></div>
+            <div className="input-group" style={{ flex: 1, minWidth: '150px' }}><label>Celular</label><input name="celular" type="tel" inputMode="tel" pattern={PADRAO.TELEFONE} title={DICA.TELEFONE} value={formData.celular || ''} onChange={e => setFormData({ ...formData, celular: mascaraTelefone(e.target.value) })} placeholder="(00) 00000-0000" required /></div>
+            <div className="input-group" style={{ flex: 1, minWidth: '200px' }}><label>E-mail</label><input type="email" name="email" maxLength={254} value={formData.email || ''} onChange={handleChange} /></div>
             <div className="input-group" style={{ flex: 1, minWidth: '200px' }}>
               <label>Cargo</label>
               <select name="cargo" value={formData.cargo} onChange={handleCargoChange} disabled={!isAdmin || editandoASiMesmo}>
@@ -203,14 +202,14 @@ export default function Usuarios() {
                 <Briefcase size={18} /> DADOS OPERACIONAIS (Ficha de Colaborador Gerada Automaticamente)
               </div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '15px' }}>
-                <div className="input-group" style={{ flex: 1 }}><label>CPF <span style={{ color: 'red' }}>*</span></label><input name="cpf" value={formData.cpf} onChange={handleChange} required placeholder="000.000.000-00" /></div>
+                <div className="input-group" style={{ flex: 1 }}><label>CPF <span style={{ color: 'red' }}>*</span></label><input name="cpf" inputMode="numeric" pattern={PADRAO.CPF} title={DICA.CPF} value={formData.cpf || ''} onChange={e => setFormData({ ...formData, cpf: mascaraCPF(e.target.value) })} required placeholder="000.000.000-00" /></div>
                 <div className="input-group" style={{ flex: 1 }}>
                   <label>Categoria CNH (Opcional)</label>
                   <select name="tipo_cnh" value={formData.tipo_cnh} onChange={handleChange}>
-                    <option value="">Nenhuma / N/A</option><option>A</option><option>B</option><option>C</option><option>D</option><option>E</option><option>AB</option><option>AD</option><option>AE</option>
+                    <option value="">Nenhuma / N/A</option>{CATEGORIAS_CNH.map(c => <option key={c} value={c}>{c}</option>)}
                   </select>
                 </div>
-                <div className="input-group" style={{ flex: 1 }}><label>Validade CNH</label><input type="date" name="vencimento_cnh" value={formData.vencimento_cnh} onChange={handleChange} /></div>
+                <div className="input-group" style={{ flex: 1 }}><label>Validade CNH</label><input type="date" name="vencimento_cnh" {...limitesDataPrazo()} value={formData.vencimento_cnh || ''} onChange={handleChange} /></div>
                 <div className="input-group" style={{ flex: 1 }}>
                   <label>Base</label>
                   <select name="base" value={formData.base} onChange={handleChange}>
